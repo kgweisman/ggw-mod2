@@ -6,6 +6,7 @@ library(ggplot2)
 library(devtools)
 library(stats)
 library(directlabels)
+library(tabular)
 
 # clear workspace
 rm(list = ls(all = T))
@@ -98,7 +99,8 @@ d_clean <- d_clean_1 %>%
 # examine demographic variables -----------------------------------------------
 
 # sample size
-sample_size <- with(d_clean, table(condition)) %>% addmargins(); sample_size
+sample_size <- with(d_clean, table(condition))
+kable(d_clean %>% count(condition))
 
 # approxiate age
 age_approx <- d_clean %>%
@@ -108,19 +110,21 @@ age_approx <- d_clean %>%
             median_age = median(age_approx, na.rm = T),
             mean_age = mean(age_approx, na.rm = T),
             sd_age = sd(age_approx, na.rm = T))
-age_approx
 t.test(age_approx ~ condition, data = d_clean) # test for differences in age across conditions
 
 # gender
-gender <- with(d_clean, table(condition, gender)); addmargins(gender)
+gender <- with(d_clean, table(condition, gender))
+kable(addmargins(gender))
 summary(gender) # test for difference in gender distribution across conditions
 
 # racial/ethnic background
-race_ethn <- with(d_clean, table(condition, race_cat)); addmargins(race_ethn) 
+race_ethn <- with(d_clean, table(condition, race_cat))
+kable(addmargins(race_ethn))
 summary(race_ethn) # test for difference in race/ethnicity distribution across conditions
 
 # religious background
-religion <- with(d_clean, table(condition, religion_cat)); addmargins(religion) 
+religion <- with(d_clean, table(condition, religion_cat))
+kable(addmargins(religion))
 summary(religion) # test for difference in religion distribution across conditions
 
 # prepare datasets for PCA ----------------------------------------------------
