@@ -150,7 +150,8 @@ pca_robot_varimax_pc2 <- pca_robot_varimax_loadings %>%
 pca_robot_varimax_pc3 <- pca_robot_varimax_loadings %>%
   mutate(mc = mc_robot) %>%
   arrange(desc(PC3)) %>%
-  select(PC3, mc, mc_cat); pca_robot_varimax_pc3
+  select(PC3, mc, mc_cat)
+pca_robot_varimax_pc3
 
 # PCA: BEETLE condition -------------------------------------------------------
 
@@ -223,19 +224,22 @@ mc_beetle = rownames(pca_beetle_varimax_loadings)
 pca_beetle_varimax_pc1 <- pca_beetle_varimax_loadings %>%
   mutate(mc = mc_beetle) %>%
   arrange(desc(PC1)) %>%
-  select(PC1, mc, mc_cat); pca_beetle_varimax_pc1
+  select(PC1, mc, mc_cat)
+pca_beetle_varimax_pc1
 
 # ... for PC2
 pca_beetle_varimax_pc2 <- pca_beetle_varimax_loadings %>%
   mutate(mc = mc_beetle) %>%
   arrange(desc(PC2)) %>%
-  select(PC2, mc, mc_cat); pca_beetle_varimax_pc2
+  select(PC2, mc, mc_cat)
+pca_beetle_varimax_pc2
 
 # ... for PC3
 pca_beetle_varimax_pc3 <- pca_beetle_varimax_loadings %>%
   mutate(mc = mc_beetle) %>%
   arrange(desc(PC3)) %>%
-  select(PC3, mc, mc_cat); pca_beetle_varimax_pc3
+  select(PC3, mc, mc_cat)
+pca_beetle_varimax_pc3
 
 # normality tests: both conditions --------------------------------------------
 
