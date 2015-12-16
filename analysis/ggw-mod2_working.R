@@ -5,8 +5,7 @@ library(psych)
 library(ggplot2)
 library(devtools)
 library(stats)
-library(directlabels)
-library(tabular)
+library(knitr)
 
 # clear workspace
 rm(list = ls(all = T))
