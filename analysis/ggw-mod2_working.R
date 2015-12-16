@@ -18,8 +18,11 @@ d_raw <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mo
 # clean up dataset ------------------------------------------------------------
 
 d_clean <- d_raw %>%
+  mutate(finished_mod = ifelse(is.na(CATCH), 0,
+                               ifelse(finished == 1, 1,
+                                      0.5))) %>%
   filter(CATCH == 1, # exclude participants who fail catch trials 
-         finished != 0) %>% # exclude participants who did not complete task
+         finished_mod != 0) %>% # exclude participants who did not complete task
   mutate(yob_correct = as.numeric(
     ifelse(as.numeric(as.character(yob)) > 1900 & 
              as.numeric(as.character(yob)) < 2000, 
