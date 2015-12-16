@@ -322,7 +322,7 @@ p.adjust(as.matrix(attr(ks_beetle, "p.value")), method = "holm") # auto false di
 
 # EXPLORATORY: look at response distributions across mental capacities ------
 
-d_merge <- d_clean %>%
+d_long <- d_clean %>%
   gather(mc, rating, happy:pride) %>%
   mutate(mc_cat = 
            factor(
@@ -357,7 +357,7 @@ d_merge <- d_clean %>%
                                                        "social",
                                                        "other"))))))))
 
-dist_plot_affective <- ggplot(d_merge %>% filter(mc_cat == "affective"), 
+dist_plot_affective <- ggplot(d_long %>% filter(mc_cat == "affective"), 
                               aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
@@ -366,7 +366,7 @@ dist_plot_affective <- ggplot(d_merge %>% filter(mc_cat == "affective"),
   scale_x_continuous(breaks = -3:3)
 dist_plot_affective
 
-dist_plot_perceptual <- ggplot(d_merge %>% filter(mc_cat == "perceptual"),
+dist_plot_perceptual <- ggplot(d_long %>% filter(mc_cat == "perceptual"),
                                aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
@@ -375,7 +375,7 @@ dist_plot_perceptual <- ggplot(d_merge %>% filter(mc_cat == "perceptual"),
   scale_x_continuous(breaks = -3:3)
 dist_plot_perceptual
 
-dist_plot_autonomous <- ggplot(d_merge %>% filter(mc_cat == "autonomous"), 
+dist_plot_autonomous <- ggplot(d_long %>% filter(mc_cat == "autonomous"), 
                                aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
@@ -384,7 +384,7 @@ dist_plot_autonomous <- ggplot(d_merge %>% filter(mc_cat == "autonomous"),
   scale_x_continuous(breaks = -3:3)
 dist_plot_autonomous
 
-dist_plot_biological <- ggplot(d_merge %>% filter(mc_cat == "biological"), 
+dist_plot_biological <- ggplot(d_long %>% filter(mc_cat == "biological"), 
                                aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
@@ -393,7 +393,7 @@ dist_plot_biological <- ggplot(d_merge %>% filter(mc_cat == "biological"),
   scale_x_continuous(breaks = -3:3)
 dist_plot_biological
 
-dist_plot_cognitive <- ggplot(d_merge %>% filter(mc_cat == "cognitive"), 
+dist_plot_cognitive <- ggplot(d_long %>% filter(mc_cat == "cognitive"), 
                               aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
@@ -402,7 +402,7 @@ dist_plot_cognitive <- ggplot(d_merge %>% filter(mc_cat == "cognitive"),
   scale_x_continuous(breaks = -3:3)
 dist_plot_cognitive
 
-dist_plot_social <- ggplot(d_merge %>% filter(mc_cat == "social"), 
+dist_plot_social <- ggplot(d_long %>% filter(mc_cat == "social"), 
                            aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
@@ -411,7 +411,7 @@ dist_plot_social <- ggplot(d_merge %>% filter(mc_cat == "social"),
   scale_x_continuous(breaks = -3:3)
 dist_plot_social
 
-dist_plot_other <- ggplot(d_merge %>% filter(mc_cat == "other"), 
+dist_plot_other <- ggplot(d_long %>% filter(mc_cat == "other"), 
                           aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
@@ -419,3 +419,44 @@ dist_plot_other <- ggplot(d_merge %>% filter(mc_cat == "other"),
   theme(text = element_text(size = 12)) +
   scale_x_continuous(breaks = -3:3)
 dist_plot_other
+
+# EXPLORATORY: generate "scores" on dimensions for each target? -------------
+
+# summarize ratings by condition and mc
+rating_sum <- d_long %>%
+  group_by(condition, mc) %>%
+  summarise(min = min(rating),
+            max = max(rating),
+            median = median(rating),
+            mean = mean(rating),
+            sd = sd(rating))
+rating_sum
+
+# extract factor loadings
+robot_PC <- cbind(mc = rownames(pca_robot_varimax_loadings),
+                  pca_robot_varimax_loadings) %>%
+  mutate(condition = "robot")
+beetle_PC <- cbind(mc = rownames(pca_beetle_varimax_loadings),
+                  pca_beetle_varimax_loadings) %>%
+  mutate(condition = "beetle")
+
+# combine!
+d_scoring_robot <- robot_PC %>%
+  full_join(rating_sum %>% filter(condition == "robot"))
+d_scoring_beetle <- beetle_PC %>%
+  full_join(rating_sum %>% filter(condition == "beetle"))
+d_scoring_pre <- rbind(d_scoring_robot, d_scoring_beetle) %>%
+  mutate(mc = factor(mc),
+         condition = factor(condition))
+
+# score!
+d_scored <- d_scoring_pre %>%
+  mutate(PC1_score = PC1 * mean,
+         PC2_score = PC2 * mean,
+         PC3_score = PC3 * mean) %>%
+  group_by(condition) %>%
+  summarise(PC1_sum = sum(PC1_score),
+            PC2_sum = sum(PC2_score),
+            PC3_sum = sum(PC3_score)) %>%
+  data.frame()
+d_scored
