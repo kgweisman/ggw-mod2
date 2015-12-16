@@ -138,13 +138,15 @@ mc_robot = rownames(pca_robot_varimax_loadings)
 pca_robot_varimax_pc1 <- pca_robot_varimax_loadings %>%
   mutate(mc = mc_robot) %>%
   arrange(desc(PC1)) %>%
-  select(PC1, mc, mc_cat); pca_robot_varimax_pc1
+  select(PC1, mc, mc_cat)
+pca_robot_varimax_pc1
 
 # ... for PC2
 pca_robot_varimax_pc2 <- pca_robot_varimax_loadings %>%
   mutate(mc = mc_robot) %>%
   arrange(desc(PC2)) %>%
-  select(PC2, mc, mc_cat); pca_robot_varimax_pc2
+  select(PC2, mc, mc_cat)
+pca_robot_varimax_pc2
 
 # ... for PC3
 pca_robot_varimax_pc3 <- pca_robot_varimax_loadings %>%
@@ -355,51 +357,65 @@ d_merge <- d_clean %>%
                                                        "social",
                                                        "other"))))))))
 
-ggplot(d_merge %>% filter(mc_cat == "affective"), aes(x = rating)) +
+dist_plot_affective <- ggplot(d_merge %>% filter(mc_cat == "affective"), 
+                              aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
   theme_bw() +
   theme(text = element_text(size = 12)) +
   scale_x_continuous(breaks = -3:3)
+dist_plot_affective
 
-ggplot(d_merge %>% filter(mc_cat == "perceptual"), aes(x = rating)) +
+dist_plot_perceptual <- ggplot(d_merge %>% filter(mc_cat == "perceptual"),
+                               aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
   theme_bw() +
   theme(text = element_text(size = 12)) +
   scale_x_continuous(breaks = -3:3)
+dist_plot_perceptual
 
-ggplot(d_merge %>% filter(mc_cat == "autonomous"), aes(x = rating)) +
+dist_plot_autonomous <- ggplot(d_merge %>% filter(mc_cat == "autonomous"), 
+                               aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
   theme_bw() +
   theme(text = element_text(size = 12)) +
   scale_x_continuous(breaks = -3:3)
+dist_plot_autonomous
 
-ggplot(d_merge %>% filter(mc_cat == "biological"), aes(x = rating)) +
+dist_plot_biological <- ggplot(d_merge %>% filter(mc_cat == "biological"), 
+                               aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
   theme_bw() +
   theme(text = element_text(size = 12)) +
   scale_x_continuous(breaks = -3:3)
+dist_plot_biological
 
-ggplot(d_merge %>% filter(mc_cat == "cognitive"), aes(x = rating)) +
+dist_plot_cognitive <- ggplot(d_merge %>% filter(mc_cat == "cognitive"), 
+                              aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
   theme_bw() +
   theme(text = element_text(size = 12)) +
   scale_x_continuous(breaks = -3:3)
+dist_plot_cognitive
 
-ggplot(d_merge %>% filter(mc_cat == "social"), aes(x = rating)) +
+dist_plot_social <- ggplot(d_merge %>% filter(mc_cat == "social"), 
+                           aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
   theme_bw() +
   theme(text = element_text(size = 12)) +
   scale_x_continuous(breaks = -3:3)
+dist_plot_social
 
-ggplot(d_merge %>% filter(mc_cat == "other"), aes(x = rating)) +
+dist_plot_other <- ggplot(d_merge %>% filter(mc_cat == "other"), 
+                          aes(x = rating)) +
   facet_grid(mc ~ condition) +
   geom_histogram() +
   theme_bw() +
   theme(text = element_text(size = 12)) +
   scale_x_continuous(breaks = -3:3)
+dist_plot_other
