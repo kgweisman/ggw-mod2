@@ -17,7 +17,7 @@ d_raw <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mo
 
 # clean up dataset ------------------------------------------------------------
 
-d_clean <- d_raw %>%
+d_clean_1 <- d_raw %>%
   mutate(finished_mod = ifelse(is.na(CATCH), 0,
                                ifelse(finished == 1, 1,
                                       0.5))) %>%
@@ -30,6 +30,70 @@ d_clean <- d_raw %>%
          age_approx = 2015 - yob_correct) %>% # calculate approximate age
   mutate(gender = factor(gender, levels = c(1, 2, 0), labels = c("m", "f", "other"))) %>%
   filter(age_approx >= 18) # exclude participants who are younger than 18 years old
+
+# recode demographic variables
+d_clean <- d_clean_1 %>%
+  mutate( # deal with race
+    race_asian_east = 
+      factor(ifelse(is.na(race_asian_east), "", "asian_east ")),
+    race_asian_south = 
+      factor(ifelse(is.na(race_asian_south), "", "asian_south ")),
+    race_asian_other = 
+      factor(ifelse(is.na(race_asian_other), "", "asian_other ")),
+    race_black = 
+      factor(ifelse(is.na(race_black), "", "black ")),
+    race_hispanic = 
+      factor(ifelse(is.na(race_hispanic), "", "hispanic ")),
+    race_middle_eastern = 
+      factor(ifelse(is.na(race_middle_eastern), "", "middle_eastern ")),
+    race_native_american = 
+      factor(ifelse(is.na(race_native_american), "", "native_american ")),
+    race_pac_islander = 
+      factor(ifelse(is.na(race_pac_islander), "", "pac_islander ")),
+    race_white = 
+      factor(ifelse(is.na(race_white), "", "white ")),
+    race_other_prefno = 
+      factor(ifelse(is.na(race_other_prefno), "", "other_prefno ")),
+    race_cat = paste0(race_asian_east, race_asian_south, race_asian_other,
+                      race_black, race_hispanic, race_middle_eastern,
+                      race_native_american, race_pac_islander, race_white,
+                      race_other_prefno),
+    race_cat2 = factor(sub(" +$", "", race_cat)),
+    race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
+                              as.character(race_cat2)))) %>%
+  select(subid:gender, religion_buddhism:age_approx, race_cat3) %>%
+  rename(race_cat = race_cat3) %>%
+  mutate( # deal with religion
+    religion_buddhism = 
+      factor(ifelse(is.na(religion_buddhism), "", "buddhism ")),
+    religion_christianity = 
+      factor(ifelse(is.na(religion_christianity), "", "christianity ")),
+    religion_hinduism = 
+      factor(ifelse(is.na(religion_hinduism), "", "hinduism ")),
+    religion_islam = 
+      factor(ifelse(is.na(religion_islam), "", "islam ")),
+    religion_jainism = 
+      factor(ifelse(is.na(religion_jainism), "", "jainism ")),
+    religion_judaism = 
+      factor(ifelse(is.na(religion_judaism), "", "judaism ")),
+    religion_sikhism = 
+      factor(ifelse(is.na(religion_sikhism), "", "sikhism ")),
+    religion_other = 
+      factor(ifelse(is.na(religion_other), "", "other ")),
+    religion_none = 
+      factor(ifelse(is.na(religion_none), "", "none ")),
+    religion_prefno = 
+      factor(ifelse(is.na(religion_prefno), "", "other_prefno ")),
+    religion_cat = paste0(religion_buddhism, religion_christianity, 
+                          religion_hinduism, religion_islam, religion_jainism,
+                          religion_judaism, religion_sikhism, religion_other, 
+                          religion_none, religion_prefno),
+    religion_cat2 = factor(sub(" +$", "", religion_cat)),
+    religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
+                                  "multireligious",
+                                  as.character(religion_cat2)))) %>%
+  select(subid:gender, feedback:race_cat, religion_cat3) %>%
+  rename(religion_cat = religion_cat3)
 
 # examine demographic variables -----------------------------------------------
 
@@ -51,13 +115,13 @@ t.test(age_approx ~ condition, data = d_clean) # test for differences in age acr
 gender <- with(d_clean, table(condition, gender)); addmargins(gender)
 summary(gender) # test for difference in gender distribution across conditions
 
-# # racial/ethnic background (NEED TO ADJUST TO ALLOW FOR MULTIPLE ANSWERS)
-# race_ethn <- with(d_clean, table(condition, race)); addmargins(race_ethn) 
-# summary(race_ethn) # test for difference in race/ethnicity distribution across conditions
-# 
-# # religious background (NEED TO ADJUST TO ALLOW FOR MULTIPLE ANSWERS)
-# religion <- with(d_clean, table(condition, religion)); addmargins(religion) 
-# summary(religion) # test for difference in religion distribution across conditions
+# racial/ethnic background
+race_ethn <- with(d_clean, table(condition, race_cat)); addmargins(race_ethn) 
+summary(race_ethn) # test for difference in race/ethnicity distribution across conditions
+
+# religious background
+religion <- with(d_clean, table(condition, religion_cat)); addmargins(religion) 
+summary(religion) # test for difference in religion distribution across conditions
 
 # prepare datasets for PCA ----------------------------------------------------
 
