@@ -13,11 +13,13 @@ library(knitr)
 rm(list = ls(all = T))
 graphics.off()
 
-# simulate or load in dataset --------------------------------------------------
+# prepare datasets -------------------------------------------------------------
+
+## simulate or load in dataset -----------------------------------------------
 
 # choose datasource: simulated or real data (manually)
-datasource <- "simulated"
-# datasource <- "real"
+# datasource <- "simulated"
+datasource <- "real"
 
 if(datasource == "simulated") { # simulate data!
   
@@ -126,7 +128,7 @@ if(datasource == "simulated") { # simulate data!
 
     }
 
-# clean up dataset ------------------------------------------------------------
+## clean up dataset ----------------------------------------------------------
 
 # enact exclusionary criteria
 d_clean_1 <- d %>%
@@ -138,10 +140,11 @@ d_clean_1 <- d %>%
   mutate(yob_correct = as.numeric(
     ifelse(as.numeric(as.character(yob)) > 1900 & 
              as.numeric(as.character(yob)) < 2000, 
-           as.numeric(as.character(yob)), NA)), # correct formatting issues in yob
+           as.numeric(as.character(yob)), NA)), # correct formatting in yob
     age_approx = 2015 - yob_correct) %>% # calculate approximate age
-  mutate(gender = factor(gender, levels = c(1, 2, 0), labels = c("m", "f", "other"))) %>%
-  filter(age_approx >= 18) # exclude participants who are younger than 18 years old
+  mutate(gender = factor(gender, levels = c(1, 2, 0), 
+                         labels = c("m", "f", "other"))) %>%
+  filter(age_approx >= 18) # exclude participants who are younger than 18 years
 
 # recode demographic variables
 d_clean <- d_clean_1 %>%
@@ -207,7 +210,7 @@ d_clean <- d_clean_1 %>%
   select(subid:gender, feedback:race_cat, religion_cat3) %>%
   rename(religion_cat = religion_cat3)
 
-# prepare datasets for PCA ----------------------------------------------------
+## prepare datasets for PCA --------------------------------------------------
 
 # separate conditions and remove identifier variables
 d_beetle <- d_clean %>%
@@ -220,7 +223,7 @@ d_robot <- d_clean %>%
   select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3!
 d_robot <- data.frame(d_robot[,-1], row.names = d_robot[,1])
 
-# examine demographic variables -----------------------------------------------
+# examine demographic variables ------------------------------------------------
 
 # sample size
 sample_size <- with(d_clean, table(condition))
@@ -253,7 +256,7 @@ summary(religion) # test for difference in religion distribution across conditio
 
 # PCA: BEETLE condition --------------------------------------------------------
 
-# step 1: determine how many dimensions to extract ---------------------------
+## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
 # VSS(d_beetle, n = 39)
@@ -267,7 +270,7 @@ pca_beetle_unrotated$values # examine eignenvalues, consider retaining iff > 1.0
 # set number of dimensions to extract (manually)
 nfactors_beetle <- 3
 
-# step 2: run pca without rotation with N dimensions -------------------------
+## step 2: run pca without rotation with N dimensions ------------------------
 
 # run unrotated pca with n dimensions
 pca_beetle_unrotatedN <- principal(d_beetle, nfactors = nfactors_beetle, rotate = "none")
@@ -341,7 +344,7 @@ pca_beetle_unrotatedN_pc3 <- pca_beetle_unrotatedN_loadings %>%
   select(PC3, mc, mc_cat)
 pca_beetle_unrotatedN_pc3
 
-# step 3: run pca with varimax rotation with N dimensions --------------------
+## step 3: run pca with varimax rotation with N dimensions -------------------
 
 # run pca with n dimensions with varimax rotation
 pca_beetle_rotatedN <- principal(d_beetle, nfactors = nfactors_beetle, 
@@ -416,9 +419,9 @@ pca_beetle_rotatedN_pc3 <- pca_beetle_rotatedN_loadings %>%
   select(PC3, mc, mc_cat)
 pca_beetle_rotatedN_pc3
 
-# PCA: ROBOT condition --------------------------------------------------------
+# PCA: ROBOT condition ---------------------------------------------------------
 
-# step 1: determine how many dimensions to extract ---------------------------
+## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
 # VSS(d_robot, n = 39)
@@ -432,7 +435,7 @@ pca_robot_unrotated$values # examine eignenvalues, consider retaining iff > 1.00
 # set number of dimensions to extract (manually)
 nfactors_robot <- 3
 
-# step 2: run pca without rotation with N dimensions -------------------------
+## step 2: run pca without rotation with N dimensions ------------------------
 
 # run unrotated pca with n dimensions
 pca_robot_unrotatedN <- principal(d_robot, nfactors = nfactors_robot, rotate = "none")
@@ -506,7 +509,7 @@ pca_robot_unrotatedN_pc3 <- pca_robot_unrotatedN_loadings %>%
   select(PC3, mc, mc_cat)
 pca_robot_unrotatedN_pc3
 
-# step 3: run pca with varimax rotation with N dimensions --------------------
+## step 3: run pca with varimax rotation with N dimensions -------------------
 
 # run pca with n dimensions with varimax rotation
 pca_robot_rotatedN <- principal(d_robot, nfactors = nfactors_robot, 
@@ -580,3 +583,197 @@ pca_robot_rotatedN_pc3 <- pca_robot_rotatedN_loadings %>%
   arrange(desc(PC3)) %>%
   select(PC3, mc, mc_cat)
 pca_robot_rotatedN_pc3
+
+# compare dimensions across conditions -----------------------------------------
+
+## look for common factors in UNROTATED solutions ----------------------------
+
+# get top 10 factor loadings by conditions and dimension (absolute value)
+beetle_unrotatedN_top10_pc1 <- pca_beetle_unrotatedN_pc1 %>%
+  mutate(abs_PC1 = abs(PC1),
+         valence = factor(ifelse(PC1 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC1)
+
+beetle_unrotatedN_top10_pc2 <- pca_beetle_unrotatedN_pc2 %>%
+  mutate(abs_PC2 = abs(PC2),
+         valence = factor(ifelse(PC2 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC2)
+
+beetle_unrotatedN_top10_pc3 <- pca_beetle_unrotatedN_pc3 %>%
+  mutate(abs_PC3 = abs(PC3),
+         valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC3)
+
+robot_unrotatedN_top10_pc1 <- pca_robot_unrotatedN_pc1 %>%
+  mutate(abs_PC1 = abs(PC1),
+         valence = factor(ifelse(PC1 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC1)
+
+robot_unrotatedN_top10_pc2 <- pca_robot_unrotatedN_pc2 %>%
+  mutate(abs_PC2 = abs(PC2),
+         valence = factor(ifelse(PC2 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC2)
+
+robot_unrotatedN_top10_pc3 <- pca_robot_unrotatedN_pc3 %>%
+  mutate(abs_PC3 = abs(PC3),
+         valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC3)
+
+# compare all possible combinations (across conditions)
+match_unrotated_beetlePC1_robotPC1 <-
+  beetle_unrotatedN_top10_pc1 %>%
+  mutate(comparison = "beetlePC1_robotPC1") %>%
+  filter(beetle_unrotatedN_top10_pc1$mc %in% robot_unrotatedN_top10_pc1$mc)
+
+match_unrotated_beetlePC1_robotPC2 <-
+  beetle_unrotatedN_top10_pc1 %>%
+  mutate(comparison = "beetlePC1_robotPC2") %>%
+  filter(beetle_unrotatedN_top10_pc1$mc %in% robot_unrotatedN_top10_pc2$mc)
+
+match_unrotated_beetlePC1_robotPC3 <-
+  beetle_unrotatedN_top10_pc1 %>%
+  mutate(comparison = "beetlePC1_robotPC3") %>%
+  filter(beetle_unrotatedN_top10_pc1$mc %in% robot_unrotatedN_top10_pc3$mc)
+
+match_unrotated_beetlePC2_robotPC1 <-
+  beetle_unrotatedN_top10_pc2 %>%
+  mutate(comparison = "beetlePC2_robotPC1") %>%
+  filter(beetle_unrotatedN_top10_pc2$mc %in% robot_unrotatedN_top10_pc1$mc)
+
+match_unrotated_beetlePC2_robotPC2 <-
+  beetle_unrotatedN_top10_pc2 %>%
+  mutate(comparison = "beetlePC2_robotPC2") %>%
+  filter(beetle_unrotatedN_top10_pc2$mc %in% robot_unrotatedN_top10_pc2$mc)
+
+match_unrotated_beetlePC2_robotPC3 <-
+  beetle_unrotatedN_top10_pc2 %>%
+  mutate(comparison = "beetlePC2_robotPC3") %>%
+  filter(beetle_unrotatedN_top10_pc2$mc %in% robot_unrotatedN_top10_pc3$mc)
+
+match_unrotated_beetlePC3_robotPC1 <-
+  beetle_unrotatedN_top10_pc3 %>%
+  mutate(comparison = "beetlePC3_robotPC1") %>%
+  filter(beetle_unrotatedN_top10_pc3$mc %in% robot_unrotatedN_top10_pc1$mc)
+
+match_unrotated_beetlePC3_robotPC2 <-
+  beetle_unrotatedN_top10_pc3 %>%
+  mutate(comparison = "beetlePC3_robotPC2") %>%
+  filter(beetle_unrotatedN_top10_pc3$mc %in% robot_unrotatedN_top10_pc2$mc)
+
+match_unrotated_beetlePC3_robotPC3 <-
+  beetle_unrotatedN_top10_pc3 %>%
+  mutate(comparison = "beetlePC3_robotPC3") %>%
+  filter(beetle_unrotatedN_top10_pc3$mc %in% robot_unrotatedN_top10_pc3$mc)
+
+match_unrotated <- match_unrotated_beetlePC1_robotPC1 %>%
+  full_join(match_unrotated_beetlePC1_robotPC2) %>%
+  full_join(match_unrotated_beetlePC1_robotPC3) %>%
+  full_join(match_unrotated_beetlePC2_robotPC1) %>%
+  full_join(match_unrotated_beetlePC2_robotPC2) %>%
+  full_join(match_unrotated_beetlePC2_robotPC3) %>%
+  full_join(match_unrotated_beetlePC3_robotPC1) %>%
+  full_join(match_unrotated_beetlePC3_robotPC2) %>%
+  full_join(match_unrotated_beetlePC3_robotPC3)
+
+top_match_unrotated <- match_unrotated %>%
+  count(comparison) %>%
+  arrange(desc(n)) %>%
+  mutate(rotation = "unrotated") %>%
+  left_join(match_unrotated) %>%
+  select(comparison, n, rotation, mc)
+
+## look for common factors in ROTATED solutions ------------------------------
+
+# get top 10 factor loadings by conditions and dimension (absolute value)
+beetle_rotatedN_top10_pc1 <- pca_beetle_rotatedN_pc1 %>%
+  mutate(abs_PC1 = abs(PC1),
+         valence = factor(ifelse(PC1 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC1)
+
+beetle_rotatedN_top10_pc2 <- pca_beetle_rotatedN_pc2 %>%
+  mutate(abs_PC2 = abs(PC2),
+         valence = factor(ifelse(PC2 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC2)
+
+beetle_rotatedN_top10_pc3 <- pca_beetle_rotatedN_pc3 %>%
+  mutate(abs_PC3 = abs(PC3),
+         valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC3)
+
+robot_rotatedN_top10_pc1 <- pca_robot_rotatedN_pc1 %>%
+  mutate(abs_PC1 = abs(PC1),
+         valence = factor(ifelse(PC1 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC1)
+
+robot_rotatedN_top10_pc2 <- pca_robot_rotatedN_pc2 %>%
+  mutate(abs_PC2 = abs(PC2),
+         valence = factor(ifelse(PC2 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC2)
+
+robot_rotatedN_top10_pc3 <- pca_robot_rotatedN_pc3 %>%
+  mutate(abs_PC3 = abs(PC3),
+         valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
+  top_n(10, abs_PC3)
+
+# compare all possible combinations (across conditions)
+match_rotated_beetlePC1_robotPC1 <-
+  beetle_rotatedN_top10_pc1 %>%
+  mutate(comparison = "beetlePC1_robotPC1") %>%
+  filter(beetle_rotatedN_top10_pc1$mc %in% robot_rotatedN_top10_pc1$mc)
+
+match_rotated_beetlePC1_robotPC2 <-
+  beetle_rotatedN_top10_pc1 %>%
+  mutate(comparison = "beetlePC1_robotPC2") %>%
+  filter(beetle_rotatedN_top10_pc1$mc %in% robot_rotatedN_top10_pc2$mc)
+
+match_rotated_beetlePC1_robotPC3 <-
+  beetle_rotatedN_top10_pc1 %>%
+  mutate(comparison = "beetlePC1_robotPC3") %>%
+  filter(beetle_rotatedN_top10_pc1$mc %in% robot_rotatedN_top10_pc3$mc)
+
+match_rotated_beetlePC2_robotPC1 <-
+  beetle_rotatedN_top10_pc2 %>%
+  mutate(comparison = "beetlePC2_robotPC1") %>%
+  filter(beetle_rotatedN_top10_pc2$mc %in% robot_rotatedN_top10_pc1$mc)
+
+match_rotated_beetlePC2_robotPC2 <-
+  beetle_rotatedN_top10_pc2 %>%
+  mutate(comparison = "beetlePC2_robotPC2") %>%
+  filter(beetle_rotatedN_top10_pc2$mc %in% robot_rotatedN_top10_pc2$mc)
+
+match_rotated_beetlePC2_robotPC3 <-
+  beetle_rotatedN_top10_pc2 %>%
+  mutate(comparison = "beetlePC2_robotPC3") %>%
+  filter(beetle_rotatedN_top10_pc2$mc %in% robot_rotatedN_top10_pc3$mc)
+
+match_rotated_beetlePC3_robotPC1 <-
+  beetle_rotatedN_top10_pc3 %>%
+  mutate(comparison = "beetlePC3_robotPC1") %>%
+  filter(beetle_rotatedN_top10_pc3$mc %in% robot_rotatedN_top10_pc1$mc)
+
+match_rotated_beetlePC3_robotPC2 <-
+  beetle_rotatedN_top10_pc3 %>%
+  mutate(comparison = "beetlePC3_robotPC2") %>%
+  filter(beetle_rotatedN_top10_pc3$mc %in% robot_rotatedN_top10_pc2$mc)
+
+match_rotated_beetlePC3_robotPC3 <-
+  beetle_rotatedN_top10_pc3 %>%
+  mutate(comparison = "beetlePC3_robotPC3") %>%
+  filter(beetle_rotatedN_top10_pc3$mc %in% robot_rotatedN_top10_pc3$mc)
+
+match_rotated <- match_rotated_beetlePC1_robotPC1 %>%
+  full_join(match_rotated_beetlePC1_robotPC2) %>%
+  full_join(match_rotated_beetlePC1_robotPC3) %>%
+  full_join(match_rotated_beetlePC2_robotPC1) %>%
+  full_join(match_rotated_beetlePC2_robotPC2) %>%
+  full_join(match_rotated_beetlePC2_robotPC3) %>%
+  full_join(match_rotated_beetlePC3_robotPC1) %>%
+  full_join(match_rotated_beetlePC3_robotPC2) %>%
+  full_join(match_rotated_beetlePC3_robotPC3)
+
+top_match_rotated <- match_rotated %>%
+  count(comparison) %>%
+  arrange(desc(n)) %>%
+  mutate(rotation = "rotated") %>%
+  left_join(match_rotated) %>%
+  select(comparison, n, rotation, mc)
