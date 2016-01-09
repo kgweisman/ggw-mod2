@@ -1,251 +1,582 @@
-# load libraries --------------------------------------------------------------
+# set up workspace -------------------------------------------------------------
+
+# load libraries
 library(dplyr)
 library(tidyr)
 library(psych)
 library(ggplot2)
 library(devtools)
 library(stats)
+library(knitr)
 
 # clear workspace
 rm(list = ls(all = T))
 graphics.off()
 
-# simulate dataset ------------------------------------------------------------
+# simulate or load in dataset --------------------------------------------------
 
-# randomly generate demographics and other background variables
-subid <- factor(paste0(rep("s", 400, replace = T), 1:400))
-condition <- factor(sample(c("beetle", "robot"), 400, replace = T))
-yob <- as.numeric(sample(1940:1997, 400, replace = T))
-gender <- factor(sample(c("m", "f", "na"), 400, replace = T))
-race <- factor(sample(c("asian_east", "asian_south", "asian_other",
-                        "black", "hispanic", "middle_eastern",
-                        "native_american", "pac_islander", "white",
-                        "other_prefno"), 400, replace = T))
-religion <- factor(sample(c("buddhism", "christianity", "hinduism", "islam",
-                            "jainism", "judaism", "sikhism", "other_religious",
-                            "not_religious", "prefno"), 400, replace = T))
-feedback <- sample(c("blahblah", "yadayada", ""), 400, replace = T)
+# choose datasource: simulated or real data (manually)
+datasource <- "simulated"
+# datasource <- "real"
 
-# randomly generate responses to test questions
-happy <- as.numeric(sample(0:6, 400, replace = T))
-depressed <- as.numeric(sample(0:6, 400, replace = T))
-fear <- as.numeric(sample(0:6, 400, replace = T))
-angry <- as.numeric(sample(0:6, 400, replace = T))
-calm <- as.numeric(sample(0:6, 400, replace = T))
-sounds <- as.numeric(sample(0:6, 400, replace = T))
-seeing <- as.numeric(sample(0:6, 400, replace = T))
-temperature <- as.numeric(sample(0:6, 400, replace = T))
-odors <- as.numeric(sample(0:6, 400, replace = T))
-depth <- as.numeric(sample(0:6, 400, replace = T))
-computations <- as.numeric(sample(0:6, 400, replace = T))
-thoughts <- as.numeric(sample(0:6, 400, replace = T))
-reasoning <- as.numeric(sample(0:6, 400, replace = T))
-remembering <- as.numeric(sample(0:6, 400, replace = T))
-beliefs <- as.numeric(sample(0:6, 400, replace = T))
-hungry <- as.numeric(sample(0:6, 400, replace = T))
-tired <- as.numeric(sample(0:6, 400, replace = T))
-pain <- as.numeric(sample(0:6, 400, replace = T))
-nauseated <- as.numeric(sample(0:6, 400, replace = T))
-safe <- as.numeric(sample(0:6, 400, replace = T))
-love <- as.numeric(sample(0:6, 400, replace = T))
-recognizing <- as.numeric(sample(0:6, 400, replace = T))
-communicating <- as.numeric(sample(0:6, 400, replace = T))
-guilt <- as.numeric(sample(0:6, 400, replace = T))
-disrespected <- as.numeric(sample(0:6, 400, replace = T))
-free_will <- as.numeric(sample(0:6, 400, replace = T))
-choices <- as.numeric(sample(0:6, 400, replace = T))
-self_restraint <- as.numeric(sample(0:6, 400, replace = T))
-intentions <- as.numeric(sample(0:6, 400, replace = T))
-goal <- as.numeric(sample(0:6, 400, replace = T))
-conscious <- as.numeric(sample(0:6, 400, replace = T))
-self_aware <- as.numeric(sample(0:6, 400, replace = T))
-desires <- as.numeric(sample(0:6, 400, replace = T))
-embarrassed <- as.numeric(sample(0:6, 400, replace = T))
-emo_recog <- as.numeric(sample(0:6, 400, replace = T))
-joy <- as.numeric(sample(0:6, 400, replace = T))
-morality <- as.numeric(sample(0:6, 400, replace = T))
-personality <- as.numeric(sample(0:6, 400, replace = T))
-pleasure <- as.numeric(sample(0:6, 400, replace = T))
-pride <- as.numeric(sample(0:6, 400, replace = T))
-CATCH <- as.numeric(sample(0:6, 400, replace = T))
+if(datasource == "simulated") { # simulate data!
+  
+  # randomly generate participation variables
+  subid <- factor(paste0(rep("s", 400, replace = T), 1:400))
+  date <- factor("1/1/2016")
+  start_time <- factor("11:30:30 AM")
+  end_time <- factor("11:34:50 AM")
+  finished <- as.integer(sample(c(0, 1), 400, replace = T))
+  mturkcode <- array()
+  for(i in 1:400) {mturkcode[i] <- paste0(sample(0:9, 9, replace = T), collapse = "")}
+  mturkcode <- factor(mturkcode)
+  condition <- factor(sample(c("beetle", "robot"), 400, replace = T))
+  
+  # randomly generate demographic variables
+  yob <- as.numeric(sample(1940:1997, 400, replace = T))
+  gender <- factor(sample(c(1, 2, 0), 400, replace = T))
+  race_asian_east <- factor(sample(c(0, 1), 400, replace = T))
+  race_asian_south <- factor(sample(c(0, 1), 400, replace = T))
+  race_asian_other <- factor(sample(c(0, 1), 400, replace = T))
+  race_black <- factor(sample(c(0, 1), 400, replace = T))
+  race_hispanic <- factor(sample(c(0, 1), 400, replace = T))
+  race_middle_eastern <- factor(sample(c(0, 1), 400, replace = T))
+  race_native_american <- factor(sample(c(0, 1), 400, replace = T))
+  race_pac_islander <- factor(sample(c(0, 1), 400, replace = T))
+  race_white <- factor(sample(c(0, 1), 400, replace = T))
+  race_other_prefno <- factor(sample(c(0, 1), 400, replace = T))
+  religion_buddhism <- factor(sample(c(0, 1), 400, replace = T))
+  religion_christianity <- factor(sample(c(0, 1), 400, replace = T))
+  religion_hinduism <- factor(sample(c(0, 1), 400, replace = T))
+  religion_islam <- factor(sample(c(0, 1), 400, replace = T))
+  religion_jainism <- factor(sample(c(0, 1), 400, replace = T))
+  religion_judaism <- factor(sample(c(0, 1), 400, replace = T))
+  religion_sikhism <- factor(sample(c(0, 1), 400, replace = T))
+  religion_other <- factor(sample(c(0, 1), 400, replace = T))
+  religion_none <- factor(sample(c(0, 1), 400, replace = T))
+  religion_prefno <- factor(sample(c(0, 1), 400, replace = T))
+  feedback <- sample(c("blahblah", "yadayada", ""), 400, replace = T)
+  
+  # randomly generate responses to test questions
+  happy <- as.integer(sample(-3:3, 400, replace = T))
+  depressed <- as.integer(sample(-3:3, 400, replace = T))
+  fear <- as.integer(sample(-3:3, 400, replace = T))
+  angry <- as.integer(sample(-3:3, 400, replace = T))
+  calm <- as.integer(sample(-3:3, 400, replace = T))
+  sounds <- as.integer(sample(-3:3, 400, replace = T))
+  seeing <- as.integer(sample(-3:3, 400, replace = T))
+  temperature <- as.integer(sample(-3:3, 400, replace = T))
+  odors <- as.integer(sample(-3:3, 400, replace = T))
+  depth <- as.integer(sample(-3:3, 400, replace = T))
+  computations <- as.integer(sample(-3:3, 400, replace = T))
+  thoughts <- as.integer(sample(-3:3, 400, replace = T))
+  reasoning <- as.integer(sample(-3:3, 400, replace = T))
+  remembering <- as.integer(sample(-3:3, 400, replace = T))
+  beliefs <- as.integer(sample(-3:3, 400, replace = T))
+  hungry <- as.integer(sample(-3:3, 400, replace = T))
+  tired <- as.integer(sample(-3:3, 400, replace = T))
+  pain <- as.integer(sample(-3:3, 400, replace = T))
+  nauseated <- as.integer(sample(-3:3, 400, replace = T))
+  safe <- as.integer(sample(-3:3, 400, replace = T))
+  love <- as.integer(sample(-3:3, 400, replace = T))
+  recognizing <- as.integer(sample(-3:3, 400, replace = T))
+  communicating <- as.integer(sample(-3:3, 400, replace = T))
+  guilt <- as.integer(sample(-3:3, 400, replace = T))
+  disrespected <- as.integer(sample(-3:3, 400, replace = T))
+  free_will <- as.integer(sample(-3:3, 400, replace = T))
+  choices <- as.integer(sample(-3:3, 400, replace = T))
+  self_restraint <- as.integer(sample(-3:3, 400, replace = T))
+  intentions <- as.integer(sample(-3:3, 400, replace = T))
+  goal <- as.integer(sample(-3:3, 400, replace = T))
+  conscious <- as.integer(sample(-3:3, 400, replace = T))
+  self_aware <- as.integer(sample(-3:3, 400, replace = T))
+  desires <- as.integer(sample(-3:3, 400, replace = T))
+  embarrassed <- as.integer(sample(-3:3, 400, replace = T))
+  emo_recog <- as.integer(sample(-3:3, 400, replace = T))
+  joy <- as.integer(sample(-3:3, 400, replace = T))
+  morality <- as.integer(sample(-3:3, 400, replace = T))
+  personality <- as.integer(sample(-3:3, 400, replace = T))
+  pleasure <- as.integer(sample(-3:3, 400, replace = T))
+  pride <- as.integer(sample(-3:3, 400, replace = T))
+  CATCH <- as.integer(sample(-3:3, 400, replace = T))
+  
+  # bind into one dataframe
+  d_sim <- data.frame(subid, date, start_time, end_time, finished, mturkcode, 
+                      condition, happy, depressed, fear, angry, calm, sounds, 
+                      seeing, temperature, odors, depth, computations, 
+                      thoughts, reasoning, remembering, beliefs, hungry, tired, 
+                      pain, nauseated, safe, love, recognizing, communicating, 
+                      guilt, disrespected, free_will, choices, self_restraint, 
+                      intentions, goal, conscious, self_aware, desires, 
+                      embarrassed, emo_recog, joy, morality, personality, 
+                      pleasure, pride, CATCH, yob, gender, race_asian_east, 
+                      race_asian_south, race_asian_other, race_black, 
+                      race_hispanic, race_middle_eastern, race_native_american, 
+                      race_pac_islander, race_white, race_other_prefno, 
+                      religion_buddhism, religion_christianity, 
+                      religion_hinduism, religion_islam, religion_jainism, 
+                      religion_judaism, religion_sikhism, religion_other, 
+                      religion_none, religion_prefno, feedback)
+  d <- d_sim
+  
+} else if(datasource == "real") { # load in real data
 
-# bind into one dataframe
-dsim <- data_frame(subid, condition, yob, gender, race, religion, feedback, happy, depressed, fear, angry, calm, sounds, seeing, temperature, odors, depth, computations, thoughts, reasoning, remembering, beliefs, hungry, tired, pain, nauseated, safe, love, recognizing, communicating, guilt, disrespected, free_will, choices, self_restraint, intentions, goal, conscious, self_aware, desires, embarrassed, emo_recog, joy, morality, personality, pleasure, pride, CATCH)
+    d_raw <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/GGWmod2_v1_clean.csv")
+    d <- d_raw
+
+    }
 
 # clean up dataset ------------------------------------------------------------
 
-dsim_clean <- dsim %>%
-  filter(CATCH == 1) %>% # exclude participants who fail catch trials 
-  mutate(age_approx = 2015 - yob) %>% # calculate approximate age
+# enact exclusionary criteria
+d_clean_1 <- d %>%
+  mutate(finished_mod = ifelse(is.na(CATCH), 0,
+                               ifelse(finished == 1, 1,
+                                      0.5))) %>%
+  filter(CATCH == 1, # exclude participants who fail catch trials 
+         finished_mod != 0) %>% # exclude participants who did not complete task
+  mutate(yob_correct = as.numeric(
+    ifelse(as.numeric(as.character(yob)) > 1900 & 
+             as.numeric(as.character(yob)) < 2000, 
+           as.numeric(as.character(yob)), NA)), # correct formatting issues in yob
+    age_approx = 2015 - yob_correct) %>% # calculate approximate age
+  mutate(gender = factor(gender, levels = c(1, 2, 0), labels = c("m", "f", "other"))) %>%
   filter(age_approx >= 18) # exclude participants who are younger than 18 years old
 
-# examine demographic variables -----------------------------------------------
-
-# sample size
-sample_size <- with(dsim_clean, table(condition)) %>% addmargins(); sample_size
-
-# approxiate age
-age_approx <- dsim_clean %>%
-  group_by(condition) %>%
-  summarise(min_age = min(age_approx),
-            max_age = max(age_approx),
-            mean_age = mean(age_approx, na.rm = T),
-            sd_age = sd(age_approx, na.rm = T))
-age_approx
-t.test(age_approx ~ condition, data = dsim_clean) # test for differences in age across conditions
-
-# gender
-gender <- with(dsim_clean, table(condition, gender)); addmargins(gender)
-summary(gender) # test for difference in gender distribution across conditions
-
-# racial/ethnic background (NEED TO ADJUST TO ALLOW FOR MULTIPLE ANSWERS)
-race_ethn <- with(dsim_clean, table(condition, race)); addmargins(race_ethn) 
-summary(race_ethn) # test for difference in race/ethnicity distribution across conditions
-
-# religious background (NEED TO ADJUST TO ALLOW FOR MULTIPLE ANSWERS)
-religion <- with(dsim_clean, table(condition, religion)); addmargins(religion) 
-summary(religion) # test for difference in religion distribution across conditions
+# recode demographic variables
+d_clean <- d_clean_1 %>%
+  mutate( # deal with race
+    race_asian_east = 
+      factor(ifelse(is.na(race_asian_east), "", "asian_east ")),
+    race_asian_south = 
+      factor(ifelse(is.na(race_asian_south), "", "asian_south ")),
+    race_asian_other = 
+      factor(ifelse(is.na(race_asian_other), "", "asian_other ")),
+    race_black = 
+      factor(ifelse(is.na(race_black), "", "black ")),
+    race_hispanic = 
+      factor(ifelse(is.na(race_hispanic), "", "hispanic ")),
+    race_middle_eastern = 
+      factor(ifelse(is.na(race_middle_eastern), "", "middle_eastern ")),
+    race_native_american = 
+      factor(ifelse(is.na(race_native_american), "", "native_american ")),
+    race_pac_islander = 
+      factor(ifelse(is.na(race_pac_islander), "", "pac_islander ")),
+    race_white = 
+      factor(ifelse(is.na(race_white), "", "white ")),
+    race_other_prefno = 
+      factor(ifelse(is.na(race_other_prefno), "", "other_prefno ")),
+    race_cat = paste0(race_asian_east, race_asian_south, race_asian_other,
+                      race_black, race_hispanic, race_middle_eastern,
+                      race_native_american, race_pac_islander, race_white,
+                      race_other_prefno),
+    race_cat2 = factor(sub(" +$", "", race_cat)),
+    race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
+                              as.character(race_cat2)))) %>%
+  select(subid:gender, religion_buddhism:age_approx, race_cat3) %>%
+  rename(race_cat = race_cat3) %>%
+  mutate( # deal with religion
+    religion_buddhism = 
+      factor(ifelse(is.na(religion_buddhism), "", "buddhism ")),
+    religion_christianity = 
+      factor(ifelse(is.na(religion_christianity), "", "christianity ")),
+    religion_hinduism = 
+      factor(ifelse(is.na(religion_hinduism), "", "hinduism ")),
+    religion_islam = 
+      factor(ifelse(is.na(religion_islam), "", "islam ")),
+    religion_jainism = 
+      factor(ifelse(is.na(religion_jainism), "", "jainism ")),
+    religion_judaism = 
+      factor(ifelse(is.na(religion_judaism), "", "judaism ")),
+    religion_sikhism = 
+      factor(ifelse(is.na(religion_sikhism), "", "sikhism ")),
+    religion_other = 
+      factor(ifelse(is.na(religion_other), "", "other ")),
+    religion_none = 
+      factor(ifelse(is.na(religion_none), "", "none ")),
+    religion_prefno = 
+      factor(ifelse(is.na(religion_prefno), "", "other_prefno ")),
+    religion_cat = paste0(religion_buddhism, religion_christianity, 
+                          religion_hinduism, religion_islam, religion_jainism,
+                          religion_judaism, religion_sikhism, religion_other, 
+                          religion_none, religion_prefno),
+    religion_cat2 = factor(sub(" +$", "", religion_cat)),
+    religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
+                                  "multireligious",
+                                  as.character(religion_cat2)))) %>%
+  select(subid:gender, feedback:race_cat, religion_cat3) %>%
+  rename(religion_cat = religion_cat3)
 
 # prepare datasets for PCA ----------------------------------------------------
 
 # separate conditions and remove identifier variables
-d_robot <- dsim_clean %>%
-  filter(condition == "robot") %>% # filter by condition
-  select(happy:pride) # NOTE: make sure to check that responses are scored as -3:3!
-
-d_beetle <- dsim_clean %>%
+d_beetle <- d_clean %>%
   filter(condition == "beetle") %>% # filter by condition
-  select(happy:pride) # NOTE: make sure to check that responses are scored as -3:3!
+  select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3! 
+d_beetle <- data.frame(d_beetle[,-1], row.names = d_beetle[,1])
+
+d_robot <- d_clean %>%
+  filter(condition == "robot") %>% # filter by condition
+  select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3!
+d_robot <- data.frame(d_robot[,-1], row.names = d_robot[,1])
+
+# examine demographic variables -----------------------------------------------
+
+# sample size
+sample_size <- with(d_clean, table(condition))
+kable(d_clean %>% count(condition))
+
+# approxiate age
+age_approx <- d_clean %>%
+  group_by(condition) %>%
+  summarise(min_age = min(age_approx, na.rm = T),
+            max_age = max(age_approx, na.rm = T),
+            median_age = median(age_approx, na.rm = T),
+            mean_age = mean(age_approx, na.rm = T),
+            sd_age = sd(age_approx, na.rm = T))
+t.test(age_approx ~ condition, data = d_clean) # test for differences in age across conditions
+
+# gender
+gender <- with(d_clean, table(condition, gender))
+kable(addmargins(gender))
+summary(gender) # test for difference in gender distribution across conditions
+
+# racial/ethnic background
+race_ethn <- with(d_clean, table(condition, race_cat))
+kable(addmargins(race_ethn))
+summary(race_ethn) # test for difference in race/ethnicity distribution across conditions
+
+# religious background
+religion <- with(d_clean, table(condition, religion_cat))
+kable(addmargins(religion))
+summary(religion) # test for difference in religion distribution across conditions
+
+# PCA: BEETLE condition --------------------------------------------------------
+
+# step 1: determine how many dimensions to extract ---------------------------
+
+# use "very simple structure" criterion
+# VSS(d_beetle, n = 39)
+VSS.scree(d_beetle)
+
+# run unrotated pca with maximum number of dimensions
+pca_beetle_unrotated <- principal(d_beetle, nfactors = 39, rotate = "none")
+pca_beetle_unrotated
+pca_beetle_unrotated$values # examine eignenvalues, consider retaining iff > 1.00
+
+# set number of dimensions to extract (manually)
+nfactors_beetle <- 3
+
+# step 2: run pca without rotation with N dimensions -------------------------
+
+# run unrotated pca with n dimensions
+pca_beetle_unrotatedN <- principal(d_beetle, nfactors = nfactors_beetle, rotate = "none")
+pca_beetle_unrotatedN
+
+# plot mental capacities in first two dimensions
+pca_beetle_unrotatedN_loadings <- 
+  data.frame(pca_beetle_unrotatedN$loadings[1:40, 1:nfactors_beetle],
+             row.names = rownames(pca_beetle_unrotatedN$loadings[1:40, 1:nfactors_beetle]))
+
+# code a priori mental capacity categories
+pca_beetle_unrotatedN_loadings[c("hungry", "tired", "pain", 
+                                 "nauseated", "safe"),
+                               "mc_cat"] <- "biological"
+pca_beetle_unrotatedN_loadings[c("happy", "depressed", "fear", 
+                                 "angry", "calm", "joy"),
+                               "mc_cat"] <- "affective"
+pca_beetle_unrotatedN_loadings[c("sounds", "seeing", "temperature", 
+                                 "odors", "depth"),
+                               "mc_cat"] <- "perceptual"
+pca_beetle_unrotatedN_loadings[c("computations", "thoughts", "reasoning", 
+                                 "remembering", "beliefs"),
+                               "mc_cat"] <- "cognitive"
+pca_beetle_unrotatedN_loadings[c("free_will", "choices", "self_restraint", 
+                                 "intentions", "goal"),
+                               "mc_cat"] <- "autonomous"
+pca_beetle_unrotatedN_loadings[c("love", "recognizing", "communicating", "guilt", 
+                                 "disrespected", "embarrassed", "emo_recog"),
+                               "mc_cat"] <- "social"
+pca_beetle_unrotatedN_loadings[c("conscious", "self_aware", "pleasure", 
+                                 "desires", "morality", "personality", "pride"),
+                               "mc_cat"] <- "other"
+
+pca_beetle_unrotatedN_loadings$mc_cat <- factor(pca_beetle_unrotatedN_loadings$mc_cat)
+
+pca_beetle_unrotatedN_plot12 <- 
+  ggplot(pca_beetle_unrotatedN_loadings,
+         aes(x = PC1, y = PC2,
+             label = rownames(pca_beetle_unrotatedN_loadings),
+             color = mc_cat)) +
+  geom_text(hjust = 0.5, vjust = 0.5) +
+  theme_bw() +
+  theme(text = element_text(size = 12)) +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(title = "BEETLE: factor loadings (first 2 unrotated components)\n",
+       x = "\nPrincipal Component 1",
+       y = "Principal Component 2\n")
+pca_beetle_unrotatedN_plot12
+
+# examine loadings
+mc_beetle_unrotatedN = rownames(pca_beetle_unrotatedN_loadings)
+
+# ... for PC1
+pca_beetle_unrotatedN_pc1 <- pca_beetle_unrotatedN_loadings %>%
+  mutate(mc = mc_beetle_unrotatedN) %>%
+  arrange(desc(PC1)) %>%
+  select(PC1, mc, mc_cat)
+pca_beetle_unrotatedN_pc1
+
+# ... for PC2
+pca_beetle_unrotatedN_pc2 <- pca_beetle_unrotatedN_loadings %>%
+  mutate(mc = mc_beetle_unrotatedN) %>%
+  arrange(desc(PC2)) %>%
+  select(PC2, mc, mc_cat)
+pca_beetle_unrotatedN_pc2
+
+# ... for PC3
+pca_beetle_unrotatedN_pc3 <- pca_beetle_unrotatedN_loadings %>%
+  mutate(mc = mc_beetle_unrotatedN) %>%
+  arrange(desc(PC3)) %>%
+  select(PC3, mc, mc_cat)
+pca_beetle_unrotatedN_pc3
+
+# step 3: run pca with varimax rotation with N dimensions --------------------
+
+# run pca with n dimensions with varimax rotation
+pca_beetle_rotatedN <- principal(d_beetle, nfactors = nfactors_beetle, 
+                                   rotate = "varimax")
+pca_beetle_rotatedN
+
+# plot mental capacities in first two dimensions
+pca_beetle_rotatedN_loadings <- 
+  data.frame(pca_beetle_rotatedN$loadings[1:40, 1:nfactors_beetle],
+             row.names = rownames(pca_beetle_rotatedN$loadings[1:40, 1:nfactors_beetle]))
+
+# code a priori mental capacity categories
+pca_beetle_rotatedN_loadings[c("hungry", "tired", "pain", 
+                                 "nauseated", "safe"),
+                               "mc_cat"] <- "biological"
+pca_beetle_rotatedN_loadings[c("happy", "depressed", "fear", 
+                                 "angry", "calm", "joy"),
+                               "mc_cat"] <- "affective"
+pca_beetle_rotatedN_loadings[c("sounds", "seeing", "temperature", 
+                                 "odors", "depth"),
+                               "mc_cat"] <- "perceptual"
+pca_beetle_rotatedN_loadings[c("computations", "thoughts", "reasoning", 
+                                 "remembering", "beliefs"),
+                               "mc_cat"] <- "cognitive"
+pca_beetle_rotatedN_loadings[c("free_will", "choices", "self_restraint", 
+                                 "intentions", "goal"),
+                               "mc_cat"] <- "autonomous"
+pca_beetle_rotatedN_loadings[c("love", "recognizing", "communicating", "guilt", 
+                                 "disrespected", "embarrassed", "emo_recog"),
+                               "mc_cat"] <- "social"
+pca_beetle_rotatedN_loadings[c("conscious", "self_aware", "pleasure", 
+                                 "desires", "morality", "personality", "pride"),
+                               "mc_cat"] <- "other"
+
+pca_beetle_rotatedN_loadings$mc_cat <- factor(pca_beetle_rotatedN_loadings$mc_cat)
+
+pca_beetle_rotatedN_plot12 <- 
+  ggplot(pca_beetle_rotatedN_loadings,
+         aes(x = PC1, y = PC2,
+             label = rownames(pca_beetle_rotatedN_loadings),
+             color = mc_cat)) +
+  geom_text(hjust = 0.5, vjust = 0.5) +
+  theme_bw() +
+  theme(text = element_text(size = 12)) +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(title = "BEETLE: factor loadings (first 2 rotated components)\n",
+       x = "\nPrincipal Component 1",
+       y = "Principal Component 2\n")
+pca_beetle_rotatedN_plot12
+
+# examine loadings
+mc_beetle_rotatedN = rownames(pca_beetle_rotatedN_loadings)
+
+# ... for PC1
+pca_beetle_rotatedN_pc1 <- pca_beetle_rotatedN_loadings %>%
+  mutate(mc = mc_beetle_rotatedN) %>%
+  arrange(desc(PC1)) %>%
+  select(PC1, mc, mc_cat)
+pca_beetle_rotatedN_pc1
+
+# ... for PC2
+pca_beetle_rotatedN_pc2 <- pca_beetle_rotatedN_loadings %>%
+  mutate(mc = mc_beetle_rotatedN) %>%
+  arrange(desc(PC2)) %>%
+  select(PC2, mc, mc_cat)
+pca_beetle_rotatedN_pc2
+
+# ... for PC3
+pca_beetle_rotatedN_pc3 <- pca_beetle_rotatedN_loadings %>%
+  mutate(mc = mc_beetle_rotatedN) %>%
+  arrange(desc(PC3)) %>%
+  select(PC3, mc, mc_cat)
+pca_beetle_rotatedN_pc3
 
 # PCA: ROBOT condition --------------------------------------------------------
 
-# use "very simple structure" criterion to examine how many factors to extract
-VSS(d_robot, n = 39)
+# step 1: determine how many dimensions to extract ---------------------------
+
+# use "very simple structure" criterion
+# VSS(d_robot, n = 39)
 VSS.scree(d_robot)
 
-# run unrotated pca with maximum number of factors
+# run unrotated pca with maximum number of dimensions
 pca_robot_unrotated <- principal(d_robot, nfactors = 39, rotate = "none")
 pca_robot_unrotated
-pca_robot_unrotated$values # examine eignenvalues, retain iff > 1.00
+pca_robot_unrotated$values # examine eignenvalues, consider retaining iff > 1.00
 
-# set number of factors to extract (manually)
-nfactors_robot <- 12
+# set number of dimensions to extract (manually)
+nfactors_robot <- 3
 
-# run pca with varimax rotation with n factors (as determined above)
-pca_robot_varimax <- principal(d_robot, nfactors = nfactors_robot, rotate = "none")
-pca_robot_varimax
-pca_robot_varimax$loadings
+# step 2: run pca without rotation with N dimensions -------------------------
 
-# plot mental capacities in first two dimensions
-ggplot(data.frame(pca_robot_varimax$loadings[1:40, 1:nfactors_robot]), aes(x = PC1, y = PC2, label = rownames(data.frame(pca_robot_varimax$loadings[1:40, 1:nfactors_robot])))) +
-  geom_text() +
-  theme_bw() +
-  labs(title = "ROBOT: factor loadings (first 2 components)\n",
-       x = "\nPrincipal Component 2",
-       y = "Principal Component 1\n")
-
-# PCA: BEETLE condition -------------------------------------------------------
-
-# use "very simple structure" criterion to examine how many factors to extract
-VSS(d_beetle, n = 39)
-VSS.scree(d_beetle)
-
-# run unrotated pca with maximum number of factors
-pca_beetle_unrotated <- principal(d_beetle, nfactors = 39, rotate = "none")
-pca_beetle_unrotated
-pca_beetle_unrotated$values # examine eignenvalues, retain iff > 1.00
-
-# set number of factors to extract (manually)
-nfactors_beetle <- 3
-
-# run pca with varimax rotation with n factors (as determined above)
-pca_beetle_varimax <- principal(d_beetle, nfactors = nfactors_beetle, rotate = "none")
-pca_beetle_varimax
+# run unrotated pca with n dimensions
+pca_robot_unrotatedN <- principal(d_robot, nfactors = nfactors_robot, rotate = "none")
+pca_robot_unrotatedN
 
 # plot mental capacities in first two dimensions
-ggplot(data.frame(pca_beetle_varimax$loadings[1:40, 1:nfactors_beetle]), aes(x = PC1, y = PC2, label = rownames(data.frame(pca_beetle_varimax$loadings[1:40, 1:nfactors_beetle])))) +
-  geom_text() +
+pca_robot_unrotatedN_loadings <- 
+  data.frame(pca_robot_unrotatedN$loadings[1:40, 1:nfactors_robot],
+             row.names = rownames(pca_robot_unrotatedN$loadings[1:40, 1:nfactors_robot]))
+
+# code a priori mental capacity categories
+pca_robot_unrotatedN_loadings[c("hungry", "tired", "pain", 
+                                 "nauseated", "safe"),
+                               "mc_cat"] <- "biological"
+pca_robot_unrotatedN_loadings[c("happy", "depressed", "fear", 
+                                 "angry", "calm", "joy"),
+                               "mc_cat"] <- "affective"
+pca_robot_unrotatedN_loadings[c("sounds", "seeing", "temperature", 
+                                 "odors", "depth"),
+                               "mc_cat"] <- "perceptual"
+pca_robot_unrotatedN_loadings[c("computations", "thoughts", "reasoning", 
+                                 "remembering", "beliefs"),
+                               "mc_cat"] <- "cognitive"
+pca_robot_unrotatedN_loadings[c("free_will", "choices", "self_restraint", 
+                                 "intentions", "goal"),
+                               "mc_cat"] <- "autonomous"
+pca_robot_unrotatedN_loadings[c("love", "recognizing", "communicating", "guilt", 
+                                 "disrespected", "embarrassed", "emo_recog"),
+                               "mc_cat"] <- "social"
+pca_robot_unrotatedN_loadings[c("conscious", "self_aware", "pleasure", 
+                                 "desires", "morality", "personality", "pride"),
+                               "mc_cat"] <- "other"
+
+pca_robot_unrotatedN_loadings$mc_cat <- factor(pca_robot_unrotatedN_loadings$mc_cat)
+
+pca_robot_unrotatedN_plot12 <- 
+  ggplot(pca_robot_unrotatedN_loadings,
+         aes(x = PC1, y = PC2,
+             label = rownames(pca_robot_unrotatedN_loadings),
+             color = mc_cat)) +
+  geom_text(hjust = 0.5, vjust = 0.5) +
   theme_bw() +
-  labs(title = "BEETLE: factor loadings (first 2 components)\n",
-       x = "\nPrincipal Component 2",
-       y = "Principal Component 1\n")
+  theme(text = element_text(size = 12)) +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(title = "ROBOT: factor loadings (first 2 unrotated components)\n",
+       x = "\nPrincipal Component 1",
+       y = "Principal Component 2\n")
+pca_robot_unrotatedN_plot12
 
-# normality tests: both conditions --------------------------------------------
+# examine loadings
+mc_robot_unrotatedN = rownames(pca_robot_unrotatedN_loadings)
 
-# make function for conducting shapiro-wilk tests for all distributions
-sw_multi <- function(data) {
-  mental_caps <- names(data)
-  sw_W <- data.frame(NULL)
-  sw_p <- data.frame(NULL)
-  for (i in 1:length(mental_caps)) {
-    temp <- shapiro.test(unlist(data[mental_caps[i]], use.names = F))
-    sw_W[1, mental_caps[i]] <- temp$statistic
-    sw_p[1, mental_caps[i]] <- temp$p.value
-  }
-  results <- data.frame(NULL)
-  attr(results, "W") <- sw_W
-  attr(results, "p.value") <- sw_p
-  return(results)
-}
+# ... for PC1
+pca_robot_unrotatedN_pc1 <- pca_robot_unrotatedN_loadings %>%
+  mutate(mc = mc_robot_unrotatedN) %>%
+  arrange(desc(PC1)) %>%
+  select(PC1, mc, mc_cat)
+pca_robot_unrotatedN_pc1
 
-# run ks tests on ROBOT condition
-sw_robot <- sw_multi(d_robot)
-attr(sw_robot, "W") # look at D-values
-attr(sw_robot, "p.value") # look at p-values
+# ... for PC2
+pca_robot_unrotatedN_pc2 <- pca_robot_unrotatedN_loadings %>%
+  mutate(mc = mc_robot_unrotatedN) %>%
+  arrange(desc(PC2)) %>%
+  select(PC2, mc, mc_cat)
+pca_robot_unrotatedN_pc2
 
-p.adjust(as.matrix(attr(sw_robot, "p.value")), method = "bonferroni") # auto bonferroni
-p.adjust(as.matrix(attr(sw_robot, "p.value")), method = "holm") # auto false discovery
+# ... for PC3
+pca_robot_unrotatedN_pc3 <- pca_robot_unrotatedN_loadings %>%
+  mutate(mc = mc_robot_unrotatedN) %>%
+  arrange(desc(PC3)) %>%
+  select(PC3, mc, mc_cat)
+pca_robot_unrotatedN_pc3
 
-# run ks tests on BEETLE condition
-sw_beetle <- sw_multi(d_beetle)
-attr(sw_beetle, "W") # look at D-values
-attr(sw_beetle, "p.value") # look at p-values
+# step 3: run pca with varimax rotation with N dimensions --------------------
 
-p.adjust(as.matrix(attr(sw_beetle, "p.value")), method = "bonferroni") # auto bonferroni
-p.adjust(as.matrix(attr(sw_beetle, "p.value")), method = "holm") # auto false discovery
+# run pca with n dimensions with varimax rotation
+pca_robot_rotatedN <- principal(d_robot, nfactors = nfactors_robot, 
+                                 rotate = "varimax")
+pca_robot_rotatedN
 
-# bimodality comparisons: both conditions -------------------------------------
+# plot mental capacities in first two dimensions
+pca_robot_rotatedN_loadings <- 
+  data.frame(pca_robot_rotatedN$loadings[1:40, 1:nfactors_robot],
+             row.names = rownames(pca_robot_rotatedN$loadings[1:40, 1:nfactors_robot]))
 
-# set corrected critical p-value for multiple comparisons (crude bonferroni method)
-n_comparisons <- choose(40, 2) # determine how many comparisons (choose 2 from 40 MCs)
-p_crit <- 0.05/n_comparisons # divide alpha by number of comparisons
+# code a priori mental capacity categories
+pca_robot_rotatedN_loadings[c("hungry", "tired", "pain", 
+                               "nauseated", "safe"),
+                             "mc_cat"] <- "biological"
+pca_robot_rotatedN_loadings[c("happy", "depressed", "fear", 
+                               "angry", "calm", "joy"),
+                             "mc_cat"] <- "affective"
+pca_robot_rotatedN_loadings[c("sounds", "seeing", "temperature", 
+                               "odors", "depth"),
+                             "mc_cat"] <- "perceptual"
+pca_robot_rotatedN_loadings[c("computations", "thoughts", "reasoning", 
+                               "remembering", "beliefs"),
+                             "mc_cat"] <- "cognitive"
+pca_robot_rotatedN_loadings[c("free_will", "choices", "self_restraint", 
+                               "intentions", "goal"),
+                             "mc_cat"] <- "autonomous"
+pca_robot_rotatedN_loadings[c("love", "recognizing", "communicating", "guilt", 
+                               "disrespected", "embarrassed", "emo_recog"),
+                             "mc_cat"] <- "social"
+pca_robot_rotatedN_loadings[c("conscious", "self_aware", "pleasure", 
+                               "desires", "morality", "personality", "pride"),
+                             "mc_cat"] <- "other"
 
-# make function for conducting kolmogorov-smirnov tests for all possible comparisons
-ks_multi <- function(data) {
-  mental_caps <- names(data)
-  ks_D <- data.frame(NULL)
-  ks_p <- data.frame(NULL)
-  ks_signif <- data.frame(NULL)
-  for (i in 1:length(mental_caps)) {
-    for (j in 2:length(mental_caps)) {
-      temp <- ks.test(unlist(data[mental_caps[i]], use.names = F), 
-                      unlist(data[mental_caps[j]], use.names = F))
-      ks_D[mental_caps[i], mental_caps[j]] <- temp$statistic
-      ks_p[mental_caps[i], mental_caps[j]] <- temp$p.value
-      ks_signif[mental_caps[i], mental_caps[j]] <- ifelse(temp$p.value < p_crit, round(p.value, 3), "ns")
-    }
-  }
-  results <- data.frame(NULL)
-  attr(results, "D") <- ks_D
-  attr(results, "p.value") <- ks_p
-  attr(results, "signif") <- ks_signif
-  return(results)
-}
+pca_robot_rotatedN_loadings$mc_cat <- factor(pca_robot_rotatedN_loadings$mc_cat)
 
-# run ks tests on ROBOT condition
-ks_robot <- ks_multi(d_robot)
-attr(ks_robot, "D") # look at D-values
-attr(ks_robot, "p.value") # look at p-values
-attr(ks_robot, "signif") # identify significant comparisons according to new p-crit
+pca_robot_rotatedN_plot12 <- 
+  ggplot(pca_robot_rotatedN_loadings,
+         aes(x = PC1, y = PC2,
+             label = rownames(pca_robot_rotatedN_loadings),
+             color = mc_cat)) +
+  geom_text(hjust = 0.5, vjust = 0.5) +
+  theme_bw() +
+  theme(text = element_text(size = 12)) +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(title = "ROBOT: factor loadings (first 2 rotated components)\n",
+       x = "\nPrincipal Component 1",
+       y = "Principal Component 2\n")
+pca_robot_rotatedN_plot12
 
-p.adjust(as.matrix(attr(ks_robot, "p.value")), method = "bonferroni") # auto bonferroni
-p.adjust(as.matrix(attr(ks_robot, "p.value")), method = "holm") # auto false discovery
+# examine loadings
+mc_robot_rotatedN = rownames(pca_robot_rotatedN_loadings)
 
-# run ks tests on BEETLE condition
-ks_beetle <- ks_multi(d_beetle)
-attr(ks_beetle, "D") # look at D-values
-attr(ks_beetle, "p.value") # look at p-values
-attr(ks_beetle, "signif") # identify significant comparisons according to new p-crit
+# ... for PC1
+pca_robot_rotatedN_pc1 <- pca_robot_rotatedN_loadings %>%
+  mutate(mc = mc_robot_rotatedN) %>%
+  arrange(desc(PC1)) %>%
+  select(PC1, mc, mc_cat)
+pca_robot_rotatedN_pc1
 
-p.adjust(as.matrix(attr(ks_beetle, "p.value")), method = "bonferroni") # auto bonferroni
-p.adjust(as.matrix(attr(ks_beetle, "p.value")), method = "holm") # auto false discovery
+# ... for PC2
+pca_robot_rotatedN_pc2 <- pca_robot_rotatedN_loadings %>%
+  mutate(mc = mc_robot_rotatedN) %>%
+  arrange(desc(PC2)) %>%
+  select(PC2, mc, mc_cat)
+pca_robot_rotatedN_pc2
+
+# ... for PC3
+pca_robot_rotatedN_pc3 <- pca_robot_rotatedN_loadings %>%
+  mutate(mc = mc_robot_rotatedN) %>%
+  arrange(desc(PC3)) %>%
+  select(PC3, mc, mc_cat)
+pca_robot_rotatedN_pc3
