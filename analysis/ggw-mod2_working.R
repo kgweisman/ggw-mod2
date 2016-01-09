@@ -95,6 +95,23 @@ d_clean <- d_clean_1 %>%
   select(subid:gender, feedback:race_cat, religion_cat3) %>%
   rename(religion_cat = religion_cat3)
 
+# prepare datasets for PCA ----------------------------------------------------
+
+# separate conditions and remove identifier variables
+d_beetle <- d_clean %>%
+  filter(condition == "beetle") %>% # filter by condition
+  select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3!
+d_beetle <- data.frame(d_beetle[,-1], row.names = d_beetle[,1])
+
+d_robot <- d_clean %>%
+  filter(condition == "robot") %>% # filter by condition
+  select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3!
+d_robot <- data.frame(d_robot[,-1], row.names = d_robot[,1])
+
+d_both <- d_clean %>%
+  select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3!
+d_both <- data.frame(d_both[,-1], row.names = d_both[,1])
+
 # examine demographic variables -----------------------------------------------
 
 # sample size
@@ -125,23 +142,6 @@ summary(race_ethn) # test for difference in race/ethnicity distribution across c
 religion <- with(d_clean, table(condition, religion_cat))
 kable(addmargins(religion))
 summary(religion) # test for difference in religion distribution across conditions
-
-# prepare datasets for PCA ----------------------------------------------------
-
-# separate conditions and remove identifier variables
-d_beetle <- d_clean %>%
-  filter(condition == "beetle") %>% # filter by condition
-  select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3!
-d_beetle <- data.frame(d_beetle[,-1], row.names = d_beetle[,1])
-
-d_robot <- d_clean %>%
-  filter(condition == "robot") %>% # filter by condition
-  select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3!
-d_robot <- data.frame(d_robot[,-1], row.names = d_robot[,1])
-
-d_both <- d_clean %>%
-  select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3!
-d_both <- data.frame(d_both[,-1], row.names = d_both[,1])
 
 # PCA: BEETLE condition --------------------------------------------------------
 
