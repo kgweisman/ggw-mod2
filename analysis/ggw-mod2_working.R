@@ -129,18 +129,183 @@ summary(religion) # test for difference in religion distribution across conditio
 # prepare datasets for PCA ----------------------------------------------------
 
 # separate conditions and remove identifier variables
-d_robot <- d_clean %>%
-  filter(condition == "robot") %>% # filter by condition
-  select(happy:pride) # NOTE: make sure to check that responses are scored as -3:3!
-
 d_beetle <- d_clean %>%
   filter(condition == "beetle") %>% # filter by condition
   select(happy:pride) # NOTE: make sure to check that responses are scored as -3:3!
 
+d_robot <- d_clean %>%
+  filter(condition == "robot") %>% # filter by condition
+  select(happy:pride) # NOTE: make sure to check that responses are scored as -3:3!
+
+d_both <- d_clean %>%
+  select(happy:pride) # NOTE: make sure to check that responses are scored as -3:3!
+
+# PCA: BEETLE condition --------------------------------------------------------
+
+# use "very simple structure" criterion to examine how many factors to extract
+# VSS(d_beetle, n = 39)
+VSS.scree(d_beetle)
+
+# run unrotated pca with maximum number of factors
+pca_beetle_unrotated <- principal(d_beetle, nfactors = 39, rotate = "none")
+pca_beetle_unrotated
+pca_beetle_unrotated$values # examine eignenvalues, retain iff > 1.00
+
+# set number of factors to extract (manually)
+nfactors_beetle <- 3
+
+# run pca without rotation with n factors (as determined above)
+pca_beetle_unrotated2 <- principal(d_beetle, nfactors = nfactors_beetle, rotate = "none")
+pca_beetle_unrotated2
+pca_beetle_unrotated2$loadings
+
+# plot mental capacities in first two dimensions
+pca_beetle_unrotated2_loadings <- 
+  data.frame(pca_beetle_unrotated2$loadings[1:40, 1:nfactors_beetle],
+             row.names = rownames(pca_beetle_unrotated2$loadings[1:40, 1:nfactors_beetle]))
+
+# code a priori mental capacity categories
+pca_beetle_unrotated2_loadings[c("hungry", "tired", "pain", 
+                             "nauseated", "safe"),
+                           "mc_cat"] <- "biological"
+pca_beetle_unrotated2_loadings[c("happy", "depressed", "fear", 
+                             "angry", "calm", "joy"),
+                           "mc_cat"] <- "affective"
+pca_beetle_unrotated2_loadings[c("sounds", "seeing", "temperature", 
+                             "odors", "depth"),
+                           "mc_cat"] <- "perceptual"
+pca_beetle_unrotated2_loadings[c("computations", "thoughts", "reasoning", 
+                             "remembering", "beliefs"),
+                           "mc_cat"] <- "cognitive"
+pca_beetle_unrotated2_loadings[c("free_will", "choices", "self_restraint", 
+                             "intentions", "goal"),
+                           "mc_cat"] <- "autonomous"
+pca_beetle_unrotated2_loadings[c("love", "recognizing", "communicating", "guilt", 
+                             "disrespected", "embarrassed", "emo_recog"),
+                           "mc_cat"] <- "social"
+pca_beetle_unrotated2_loadings[c("conscious", "self_aware", "pleasure", 
+                             "desires", "morality", "personality", "pride"),
+                           "mc_cat"] <- "other"
+
+pca_beetle_unrotated2_loadings$mc_cat <- factor(pca_beetle_unrotated2_loadings$mc_cat)
+
+pca_beetle_plot <- ggplot(pca_beetle_unrotated2_loadings,
+                         aes(x = PC1, y = PC2,
+                             label = rownames(pca_beetle_unrotated2_loadings),
+                             color = mc_cat)) +
+  geom_text(hjust = 0.5, vjust = 0.5) +
+  # geom_point() +
+  # geom_dl(method = "smart.grid")+
+  theme_bw() +
+  theme(text = element_text(size = 12)) +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(title = "BEETLE: factor loadings (first 2 unrotated components)\n",
+       x = "\nPrincipal Component 1",
+       y = "Principal Component 2\n")
+pca_beetle_plot
+
+# examine loadings
+mc_beetle = rownames(pca_beetle_unrotated2_loadings)
+
+# ... for PC1
+pca_beetle_unrotated2_pc1 <- pca_beetle_unrotated2_loadings %>%
+  mutate(mc = mc_beetle) %>%
+  arrange(desc(PC1)) %>%
+  select(PC1, mc, mc_cat)
+pca_beetle_unrotated2_pc1
+
+# ... for PC2
+pca_beetle_unrotated2_pc2 <- pca_beetle_unrotated2_loadings %>%
+  mutate(mc = mc_beetle) %>%
+  arrange(desc(PC2)) %>%
+  select(PC2, mc, mc_cat)
+pca_beetle_unrotated2_pc2
+
+# ... for PC3
+pca_beetle_unrotated2_pc3 <- pca_beetle_unrotated2_loadings %>%
+  mutate(mc = mc_beetle) %>%
+  arrange(desc(PC3)) %>%
+  select(PC3, mc, mc_cat)
+pca_beetle_unrotated2_pc3
+
+# run pca with varimax rotation with n factors (as determined above)
+pca_beetle_varimax <- principal(d_beetle, nfactors = nfactors_beetle, rotate = "varimax")
+pca_beetle_varimax
+pca_beetle_varimax$loadings
+
+# plot mental capacities in first two dimensions
+pca_beetle_varimax_loadings <- 
+  data.frame(pca_beetle_varimax$loadings[1:40, 1:nfactors_beetle],
+             row.names = rownames(pca_beetle_varimax$loadings[1:40, 1:nfactors_beetle]))
+
+# code a priori mental capacity categories
+pca_beetle_varimax_loadings[c("hungry", "tired", "pain", 
+                             "nauseated", "safe"),
+                           "mc_cat"] <- "biological"
+pca_beetle_varimax_loadings[c("happy", "depressed", "fear", 
+                             "angry", "calm", "joy"),
+                           "mc_cat"] <- "affective"
+pca_beetle_varimax_loadings[c("sounds", "seeing", "temperature", 
+                             "odors", "depth"),
+                           "mc_cat"] <- "perceptual"
+pca_beetle_varimax_loadings[c("computations", "thoughts", "reasoning", 
+                             "remembering", "beliefs"),
+                           "mc_cat"] <- "cognitive"
+pca_beetle_varimax_loadings[c("free_will", "choices", "self_restraint", 
+                             "intentions", "goal"),
+                           "mc_cat"] <- "autonomous"
+pca_beetle_varimax_loadings[c("love", "recognizing", "communicating", "guilt", 
+                             "disrespected", "embarrassed", "emo_recog"),
+                           "mc_cat"] <- "social"
+pca_beetle_varimax_loadings[c("conscious", "self_aware", "pleasure", 
+                             "desires", "morality", "personality", "pride"),
+                           "mc_cat"] <- "other"
+
+pca_beetle_varimax_loadings$mc_cat <- factor(pca_beetle_varimax_loadings$mc_cat)
+
+pca_beetle_plot <- ggplot(pca_beetle_varimax_loadings,
+                         aes(x = PC1, y = PC2,
+                             label = rownames(pca_beetle_varimax_loadings),
+                             color = mc_cat)) +
+  geom_text(hjust = 0.5, vjust = 0.5) +
+  # geom_point() +
+  # geom_dl(method = "smart.grid")+
+  theme_bw() +
+  theme(text = element_text(size = 12)) +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(title = "BEETLE: factor loadings (first 2 rotated components)\n",
+       x = "\nPrincipal Component 1",
+       y = "Principal Component 2\n")
+pca_beetle_plot
+
+# examine loadings
+mc_beetle = rownames(pca_beetle_varimax_loadings)
+
+# ... for PC1
+pca_beetle_varimax_pc1 <- pca_beetle_varimax_loadings %>%
+  mutate(mc = mc_beetle) %>%
+  arrange(desc(PC1)) %>%
+  select(PC1, mc, mc_cat)
+pca_beetle_varimax_pc1
+
+# ... for PC2
+pca_beetle_varimax_pc2 <- pca_beetle_varimax_loadings %>%
+  mutate(mc = mc_beetle) %>%
+  arrange(desc(PC2)) %>%
+  select(PC2, mc, mc_cat)
+pca_beetle_varimax_pc2
+
+# ... for PC3
+pca_beetle_varimax_pc3 <- pca_beetle_varimax_loadings %>%
+  mutate(mc = mc_beetle) %>%
+  arrange(desc(PC3)) %>%
+  select(PC3, mc, mc_cat)
+pca_beetle_varimax_pc3
+
 # PCA: ROBOT condition --------------------------------------------------------
 
 # use "very simple structure" criterion to examine how many factors to extract
-VSS(d_robot, n = 39)
+# VSS(d_robot, n = 39)
 VSS.scree(d_robot)
 
 # run unrotated pca with maximum number of factors
@@ -150,6 +315,80 @@ pca_robot_unrotated$values # examine eignenvalues, retain iff > 1.00
 
 # set number of factors to extract (manually)
 nfactors_robot <- 3
+
+# run pca without rotation with n factors (as determined above)
+pca_robot_unrotated2 <- principal(d_robot, nfactors = nfactors_robot, rotate = "none")
+pca_robot_unrotated2
+pca_robot_unrotated2$loadings
+
+# plot mental capacities in first two dimensions
+pca_robot_unrotated2_loadings <- 
+  data.frame(pca_robot_unrotated2$loadings[1:40, 1:nfactors_robot],
+             row.names = rownames(pca_robot_unrotated2$loadings[1:40, 1:nfactors_robot]))
+
+# code a priori mental capacity categories
+pca_robot_unrotated2_loadings[c("hungry", "tired", "pain", 
+                                "nauseated", "safe"),
+                              "mc_cat"] <- "biological"
+pca_robot_unrotated2_loadings[c("happy", "depressed", "fear", 
+                                "angry", "calm", "joy"),
+                              "mc_cat"] <- "affective"
+pca_robot_unrotated2_loadings[c("sounds", "seeing", "temperature", 
+                                "odors", "depth"),
+                              "mc_cat"] <- "perceptual"
+pca_robot_unrotated2_loadings[c("computations", "thoughts", "reasoning", 
+                                "remembering", "beliefs"),
+                              "mc_cat"] <- "cognitive"
+pca_robot_unrotated2_loadings[c("free_will", "choices", "self_restraint", 
+                                "intentions", "goal"),
+                              "mc_cat"] <- "autonomous"
+pca_robot_unrotated2_loadings[c("love", "recognizing", "communicating", "guilt", 
+                                "disrespected", "embarrassed", "emo_recog"),
+                              "mc_cat"] <- "social"
+pca_robot_unrotated2_loadings[c("conscious", "self_aware", "pleasure", 
+                                "desires", "morality", "personality", "pride"),
+                              "mc_cat"] <- "other"
+
+pca_robot_unrotated2_loadings$mc_cat <- factor(pca_robot_unrotated2_loadings$mc_cat)
+
+pca_robot_plot <- ggplot(pca_robot_unrotated2_loadings,
+                         aes(x = PC1, y = PC2,
+                             label = rownames(pca_robot_unrotated2_loadings),
+                             color = mc_cat)) +
+  geom_text(hjust = 0.5, vjust = 0.5) +
+  # geom_point() +
+  # geom_dl(method = "smart.grid")+
+  theme_bw() +
+  theme(text = element_text(size = 12)) +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(title = "ROBOT: factor loadings (first 2 unrotated components)\n",
+       x = "\nPrincipal Component 1",
+       y = "Principal Component 2\n")
+pca_robot_plot
+
+# examine loadings
+mc_robot = rownames(pca_robot_unrotated2_loadings)
+
+# ... for PC1
+pca_robot_unrotated2_pc1 <- pca_robot_unrotated2_loadings %>%
+  mutate(mc = mc_robot) %>%
+  arrange(desc(PC1)) %>%
+  select(PC1, mc, mc_cat)
+pca_robot_unrotated2_pc1
+
+# ... for PC2
+pca_robot_unrotated2_pc2 <- pca_robot_unrotated2_loadings %>%
+  mutate(mc = mc_robot) %>%
+  arrange(desc(PC2)) %>%
+  select(PC2, mc, mc_cat)
+pca_robot_unrotated2_pc2
+
+# ... for PC3
+pca_robot_unrotated2_pc3 <- pca_robot_unrotated2_loadings %>%
+  mutate(mc = mc_robot) %>%
+  arrange(desc(PC3)) %>%
+  select(PC3, mc, mc_cat)
+pca_robot_unrotated2_pc3
 
 # run pca with varimax rotation with n factors (as determined above)
 pca_robot_varimax <- principal(d_robot, nfactors = nfactors_robot, rotate = "varimax")
@@ -225,58 +464,58 @@ pca_robot_varimax_pc3 <- pca_robot_varimax_loadings %>%
   select(PC3, mc, mc_cat)
 pca_robot_varimax_pc3
 
-# PCA: BEETLE condition -------------------------------------------------------
+# PCA: BOTH condition --------------------------------------------------------
 
 # use "very simple structure" criterion to examine how many factors to extract
-VSS(d_beetle, n = 39)
-VSS.scree(d_beetle)
+# VSS(d_both, n = 39)
+VSS.scree(d_both)
 
 # run unrotated pca with maximum number of factors
-pca_beetle_unrotated <- principal(d_beetle, nfactors = 39, rotate = "none")
-pca_beetle_unrotated
-pca_beetle_unrotated$values # examine eignenvalues, retain iff > 1.00
+pca_both_unrotated <- principal(d_both, nfactors = 39, rotate = "none")
+pca_both_unrotated
+pca_both_unrotated$values # examine eignenvalues, retain iff > 1.00
 
 # set number of factors to extract (manually)
-nfactors_beetle <- 3
+nfactors_both <- 4
 
-# run pca with varimax rotation with n factors (as determined above)
-pca_beetle_varimax <- principal(d_beetle, nfactors = nfactors_beetle, rotate = "varimax")
-pca_beetle_varimax
-pca_beetle_varimax$loadings
+# run pca without rotation with n factors (as determined above)
+pca_both_unrotated2 <- principal(d_both, nfactors = nfactors_both, rotate = "none")
+pca_both_unrotated2
+pca_both_unrotated2$loadings
 
 # plot mental capacities in first two dimensions
-pca_beetle_varimax_loadings <- 
-  data.frame(pca_beetle_varimax$loadings[1:40, 1:nfactors_beetle],
-             row.names = rownames(pca_beetle_varimax$loadings[1:40, 1:nfactors_beetle]))
+pca_both_unrotated2_loadings <- 
+  data.frame(pca_both_unrotated2$loadings[1:40, 1:nfactors_both],
+             row.names = rownames(pca_both_unrotated2$loadings[1:40, 1:nfactors_both]))
 
 # code a priori mental capacity categories
-pca_beetle_varimax_loadings[c("hungry", "tired", "pain", 
-                             "nauseated", "safe"),
-                           "mc_cat"] <- "biological"
-pca_beetle_varimax_loadings[c("happy", "depressed", "fear", 
-                             "angry", "calm", "joy"),
-                           "mc_cat"] <- "affective"
-pca_beetle_varimax_loadings[c("sounds", "seeing", "temperature", 
-                             "odors", "depth"),
-                           "mc_cat"] <- "perceptual"
-pca_beetle_varimax_loadings[c("computations", "thoughts", "reasoning", 
-                             "remembering", "beliefs"),
-                           "mc_cat"] <- "cognitive"
-pca_beetle_varimax_loadings[c("free_will", "choices", "self_restraint", 
-                             "intentions", "goal"),
-                           "mc_cat"] <- "autonomous"
-pca_beetle_varimax_loadings[c("love", "recognizing", "communicating", "guilt", 
-                             "disrespected", "embarrassed", "emo_recog"),
-                           "mc_cat"] <- "social"
-pca_beetle_varimax_loadings[c("conscious", "self_aware", "pleasure", 
-                             "desires", "morality", "personality", "pride"),
-                           "mc_cat"] <- "other"
+pca_both_unrotated2_loadings[c("hungry", "tired", "pain", 
+                                "nauseated", "safe"),
+                              "mc_cat"] <- "biological"
+pca_both_unrotated2_loadings[c("happy", "depressed", "fear", 
+                                "angry", "calm", "joy"),
+                              "mc_cat"] <- "affective"
+pca_both_unrotated2_loadings[c("sounds", "seeing", "temperature", 
+                                "odors", "depth"),
+                              "mc_cat"] <- "perceptual"
+pca_both_unrotated2_loadings[c("computations", "thoughts", "reasoning", 
+                                "remembering", "beliefs"),
+                              "mc_cat"] <- "cognitive"
+pca_both_unrotated2_loadings[c("free_will", "choices", "self_restraint", 
+                                "intentions", "goal"),
+                              "mc_cat"] <- "autonomous"
+pca_both_unrotated2_loadings[c("love", "recognizing", "communicating", "guilt", 
+                                "disrespected", "embarrassed", "emo_recog"),
+                              "mc_cat"] <- "social"
+pca_both_unrotated2_loadings[c("conscious", "self_aware", "pleasure", 
+                                "desires", "morality", "personality", "pride"),
+                              "mc_cat"] <- "other"
 
-pca_beetle_varimax_loadings$mc_cat <- factor(pca_beetle_varimax_loadings$mc_cat)
+pca_both_unrotated2_loadings$mc_cat <- factor(pca_both_unrotated2_loadings$mc_cat)
 
-pca_beetle_plot <- ggplot(pca_beetle_varimax_loadings,
+pca_both_plot <- ggplot(pca_both_unrotated2_loadings,
                          aes(x = PC1, y = PC2,
-                             label = rownames(pca_beetle_varimax_loadings),
+                             label = rownames(pca_both_unrotated2_loadings),
                              color = mc_cat)) +
   geom_text(hjust = 0.5, vjust = 0.5) +
   # geom_point() +
@@ -284,34 +523,122 @@ pca_beetle_plot <- ggplot(pca_beetle_varimax_loadings,
   theme_bw() +
   theme(text = element_text(size = 12)) +
   scale_color_brewer(type = "qual", palette = 2) +
-  labs(title = "BEETLE: factor loadings (first 2 rotated components)\n",
+  labs(title = "BOTH: factor loadings (first 2 unrotated components)\n",
        x = "\nPrincipal Component 1",
        y = "Principal Component 2\n")
-pca_beetle_plot
+pca_both_plot
 
 # examine loadings
-mc_beetle = rownames(pca_beetle_varimax_loadings)
+mc_both = rownames(pca_both_unrotated2_loadings)
 
 # ... for PC1
-pca_beetle_varimax_pc1 <- pca_beetle_varimax_loadings %>%
-  mutate(mc = mc_beetle) %>%
+pca_both_unrotated2_pc1 <- pca_both_unrotated2_loadings %>%
+  mutate(mc = mc_both) %>%
   arrange(desc(PC1)) %>%
   select(PC1, mc, mc_cat)
-pca_beetle_varimax_pc1
+pca_both_unrotated2_pc1
 
 # ... for PC2
-pca_beetle_varimax_pc2 <- pca_beetle_varimax_loadings %>%
-  mutate(mc = mc_beetle) %>%
+pca_both_unrotated2_pc2 <- pca_both_unrotated2_loadings %>%
+  mutate(mc = mc_both) %>%
   arrange(desc(PC2)) %>%
   select(PC2, mc, mc_cat)
-pca_beetle_varimax_pc2
+pca_both_unrotated2_pc2
 
 # ... for PC3
-pca_beetle_varimax_pc3 <- pca_beetle_varimax_loadings %>%
-  mutate(mc = mc_beetle) %>%
+pca_both_unrotated2_pc3 <- pca_both_unrotated2_loadings %>%
+  mutate(mc = mc_both) %>%
   arrange(desc(PC3)) %>%
   select(PC3, mc, mc_cat)
-pca_beetle_varimax_pc3
+pca_both_unrotated2_pc3
+
+# ... for PC4
+pca_both_unrotated2_pc4 <- pca_both_unrotated2_loadings %>%
+  mutate(mc = mc_both) %>%
+  arrange(desc(PC4)) %>%
+  select(PC4, mc, mc_cat)
+pca_both_unrotated2_pc4
+
+# run pca with varimax rotation with n factors (as determined above)
+pca_both_varimax <- principal(d_both, nfactors = nfactors_both, rotate = "varimax")
+pca_both_varimax
+pca_both_varimax$loadings
+
+# plot mental capacities in first two dimensions
+pca_both_varimax_loadings <- 
+  data.frame(pca_both_varimax$loadings[1:40, 1:nfactors_both],
+             row.names = rownames(pca_both_varimax$loadings[1:40, 1:nfactors_both]))
+
+# code a priori mental capacity categories
+pca_both_varimax_loadings[c("hungry", "tired", "pain", 
+                             "nauseated", "safe"),
+                           "mc_cat"] <- "biological"
+pca_both_varimax_loadings[c("happy", "depressed", "fear", 
+                             "angry", "calm", "joy"),
+                           "mc_cat"] <- "affective"
+pca_both_varimax_loadings[c("sounds", "seeing", "temperature", 
+                             "odors", "depth"),
+                           "mc_cat"] <- "perceptual"
+pca_both_varimax_loadings[c("computations", "thoughts", "reasoning", 
+                             "remembering", "beliefs"),
+                           "mc_cat"] <- "cognitive"
+pca_both_varimax_loadings[c("free_will", "choices", "self_restraint", 
+                             "intentions", "goal"),
+                           "mc_cat"] <- "autonomous"
+pca_both_varimax_loadings[c("love", "recognizing", "communicating", "guilt", 
+                             "disrespected", "embarrassed", "emo_recog"),
+                           "mc_cat"] <- "social"
+pca_both_varimax_loadings[c("conscious", "self_aware", "pleasure", 
+                             "desires", "morality", "personality", "pride"),
+                           "mc_cat"] <- "other"
+
+pca_both_varimax_loadings$mc_cat <- factor(pca_both_varimax_loadings$mc_cat)
+
+pca_both_plot <- ggplot(pca_both_varimax_loadings,
+                         aes(x = PC1, y = PC2,
+                             label = rownames(pca_both_varimax_loadings),
+                             color = mc_cat)) +
+  geom_text(hjust = 0.5, vjust = 0.5) +
+  # geom_point() +
+  # geom_dl(method = "smart.grid")+
+  theme_bw() +
+  theme(text = element_text(size = 12)) +
+  scale_color_brewer(type = "qual", palette = 2) +
+  labs(title = "BOTH: factor loadings (first 2 rotated components)\n",
+       x = "\nPrincipal Component 1",
+       y = "Principal Component 2\n")
+pca_both_plot
+
+# examine loadings
+mc_both = rownames(pca_both_varimax_loadings)
+
+# ... for PC1
+pca_both_varimax_pc1 <- pca_both_varimax_loadings %>%
+  mutate(mc = mc_both) %>%
+  arrange(desc(PC1)) %>%
+  select(PC1, mc, mc_cat)
+pca_both_varimax_pc1
+
+# ... for PC2
+pca_both_varimax_pc2 <- pca_both_varimax_loadings %>%
+  mutate(mc = mc_both) %>%
+  arrange(desc(PC2)) %>%
+  select(PC2, mc, mc_cat)
+pca_both_varimax_pc2
+
+# ... for PC3
+pca_both_varimax_pc3 <- pca_both_varimax_loadings %>%
+  mutate(mc = mc_both) %>%
+  arrange(desc(PC3)) %>%
+  select(PC3, mc, mc_cat)
+pca_both_varimax_pc3
+
+# ... for PC4
+pca_both_varimax_pc4 <- pca_both_varimax_loadings %>%
+  mutate(mc = mc_both) %>%
+  arrange(desc(PC4)) %>%
+  select(PC4, mc, mc_cat)
+pca_both_varimax_pc4
 
 # normality tests: both conditions --------------------------------------------
 
@@ -503,30 +830,43 @@ rating_sum <- d_long %>%
 rating_sum
 
 # extract factor loadings
-robot_PC <- cbind(mc = rownames(pca_robot_varimax_loadings),
-                  pca_robot_varimax_loadings) %>%
-  mutate(condition = "robot")
-beetle_PC <- cbind(mc = rownames(pca_beetle_varimax_loadings),
-                  pca_beetle_varimax_loadings) %>%
-  mutate(condition = "beetle")
+both_PC <- cbind(mc = rownames(pca_both_varimax_loadings),
+                  pca_both_varimax_loadings)
 
 # combine!
-d_scoring_robot <- robot_PC %>%
-  full_join(rating_sum %>% filter(condition == "robot"))
-d_scoring_beetle <- beetle_PC %>%
-  full_join(rating_sum %>% filter(condition == "beetle"))
-d_scoring_pre <- rbind(d_scoring_robot, d_scoring_beetle) %>%
-  mutate(mc = factor(mc),
-         condition = factor(condition))
+d_scoring_pre <- full_join(rating_sum, both_PC)
 
 # score!
 d_scored <- d_scoring_pre %>%
   mutate(PC1_score = PC1 * mean,
          PC2_score = PC2 * mean,
-         PC3_score = PC3 * mean) %>%
+         PC3_score = PC3 * mean,
+         PC4_score = PC4 * mean) %>%
   group_by(condition) %>%
   summarise(PC1_sum = sum(PC1_score),
             PC2_sum = sum(PC2_score),
-            PC3_sum = sum(PC3_score)) %>%
+            PC3_sum = sum(PC3_score),
+            PC4_sum = sum(PC4_score)) %>%
   data.frame()
 d_scored
+
+# plot scores
+
+d_scored_long <- d_scored %>%
+  gather(PC, score, -condition) %>%
+  mutate(dimension = factor(PC,
+                            levels = c("PC1_sum", "PC2_sum", "PC3_sum", "PC4_sum"),
+                            labels = c("social_emotional", "cognitive_agentic", 
+                                       "perceptual", "biological")))
+
+p_scored <- ggplot(aes(x = dimension, y = score,
+                       group = condition, fill = condition), 
+                   data = d_scored_long) +
+  geom_bar(stat = "identity", width = 0.8,
+           position = position_dodge(width = 0.9)) +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  labs(title = "Hand-calculated scores by character\nfrom large PCA with varimax rotation\n",
+       x = "\nDimension",
+       y = "Score\n")
+p_scored
