@@ -13,13 +13,13 @@ library(knitr)
 rm(list = ls(all = T))
 graphics.off()
 
-# prepare datasets -------------------------------------------------------------
-
-## simulate or load in dataset -----------------------------------------------
-
 # choose datasource: simulated or real data (manually)
 # datasource <- "simulated"
 datasource <- "real"
+
+# prepare datasets -------------------------------------------------------------
+
+## simulate or load in dataset -----------------------------------------------
 
 if(datasource == "simulated") { # simulate data!
   
