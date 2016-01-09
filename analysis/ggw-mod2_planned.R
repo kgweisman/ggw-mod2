@@ -682,6 +682,8 @@ top_match_unrotated <- match_unrotated %>%
   left_join(match_unrotated) %>%
   select(comparison, n, rotation, mc)
 
+kable(top_match_unrotated)
+
 ## look for common factors in ROTATED solutions ------------------------------
 
 # get top 10 factor loadings by conditions and dimension (absolute value)
@@ -777,3 +779,5 @@ top_match_rotated <- match_rotated %>%
   mutate(rotation = "rotated") %>%
   left_join(match_rotated) %>%
   select(comparison, n, rotation, mc)
+
+kable(top_match_rotated)
