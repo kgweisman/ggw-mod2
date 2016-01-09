@@ -723,7 +723,6 @@ p_both_varimax_scores_23
 p_both_varimax_scores_24
 p_both_varimax_scores_34
 
-
 # EXPLORATORY: hand-calculate "scores" on dimensions for each target? ---------
 
 d_long <- d_clean %>%
@@ -813,144 +812,143 @@ p_scored <- ggplot(aes(x = dimension, y = score,
        y = "Score\n")
 p_scored
 
-# EXPLORATORY: normality tests (both conditions) --------------------------------------------
+# # EXPLORATORY: normality tests (both conditions) --------------------------------------------
+# 
+# # make function for conducting shapiro-wilk tests for all distributions
+# sw_multi <- function(data) {
+#   mental_caps <- names(data)
+#   sw_W <- data.frame(NULL)
+#   sw_p <- data.frame(NULL)
+#   for (i in 1:length(mental_caps)) {
+#     temp <- shapiro.test(unlist(data[mental_caps[i]], use.names = F))
+#     sw_W[1, mental_caps[i]] <- temp$statistic
+#     sw_p[1, mental_caps[i]] <- temp$p.value
+#   }
+#   results <- data.frame(NULL)
+#   attr(results, "W") <- sw_W
+#   attr(results, "p.value") <- sw_p
+#   return(results)
+# }
+# 
+# # run sw tests on ROBOT condition
+# sw_robot <- sw_multi(d_robot)
+# attr(sw_robot, "W") # look at D-values
+# attr(sw_robot, "p.value") # look at p-values
+# 
+# p.adjust(as.matrix(attr(sw_robot, "p.value")), method = "bonferroni") # auto bonferroni
+# p.adjust(as.matrix(attr(sw_robot, "p.value")), method = "holm") # auto false discovery
+# 
+# # run sw tests on BEETLE condition
+# sw_beetle <- sw_multi(d_beetle)
+# attr(sw_beetle, "W") # look at D-values
+# attr(sw_beetle, "p.value") # look at p-values
+# 
+# p.adjust(as.matrix(attr(sw_beetle, "p.value")), method = "bonferroni") # auto bonferroni
+# p.adjust(as.matrix(attr(sw_beetle, "p.value")), method = "holm") # auto false discovery
 
-# make function for conducting shapiro-wilk tests for all distributions
-sw_multi <- function(data) {
-  mental_caps <- names(data)
-  sw_W <- data.frame(NULL)
-  sw_p <- data.frame(NULL)
-  for (i in 1:length(mental_caps)) {
-    temp <- shapiro.test(unlist(data[mental_caps[i]], use.names = F))
-    sw_W[1, mental_caps[i]] <- temp$statistic
-    sw_p[1, mental_caps[i]] <- temp$p.value
-  }
-  results <- data.frame(NULL)
-  attr(results, "W") <- sw_W
-  attr(results, "p.value") <- sw_p
-  return(results)
-}
+# # EXPLORATORY: bimodality comparisons (both conditions) -------------------------------------
+# 
+# # set corrected critical p-value for multiple comparisons (crude bonferroni method)
+# n_comparisons <- choose(40, 2) # determine how many comparisons (choose 2 from 40 MCs)
+# p_crit <- 0.05/n_comparisons # divide alpha by number of comparisons
+# 
+# # make function for conducting kolmogorov-smirnov tests for all possible comparisons
+# ks_multi <- function(data) {
+#   mental_caps <- names(data)
+#   ks_D <- data.frame(NULL)
+#   ks_p <- data.frame(NULL)
+#   ks_signif <- data.frame(NULL)
+#   for (i in 1:length(mental_caps)) {
+#     for (j in 2:length(mental_caps)) {
+#       temp <- ks.test(unlist(data[mental_caps[i]], use.names = F), 
+#                       unlist(data[mental_caps[j]], use.names = F))
+#       ks_D[mental_caps[i], mental_caps[j]] <- temp$statistic
+#       ks_p[mental_caps[i], mental_caps[j]] <- temp$p.value
+#     }
+#   }
+#   results <- data.frame(NULL)
+#   attr(results, "D") <- ks_D
+#   attr(results, "p.value") <- ks_p
+#   attr(results, "signif") <- ks_signif
+#   return(results)
+# }
+# 
+# # run ks tests on ROBOT condition
+# ks_robot <- ks_multi(d_robot)
+# attr(ks_robot, "D") # look at D-values
+# attr(ks_robot, "p.value") # look at p-values
+# 
+# p.adjust(as.matrix(attr(ks_robot, "p.value")), method = "bonferroni") # auto bonferroni
+# p.adjust(as.matrix(attr(ks_robot, "p.value")), method = "holm") # auto false discovery
+# 
+# # run ks tests on BEETLE condition
+# ks_beetle <- ks_multi(d_beetle)
+# attr(ks_beetle, "D") # look at D-values
+# attr(ks_beetle, "p.value") # look at p-values
+# 
+# p.adjust(as.matrix(attr(ks_beetle, "p.value")), method = "bonferroni") # auto bonferroni
+# p.adjust(as.matrix(attr(ks_beetle, "p.value")), method = "holm") # auto false discovery
 
-# run sw tests on ROBOT condition
-sw_robot <- sw_multi(d_robot)
-attr(sw_robot, "W") # look at D-values
-attr(sw_robot, "p.value") # look at p-values
-
-p.adjust(as.matrix(attr(sw_robot, "p.value")), method = "bonferroni") # auto bonferroni
-p.adjust(as.matrix(attr(sw_robot, "p.value")), method = "holm") # auto false discovery
-
-# run sw tests on BEETLE condition
-sw_beetle <- sw_multi(d_beetle)
-attr(sw_beetle, "W") # look at D-values
-attr(sw_beetle, "p.value") # look at p-values
-
-p.adjust(as.matrix(attr(sw_beetle, "p.value")), method = "bonferroni") # auto bonferroni
-p.adjust(as.matrix(attr(sw_beetle, "p.value")), method = "holm") # auto false discovery
-
-# EXPLORATORY: bimodality comparisons (both conditions) -------------------------------------
-
-# set corrected critical p-value for multiple comparisons (crude bonferroni method)
-n_comparisons <- choose(40, 2) # determine how many comparisons (choose 2 from 40 MCs)
-p_crit <- 0.05/n_comparisons # divide alpha by number of comparisons
-
-# make function for conducting kolmogorov-smirnov tests for all possible comparisons
-ks_multi <- function(data) {
-  mental_caps <- names(data)
-  ks_D <- data.frame(NULL)
-  ks_p <- data.frame(NULL)
-  ks_signif <- data.frame(NULL)
-  for (i in 1:length(mental_caps)) {
-    for (j in 2:length(mental_caps)) {
-      temp <- ks.test(unlist(data[mental_caps[i]], use.names = F), 
-                      unlist(data[mental_caps[j]], use.names = F))
-      ks_D[mental_caps[i], mental_caps[j]] <- temp$statistic
-      ks_p[mental_caps[i], mental_caps[j]] <- temp$p.value
-    }
-  }
-  results <- data.frame(NULL)
-  attr(results, "D") <- ks_D
-  attr(results, "p.value") <- ks_p
-  attr(results, "signif") <- ks_signif
-  return(results)
-}
-
-# run ks tests on ROBOT condition
-ks_robot <- ks_multi(d_robot)
-attr(ks_robot, "D") # look at D-values
-attr(ks_robot, "p.value") # look at p-values
-
-p.adjust(as.matrix(attr(ks_robot, "p.value")), method = "bonferroni") # auto bonferroni
-p.adjust(as.matrix(attr(ks_robot, "p.value")), method = "holm") # auto false discovery
-
-# run ks tests on BEETLE condition
-ks_beetle <- ks_multi(d_beetle)
-attr(ks_beetle, "D") # look at D-values
-attr(ks_beetle, "p.value") # look at p-values
-
-p.adjust(as.matrix(attr(ks_beetle, "p.value")), method = "bonferroni") # auto bonferroni
-p.adjust(as.matrix(attr(ks_beetle, "p.value")), method = "holm") # auto false discovery
-
-# EXPLORATORY: look at response distributions across mental capacities ------
-dist_plot_affective <- ggplot(d_long %>% filter(mc_cat == "affective"), 
-                              aes(x = rating)) +
-  facet_grid(mc ~ condition) +
-  geom_histogram() +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_x_continuous(breaks = -3:3)
-dist_plot_affective
-
-dist_plot_perceptual <- ggplot(d_long %>% filter(mc_cat == "perceptual"),
-                               aes(x = rating)) +
-  facet_grid(mc ~ condition) +
-  geom_histogram() +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_x_continuous(breaks = -3:3)
-dist_plot_perceptual
-
-dist_plot_autonomous <- ggplot(d_long %>% filter(mc_cat == "autonomous"), 
-                               aes(x = rating)) +
-  facet_grid(mc ~ condition) +
-  geom_histogram() +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_x_continuous(breaks = -3:3)
-dist_plot_autonomous
-
-dist_plot_biological <- ggplot(d_long %>% filter(mc_cat == "biological"), 
-                               aes(x = rating)) +
-  facet_grid(mc ~ condition) +
-  geom_histogram() +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_x_continuous(breaks = -3:3)
-dist_plot_biological
-
-dist_plot_cognitive <- ggplot(d_long %>% filter(mc_cat == "cognitive"), 
-                              aes(x = rating)) +
-  facet_grid(mc ~ condition) +
-  geom_histogram() +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_x_continuous(breaks = -3:3)
-dist_plot_cognitive
-
-dist_plot_social <- ggplot(d_long %>% filter(mc_cat == "social"), 
-                           aes(x = rating)) +
-  facet_grid(mc ~ condition) +
-  geom_histogram() +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_x_continuous(breaks = -3:3)
-dist_plot_social
-
-dist_plot_other <- ggplot(d_long %>% filter(mc_cat == "other"), 
-                          aes(x = rating)) +
-  facet_grid(mc ~ condition) +
-  geom_histogram() +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_x_continuous(breaks = -3:3)
-dist_plot_other
-
+# # EXPLORATORY: look at response distributions across mental capacities ------
+# dist_plot_affective <- ggplot(d_long %>% filter(mc_cat == "affective"), 
+#                               aes(x = rating)) +
+#   facet_grid(mc ~ condition) +
+#   geom_histogram() +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_x_continuous(breaks = -3:3)
+# dist_plot_affective
+# 
+# dist_plot_perceptual <- ggplot(d_long %>% filter(mc_cat == "perceptual"),
+#                                aes(x = rating)) +
+#   facet_grid(mc ~ condition) +
+#   geom_histogram() +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_x_continuous(breaks = -3:3)
+# dist_plot_perceptual
+# 
+# dist_plot_autonomous <- ggplot(d_long %>% filter(mc_cat == "autonomous"), 
+#                                aes(x = rating)) +
+#   facet_grid(mc ~ condition) +
+#   geom_histogram() +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_x_continuous(breaks = -3:3)
+# dist_plot_autonomous
+# 
+# dist_plot_biological <- ggplot(d_long %>% filter(mc_cat == "biological"), 
+#                                aes(x = rating)) +
+#   facet_grid(mc ~ condition) +
+#   geom_histogram() +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_x_continuous(breaks = -3:3)
+# dist_plot_biological
+# 
+# dist_plot_cognitive <- ggplot(d_long %>% filter(mc_cat == "cognitive"), 
+#                               aes(x = rating)) +
+#   facet_grid(mc ~ condition) +
+#   geom_histogram() +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_x_continuous(breaks = -3:3)
+# dist_plot_cognitive
+# 
+# dist_plot_social <- ggplot(d_long %>% filter(mc_cat == "social"), 
+#                            aes(x = rating)) +
+#   facet_grid(mc ~ condition) +
+#   geom_histogram() +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_x_continuous(breaks = -3:3)
+# dist_plot_social
+# 
+# dist_plot_other <- ggplot(d_long %>% filter(mc_cat == "other"), 
+#                           aes(x = rating)) +
+#   facet_grid(mc ~ condition) +
+#   geom_histogram() +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_x_continuous(breaks = -3:3)
+# dist_plot_other
