@@ -146,8 +146,10 @@ d_clean_1 <- d %>%
                          labels = c("m", "f", "other"))) %>%
   filter(age_approx >= 18) # exclude participants who are younger than 18 years
 
-# recode demographic variables
+# recode background and demographic variables
 d_clean <- d_clean_1 %>%
+  mutate( # deal with study duration
+    duration = strptime(end_time, "%I:%M:%S") - strptime(start_time, "%I:%M:%S")) %>%
   mutate( # deal with race
     race_asian_east = 
       factor(ifelse(is.na(race_asian_east), "", "asian_east ")),
@@ -176,7 +178,8 @@ d_clean <- d_clean_1 %>%
     race_cat2 = factor(sub(" +$", "", race_cat)),
     race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
                               as.character(race_cat2)))) %>%
-  select(subid:gender, religion_buddhism:age_approx, race_cat3) %>%
+  select(subid:end_time, duration, finished:gender, 
+         religion_buddhism:age_approx, race_cat3) %>%
   rename(race_cat = race_cat3) %>%
   mutate( # deal with religion
     religion_buddhism = 
@@ -207,7 +210,7 @@ d_clean <- d_clean_1 %>%
     religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
                                   "multireligious",
                                   as.character(religion_cat2)))) %>%
-  select(subid:gender, feedback:race_cat, religion_cat3) %>%
+  select(subid:age_approx, religion_cat3) %>%
   rename(religion_cat = religion_cat3)
 
 ## prepare datasets for PCA --------------------------------------------------
@@ -228,6 +231,16 @@ d_robot <- data.frame(d_robot[,-1], row.names = d_robot[,1])
 # sample size
 sample_size <- with(d_clean, table(condition))
 kable(d_clean %>% count(condition))
+
+# duration
+duration <- d_clean %>% 
+  group_by(condition) %>%
+  summarise(min_duration = min(duration, na.rm = T),
+            max_duration = max(duration, na.rm = T),
+            median_duration = median(duration, na.rm = T),
+            mean_duration = mean(duration, na.rm = T),
+            sd_duration = sd(duration, na.rm = T))
+t.test(duration ~ condition, data = d_clean) # test for differences in duration across conditions
 
 # approxiate age
 age_approx <- d_clean %>%
