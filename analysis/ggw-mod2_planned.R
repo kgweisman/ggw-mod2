@@ -210,7 +210,7 @@ d_clean <- d_clean_1 %>%
     religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
                                   "multireligious",
                                   as.character(religion_cat2)))) %>%
-  select(subid:age_approx, religion_cat3) %>%
+  select(subid:gender, feedback:age_approx, religion_cat3) %>%
   rename(religion_cat = religion_cat3)
 
 ## prepare datasets for PCA --------------------------------------------------
