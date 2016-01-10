@@ -2,7 +2,6 @@
 
 # make dataset for both conditions
 d_both <- d_clean %>%
-  mutate(subid = paste(target, subid, sep = "_")) %>%
   select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3! 
 d_both <- data.frame(d_both[,-1], row.names = d_both[,1])
 
@@ -16,7 +15,7 @@ pca_both_unrotated
 pca_both_unrotated$values # examine eignenvalues, retain iff > 1.00
 
 # set number of factors to extract (manually)
-nfactors_both <- 3
+nfactors_both <- 4
 
 # run pca without rotation with n factors (as determined above)
 pca_both_unrotatedN <- principal(d_both, nfactors = nfactors_both, rotate = "none")
@@ -177,12 +176,15 @@ pca_both_varimax_pc4
 # plot participants by component scores ---------------------------------------
 
 # get condition by subject
+condition_subid <- d_clean %>%
+  select(subid, condition)
+
 pca_both_varimax_scores <- pca_both_varimax$scores %>%
   data.frame() %>%
   add_rownames(var = "subid") %>%
-  mutate(target = factor(ifelse(grepl("robot", subid), "robot", "beetle")))
+  full_join(condition_subid, by = "subid")
 
-p_both_varimax_scores_12 <- ggplot(aes(x = PC1, y = PC2, color = target),
+p_both_varimax_scores_12 <- ggplot(aes(x = PC1, y = PC2, color = condition),
                                    data = pca_both_varimax_scores) +
   geom_point(size = 4) +
   theme_bw() +
@@ -191,7 +193,7 @@ p_both_varimax_scores_12 <- ggplot(aes(x = PC1, y = PC2, color = target),
        x = "\nPC1",
        y = "PC2\n")
 
-p_both_varimax_scores_13 <- ggplot(aes(x = PC1, y = PC3, color = target),
+p_both_varimax_scores_13 <- ggplot(aes(x = PC1, y = PC3, color = condition),
                                    data = pca_both_varimax_scores) +
   geom_point(size = 4) +
   theme_bw() +
@@ -200,7 +202,7 @@ p_both_varimax_scores_13 <- ggplot(aes(x = PC1, y = PC3, color = target),
        x = "\nPC1",
        y = "PC3\n")
 
-p_both_varimax_scores_14 <- ggplot(aes(x = PC1, y = PC4, color = target),
+p_both_varimax_scores_14 <- ggplot(aes(x = PC1, y = PC4, color = condition),
                                    data = pca_both_varimax_scores) +
   geom_point(size = 4) +
   theme_bw() +
@@ -209,7 +211,7 @@ p_both_varimax_scores_14 <- ggplot(aes(x = PC1, y = PC4, color = target),
        x = "\nPC1",
        y = "PC4\n")
 
-p_both_varimax_scores_23 <- ggplot(aes(x = PC2, y = PC3, color = target),
+p_both_varimax_scores_23 <- ggplot(aes(x = PC2, y = PC3, color = condition),
                                    data = pca_both_varimax_scores) +
   geom_point(size = 4) +
   theme_bw() +
@@ -218,7 +220,7 @@ p_both_varimax_scores_23 <- ggplot(aes(x = PC2, y = PC3, color = target),
        x = "\nPC2",
        y = "PC3\n")
 
-p_both_varimax_scores_24 <- ggplot(aes(x = PC2, y = PC4, color = target),
+p_both_varimax_scores_24 <- ggplot(aes(x = PC2, y = PC4, color = condition),
                                    data = pca_both_varimax_scores) +
   geom_point(size = 4) +
   theme_bw() +
@@ -227,7 +229,7 @@ p_both_varimax_scores_24 <- ggplot(aes(x = PC2, y = PC4, color = target),
        x = "\nPC2",
        y = "PC4\n")
 
-p_both_varimax_scores_34 <- ggplot(aes(x = PC3, y = PC4, color = target),
+p_both_varimax_scores_34 <- ggplot(aes(x = PC3, y = PC4, color = condition),
                                    data = pca_both_varimax_scores) +
   geom_point(size = 4) +
   theme_bw() +
@@ -243,7 +245,7 @@ p_both_varimax_scores_23
 p_both_varimax_scores_24
 p_both_varimax_scores_34
 
-# EXPLORATORY: hand-calculate "scores" on dimensions for each target? ---------
+# EXPLORATORY: hand-calculate "scores" on dimensions for each condition? ---------
 
 d_long <- d_clean %>%
   gather(mc, rating, happy:pride) %>%
@@ -280,9 +282,9 @@ d_long <- d_clean %>%
                                                        "social",
                                                        "other"))))))))
 
-# summarize ratings by target and mc
+# summarize ratings by condition and mc
 rating_sum <- d_long %>%
-  group_by(target, mc) %>%
+  group_by(condition, mc) %>%
   summarise(min = min(rating),
             max = max(rating),
             median = median(rating),
@@ -304,7 +306,7 @@ if(nfactors_both == 4) {
            PC2_score = PC2 * mean,
            PC3_score = PC3 * mean,
            PC4_score = PC4 * mean) %>%
-    group_by(target) %>%
+    group_by(condition) %>%
     summarise(PC1_sum = sum(PC1_score),
               PC2_sum = sum(PC2_score),
               PC3_sum = sum(PC3_score),
@@ -315,13 +317,13 @@ if(nfactors_both == 4) {
   # plot scores
   
   d_scored_long <- d_scored %>%
-    gather(PC, score, -target) %>%
+    gather(PC, score, -condition) %>%
     mutate(dimension = factor(PC,
                               levels = c("PC1_sum", "PC2_sum", "PC3_sum", "PC4_sum"),
                               labels = c("PC1", "PC2", "PC3", "PC4")))
   
   p_scored <- ggplot(aes(x = dimension, y = score,
-                         group = target, fill = target), 
+                         group = condition, fill = condition), 
                      data = d_scored_long) +
     geom_bar(stat = "identity", width = 0.8,
              position = position_dodge(width = 0.9)) +
@@ -338,7 +340,7 @@ if(nfactors_both == 4) {
     mutate(PC1_score = PC1 * mean,
            PC2_score = PC2 * mean,
            PC3_score = PC3 * mean) %>%
-    group_by(target) %>%
+    group_by(condition) %>%
     summarise(PC1_sum = sum(PC1_score),
               PC2_sum = sum(PC2_score),
               PC3_sum = sum(PC3_score)) %>%
@@ -348,13 +350,13 @@ if(nfactors_both == 4) {
   # plot scores
   
   d_scored_long <- d_scored %>%
-    gather(PC, score, -target) %>%
+    gather(PC, score, -condition) %>%
     mutate(dimension = factor(PC,
                               levels = c("PC1_sum", "PC2_sum", "PC3_sum"),
                               labels = c("PC1", "PC2", "PC3")))
   
   p_scored <- ggplot(aes(x = dimension, y = score,
-                         group = target, fill = target), 
+                         group = condition, fill = condition), 
                      data = d_scored_long) +
     geom_bar(stat = "identity", width = 0.8,
              position = position_dodge(width = 0.9)) +
