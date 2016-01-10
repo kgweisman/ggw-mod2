@@ -123,7 +123,7 @@ if(datasource == "simulated") { # simulate data!
   
 } else if(datasource == "real") { # load in real data
 
-    d_raw <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/GGWmod2_v1_clean.csv")
+    d_raw <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (2 conditions between)/GGWmod2_v1_clean.csv")
     d <- d_raw
 
     }
