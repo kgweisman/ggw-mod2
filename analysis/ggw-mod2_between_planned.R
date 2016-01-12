@@ -278,7 +278,7 @@ summary(religion) # test for difference in religion distribution across conditio
 ## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
-VSS(d_beetle, n = 39)
+VSS(d_beetle, n = 39, rotate = "varimax")
 VSS.scree(d_beetle)
 
 # run unrotated pca with maximum number of dimensions
@@ -357,11 +357,13 @@ pca_beetle_unrotatedN_pc2 <- pca_beetle_unrotatedN_loadings %>%
 pca_beetle_unrotatedN_pc2
 
 # ... for PC3
-pca_beetle_unrotatedN_pc3 <- pca_beetle_unrotatedN_loadings %>%
-  mutate(mc = mc_beetle_unrotatedN) %>%
-  arrange(desc(PC3)) %>%
-  select(PC3, mc, mc_cat)
-pca_beetle_unrotatedN_pc3
+if(nfactors_beetle > 2) {
+  pca_beetle_unrotatedN_pc3 <- pca_beetle_unrotatedN_loadings %>%
+    mutate(mc = mc_beetle_unrotatedN) %>%
+    arrange(desc(PC3)) %>%
+    select(PC3, mc, mc_cat)
+  pca_beetle_unrotatedN_pc3
+}
 
 # ... for PC4
 if(nfactors_beetle > 3) {
@@ -441,11 +443,13 @@ pca_beetle_rotatedN_pc2 <- pca_beetle_rotatedN_loadings %>%
 pca_beetle_rotatedN_pc2
 
 # ... for PC3
-pca_beetle_rotatedN_pc3 <- pca_beetle_rotatedN_loadings %>%
-  mutate(mc = mc_beetle_rotatedN) %>%
-  arrange(desc(PC3)) %>%
-  select(PC3, mc, mc_cat)
-pca_beetle_rotatedN_pc3
+if(nfactors_beetle > 2) {
+  pca_beetle_rotatedN_pc3 <- pca_beetle_rotatedN_loadings %>%
+    mutate(mc = mc_beetle_rotatedN) %>%
+    arrange(desc(PC3)) %>%
+    select(PC3, mc, mc_cat)
+  pca_beetle_rotatedN_pc3
+}
 
 # ... for PC4
 if(nfactors_beetle > 3) {
@@ -540,11 +544,13 @@ pca_robot_unrotatedN_pc2 <- pca_robot_unrotatedN_loadings %>%
 pca_robot_unrotatedN_pc2
 
 # ... for PC3
-pca_robot_unrotatedN_pc3 <- pca_robot_unrotatedN_loadings %>%
-  mutate(mc = mc_robot_unrotatedN) %>%
-  arrange(desc(PC3)) %>%
-  select(PC3, mc, mc_cat)
-pca_robot_unrotatedN_pc3
+if(nfactors_robot > 2) {
+  pca_robot_unrotatedN_pc3 <- pca_robot_unrotatedN_loadings %>%
+    mutate(mc = mc_robot_unrotatedN) %>%
+    arrange(desc(PC3)) %>%
+    select(PC3, mc, mc_cat)
+  pca_robot_unrotatedN_pc3
+}
 
 # ... for PC4
 if(nfactors_robot > 3) {
@@ -624,12 +630,15 @@ pca_robot_rotatedN_pc2 <- pca_robot_rotatedN_loadings %>%
 pca_robot_rotatedN_pc2
 
 # ... for PC3
-pca_robot_rotatedN_pc3 <- pca_robot_rotatedN_loadings %>%
-  mutate(mc = mc_robot_rotatedN) %>%
-  arrange(desc(PC3)) %>%
-  select(PC3, mc, mc_cat)
-pca_robot_rotatedN_pc3
+if(nfactors_robot > 2) {
+  pca_robot_rotatedN_pc3 <- pca_robot_rotatedN_loadings %>%
+    mutate(mc = mc_robot_rotatedN) %>%
+    arrange(desc(PC3)) %>%
+    select(PC3, mc, mc_cat)
+  pca_robot_rotatedN_pc3
+}
 
+# ... for PC4
 if(nfactors_robot > 3) {
   pca_robot_rotatedN_pc4 <- pca_robot_rotatedN_loadings %>%
     mutate(mc = mc_robot_rotatedN) %>%
@@ -653,10 +662,19 @@ beetle_unrotatedN_top10_pc2 <- pca_beetle_unrotatedN_pc2 %>%
          valence = factor(ifelse(PC2 < 0, "neg", "pos"))) %>%
   top_n(10, abs_PC2)
 
-beetle_unrotatedN_top10_pc3 <- pca_beetle_unrotatedN_pc3 %>%
-  mutate(abs_PC3 = abs(PC3),
-         valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
-  top_n(10, abs_PC3)
+if(nfactors_beetle > 2) {
+  beetle_unrotatedN_top10_pc3 <- pca_beetle_unrotatedN_pc3 %>%
+    mutate(abs_PC3 = abs(PC3),
+           valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
+    top_n(10, abs_PC3)
+}
+
+if(nfactors_beetle > 3) {
+  beetle_unrotatedN_top10_pc4 <- pca_beetle_unrotatedN_pc4 %>%
+    mutate(abs_PC4 = abs(PC4),
+           valence = factor(ifelse(PC4 < 0, "neg", "pos"))) %>%
+    top_n(10, abs_PC4)
+}
 
 robot_unrotatedN_top10_pc1 <- pca_robot_unrotatedN_pc1 %>%
   mutate(abs_PC1 = abs(PC1),
@@ -668,10 +686,19 @@ robot_unrotatedN_top10_pc2 <- pca_robot_unrotatedN_pc2 %>%
          valence = factor(ifelse(PC2 < 0, "neg", "pos"))) %>%
   top_n(10, abs_PC2)
 
-robot_unrotatedN_top10_pc3 <- pca_robot_unrotatedN_pc3 %>%
-  mutate(abs_PC3 = abs(PC3),
-         valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
-  top_n(10, abs_PC3)
+if(nfactors_robot > 2) {
+  robot_unrotatedN_top10_pc3 <- pca_robot_unrotatedN_pc3 %>%
+    mutate(abs_PC3 = abs(PC3),
+           valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
+    top_n(10, abs_PC3)
+}
+
+if(nfactors_robot > 3) {
+  robot_unrotatedN_top10_pc4 <- pca_robot_unrotatedN_pc4 %>%
+    mutate(abs_PC4 = abs(PC4),
+           valence = factor(ifelse(PC4 < 0, "neg", "pos"))) %>%
+    top_n(10, abs_PC4)
+}
 
 # compare all possible combinations (across conditions)
 match_unrotated_beetlePC1_robotPC1 <-
@@ -684,11 +711,6 @@ match_unrotated_beetlePC1_robotPC2 <-
   mutate(comparison = "beetlePC1_robotPC2") %>%
   filter(beetle_unrotatedN_top10_pc1$mc %in% robot_unrotatedN_top10_pc2$mc)
 
-match_unrotated_beetlePC1_robotPC3 <-
-  beetle_unrotatedN_top10_pc1 %>%
-  mutate(comparison = "beetlePC1_robotPC3") %>%
-  filter(beetle_unrotatedN_top10_pc1$mc %in% robot_unrotatedN_top10_pc3$mc)
-
 match_unrotated_beetlePC2_robotPC1 <-
   beetle_unrotatedN_top10_pc2 %>%
   mutate(comparison = "beetlePC2_robotPC1") %>%
@@ -699,35 +721,94 @@ match_unrotated_beetlePC2_robotPC2 <-
   mutate(comparison = "beetlePC2_robotPC2") %>%
   filter(beetle_unrotatedN_top10_pc2$mc %in% robot_unrotatedN_top10_pc2$mc)
 
-match_unrotated_beetlePC2_robotPC3 <-
-  beetle_unrotatedN_top10_pc2 %>%
-  mutate(comparison = "beetlePC2_robotPC3") %>%
-  filter(beetle_unrotatedN_top10_pc2$mc %in% robot_unrotatedN_top10_pc3$mc)
+if(nfactors_beetle > 2 & nfactors_robot > 2) {
+  match_unrotated_beetlePC1_robotPC3 <-
+    beetle_unrotatedN_top10_pc1 %>%
+    mutate(comparison = "beetlePC1_robotPC3") %>%
+    filter(beetle_unrotatedN_top10_pc1$mc %in% robot_unrotatedN_top10_pc3$mc)
 
-match_unrotated_beetlePC3_robotPC1 <-
-  beetle_unrotatedN_top10_pc3 %>%
-  mutate(comparison = "beetlePC3_robotPC1") %>%
-  filter(beetle_unrotatedN_top10_pc3$mc %in% robot_unrotatedN_top10_pc1$mc)
+    match_unrotated_beetlePC2_robotPC3 <-
+    beetle_unrotatedN_top10_pc2 %>%
+    mutate(comparison = "beetlePC2_robotPC3") %>%
+    filter(beetle_unrotatedN_top10_pc2$mc %in% robot_unrotatedN_top10_pc3$mc)
 
-match_unrotated_beetlePC3_robotPC2 <-
-  beetle_unrotatedN_top10_pc3 %>%
-  mutate(comparison = "beetlePC3_robotPC2") %>%
-  filter(beetle_unrotatedN_top10_pc3$mc %in% robot_unrotatedN_top10_pc2$mc)
+  match_unrotated_beetlePC3_robotPC1 <-
+    beetle_unrotatedN_top10_pc3 %>%
+    mutate(comparison = "beetlePC3_robotPC1") %>%
+    filter(beetle_unrotatedN_top10_pc3$mc %in% robot_unrotatedN_top10_pc1$mc)
+  
+  match_unrotated_beetlePC3_robotPC2 <-
+    beetle_unrotatedN_top10_pc3 %>%
+    mutate(comparison = "beetlePC3_robotPC2") %>%
+    filter(beetle_unrotatedN_top10_pc3$mc %in% robot_unrotatedN_top10_pc2$mc)
+  
+  match_unrotated_beetlePC3_robotPC3 <-
+    beetle_unrotatedN_top10_pc3 %>%
+    mutate(comparison = "beetlePC3_robotPC3") %>%
+    filter(beetle_unrotatedN_top10_pc3$mc %in% robot_unrotatedN_top10_pc3$mc)
+}
 
-match_unrotated_beetlePC3_robotPC3 <-
-  beetle_unrotatedN_top10_pc3 %>%
-  mutate(comparison = "beetlePC3_robotPC3") %>%
-  filter(beetle_unrotatedN_top10_pc3$mc %in% robot_unrotatedN_top10_pc3$mc)
+if(nfactors_beetle > 3 & nfactors_robot > 3) {
+  match_unrotated_beetlePC1_robotPC4 <-
+    beetle_unrotatedN_top10_pc1 %>%
+    mutate(comparison = "beetlePC1_robotPC4") %>%
+    filter(beetle_unrotatedN_top10_pc1$mc %in% robot_unrotatedN_top10_pc4$mc)
+  
+  match_unrotated_beetlePC2_robotPC4 <-
+    beetle_unrotatedN_top10_pc2 %>%
+    mutate(comparison = "beetlePC2_robotPC4") %>%
+    filter(beetle_unrotatedN_top10_pc2$mc %in% robot_unrotatedN_top10_pc4$mc)
+
+    match_unrotated_beetlePC3_robotPC4 <-
+    beetle_unrotatedN_top10_pc3 %>%
+    mutate(comparison = "beetlePC3_robotPC4") %>%
+    filter(beetle_unrotatedN_top10_pc3$mc %in% robot_unrotatedN_top10_pc4$mc)
+  
+  match_unrotated_beetlePC4_robotPC1 <-
+    beetle_unrotatedN_top10_pc4 %>%
+    mutate(comparison = "beetlePC4_robotPC1") %>%
+    filter(beetle_unrotatedN_top10_pc4$mc %in% robot_unrotatedN_top10_pc1$mc)
+  
+  match_unrotated_beetlePC4_robotPC2 <-
+    beetle_unrotatedN_top10_pc4 %>%
+    mutate(comparison = "beetlePC4_robotPC2") %>%
+    filter(beetle_unrotatedN_top10_pc4$mc %in% robot_unrotatedN_top10_pc2$mc)
+
+  match_unrotated_beetlePC4_robotPC3 <-
+    beetle_unrotatedN_top10_pc4 %>%
+    mutate(comparison = "beetlePC4_robotPC3") %>%
+    filter(beetle_unrotatedN_top10_pc4$mc %in% robot_unrotatedN_top10_pc3$mc)
+  
+  match_unrotated_beetlePC4_robotPC4 <-
+    beetle_unrotatedN_top10_pc4 %>%
+    mutate(comparison = "beetlePC4_robotPC4") %>%
+    filter(beetle_unrotatedN_top10_pc4$mc %in% robot_unrotatedN_top10_pc4$mc)
+}
 
 match_unrotated <- match_unrotated_beetlePC1_robotPC1 %>%
   full_join(match_unrotated_beetlePC1_robotPC2) %>%
-  full_join(match_unrotated_beetlePC1_robotPC3) %>%
   full_join(match_unrotated_beetlePC2_robotPC1) %>%
-  full_join(match_unrotated_beetlePC2_robotPC2) %>%
-  full_join(match_unrotated_beetlePC2_robotPC3) %>%
-  full_join(match_unrotated_beetlePC3_robotPC1) %>%
-  full_join(match_unrotated_beetlePC3_robotPC2) %>%
-  full_join(match_unrotated_beetlePC3_robotPC3)
+  full_join(match_unrotated_beetlePC2_robotPC2)
+
+if(nfactors_beetle > 2 & nfactors_robot > 2) {
+  match_unrotated <- match_unrotated %>%
+    full_join(match_unrotated_beetlePC1_robotPC3) %>%
+    full_join(match_unrotated_beetlePC2_robotPC3) %>%
+    full_join(match_unrotated_beetlePC3_robotPC1) %>%
+    full_join(match_unrotated_beetlePC3_robotPC2) %>%
+    full_join(match_unrotated_beetlePC3_robotPC3)
+}
+
+if(nfactors_beetle > 3 & nfactors_robot > 3) {
+  match_unrotated <- match_unrotated %>%
+    full_join(match_unrotated_beetlePC1_robotPC4) %>%
+    full_join(match_unrotated_beetlePC2_robotPC4) %>%
+    full_join(match_unrotated_beetlePC3_robotPC4) %>%
+    full_join(match_unrotated_beetlePC4_robotPC1) %>%
+    full_join(match_unrotated_beetlePC4_robotPC2) %>%
+    full_join(match_unrotated_beetlePC4_robotPC3) %>%
+    full_join(match_unrotated_beetlePC4_robotPC4)
+}
 
 top_match_unrotated <- match_unrotated %>%
   count(comparison) %>%
@@ -738,7 +819,7 @@ top_match_unrotated <- match_unrotated %>%
 
 kable(top_match_unrotated)
 
-## look for common factors in ROTATED solutions ------------------------------
+## look for common factors in ROTATED solutions ----------------------------
 
 # get top 10 factor loadings by conditions and dimension (absolute value)
 beetle_rotatedN_top10_pc1 <- pca_beetle_rotatedN_pc1 %>%
@@ -751,10 +832,19 @@ beetle_rotatedN_top10_pc2 <- pca_beetle_rotatedN_pc2 %>%
          valence = factor(ifelse(PC2 < 0, "neg", "pos"))) %>%
   top_n(10, abs_PC2)
 
-beetle_rotatedN_top10_pc3 <- pca_beetle_rotatedN_pc3 %>%
-  mutate(abs_PC3 = abs(PC3),
-         valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
-  top_n(10, abs_PC3)
+if(nfactors_beetle > 2) {
+  beetle_rotatedN_top10_pc3 <- pca_beetle_rotatedN_pc3 %>%
+    mutate(abs_PC3 = abs(PC3),
+           valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
+    top_n(10, abs_PC3)
+}
+
+if(nfactors_beetle > 3) {
+  beetle_rotatedN_top10_pc4 <- pca_beetle_rotatedN_pc4 %>%
+    mutate(abs_PC4 = abs(PC4),
+           valence = factor(ifelse(PC4 < 0, "neg", "pos"))) %>%
+    top_n(10, abs_PC4)
+}
 
 robot_rotatedN_top10_pc1 <- pca_robot_rotatedN_pc1 %>%
   mutate(abs_PC1 = abs(PC1),
@@ -766,10 +856,19 @@ robot_rotatedN_top10_pc2 <- pca_robot_rotatedN_pc2 %>%
          valence = factor(ifelse(PC2 < 0, "neg", "pos"))) %>%
   top_n(10, abs_PC2)
 
-robot_rotatedN_top10_pc3 <- pca_robot_rotatedN_pc3 %>%
-  mutate(abs_PC3 = abs(PC3),
-         valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
-  top_n(10, abs_PC3)
+if(nfactors_robot > 2) {
+  robot_rotatedN_top10_pc3 <- pca_robot_rotatedN_pc3 %>%
+    mutate(abs_PC3 = abs(PC3),
+           valence = factor(ifelse(PC3 < 0, "neg", "pos"))) %>%
+    top_n(10, abs_PC3)
+}
+
+if(nfactors_robot > 3) {
+  robot_rotatedN_top10_pc4 <- pca_robot_rotatedN_pc4 %>%
+    mutate(abs_PC4 = abs(PC4),
+           valence = factor(ifelse(PC4 < 0, "neg", "pos"))) %>%
+    top_n(10, abs_PC4)
+}
 
 # compare all possible combinations (across conditions)
 match_rotated_beetlePC1_robotPC1 <-
@@ -782,11 +881,6 @@ match_rotated_beetlePC1_robotPC2 <-
   mutate(comparison = "beetlePC1_robotPC2") %>%
   filter(beetle_rotatedN_top10_pc1$mc %in% robot_rotatedN_top10_pc2$mc)
 
-match_rotated_beetlePC1_robotPC3 <-
-  beetle_rotatedN_top10_pc1 %>%
-  mutate(comparison = "beetlePC1_robotPC3") %>%
-  filter(beetle_rotatedN_top10_pc1$mc %in% robot_rotatedN_top10_pc3$mc)
-
 match_rotated_beetlePC2_robotPC1 <-
   beetle_rotatedN_top10_pc2 %>%
   mutate(comparison = "beetlePC2_robotPC1") %>%
@@ -797,35 +891,94 @@ match_rotated_beetlePC2_robotPC2 <-
   mutate(comparison = "beetlePC2_robotPC2") %>%
   filter(beetle_rotatedN_top10_pc2$mc %in% robot_rotatedN_top10_pc2$mc)
 
-match_rotated_beetlePC2_robotPC3 <-
-  beetle_rotatedN_top10_pc2 %>%
-  mutate(comparison = "beetlePC2_robotPC3") %>%
-  filter(beetle_rotatedN_top10_pc2$mc %in% robot_rotatedN_top10_pc3$mc)
+if(nfactors_beetle > 2 & nfactors_robot > 2) {
+  match_rotated_beetlePC1_robotPC3 <-
+    beetle_rotatedN_top10_pc1 %>%
+    mutate(comparison = "beetlePC1_robotPC3") %>%
+    filter(beetle_rotatedN_top10_pc1$mc %in% robot_rotatedN_top10_pc3$mc)
+  
+  match_rotated_beetlePC2_robotPC3 <-
+    beetle_rotatedN_top10_pc2 %>%
+    mutate(comparison = "beetlePC2_robotPC3") %>%
+    filter(beetle_rotatedN_top10_pc2$mc %in% robot_rotatedN_top10_pc3$mc)
+  
+  match_rotated_beetlePC3_robotPC1 <-
+    beetle_rotatedN_top10_pc3 %>%
+    mutate(comparison = "beetlePC3_robotPC1") %>%
+    filter(beetle_rotatedN_top10_pc3$mc %in% robot_rotatedN_top10_pc1$mc)
+  
+  match_rotated_beetlePC3_robotPC2 <-
+    beetle_rotatedN_top10_pc3 %>%
+    mutate(comparison = "beetlePC3_robotPC2") %>%
+    filter(beetle_rotatedN_top10_pc3$mc %in% robot_rotatedN_top10_pc2$mc)
+  
+  match_rotated_beetlePC3_robotPC3 <-
+    beetle_rotatedN_top10_pc3 %>%
+    mutate(comparison = "beetlePC3_robotPC3") %>%
+    filter(beetle_rotatedN_top10_pc3$mc %in% robot_rotatedN_top10_pc3$mc)
+}
 
-match_rotated_beetlePC3_robotPC1 <-
-  beetle_rotatedN_top10_pc3 %>%
-  mutate(comparison = "beetlePC3_robotPC1") %>%
-  filter(beetle_rotatedN_top10_pc3$mc %in% robot_rotatedN_top10_pc1$mc)
-
-match_rotated_beetlePC3_robotPC2 <-
-  beetle_rotatedN_top10_pc3 %>%
-  mutate(comparison = "beetlePC3_robotPC2") %>%
-  filter(beetle_rotatedN_top10_pc3$mc %in% robot_rotatedN_top10_pc2$mc)
-
-match_rotated_beetlePC3_robotPC3 <-
-  beetle_rotatedN_top10_pc3 %>%
-  mutate(comparison = "beetlePC3_robotPC3") %>%
-  filter(beetle_rotatedN_top10_pc3$mc %in% robot_rotatedN_top10_pc3$mc)
+if(nfactors_beetle > 3 & nfactors_robot > 3) {
+  match_rotated_beetlePC1_robotPC4 <-
+    beetle_rotatedN_top10_pc1 %>%
+    mutate(comparison = "beetlePC1_robotPC4") %>%
+    filter(beetle_rotatedN_top10_pc1$mc %in% robot_rotatedN_top10_pc4$mc)
+  
+  match_rotated_beetlePC2_robotPC4 <-
+    beetle_rotatedN_top10_pc2 %>%
+    mutate(comparison = "beetlePC2_robotPC4") %>%
+    filter(beetle_rotatedN_top10_pc2$mc %in% robot_rotatedN_top10_pc4$mc)
+  
+  match_rotated_beetlePC3_robotPC4 <-
+    beetle_rotatedN_top10_pc3 %>%
+    mutate(comparison = "beetlePC3_robotPC4") %>%
+    filter(beetle_rotatedN_top10_pc3$mc %in% robot_rotatedN_top10_pc4$mc)
+  
+  match_rotated_beetlePC4_robotPC1 <-
+    beetle_rotatedN_top10_pc4 %>%
+    mutate(comparison = "beetlePC4_robotPC1") %>%
+    filter(beetle_rotatedN_top10_pc4$mc %in% robot_rotatedN_top10_pc1$mc)
+  
+  match_rotated_beetlePC4_robotPC2 <-
+    beetle_rotatedN_top10_pc4 %>%
+    mutate(comparison = "beetlePC4_robotPC2") %>%
+    filter(beetle_rotatedN_top10_pc4$mc %in% robot_rotatedN_top10_pc2$mc)
+  
+  match_rotated_beetlePC4_robotPC3 <-
+    beetle_rotatedN_top10_pc4 %>%
+    mutate(comparison = "beetlePC4_robotPC3") %>%
+    filter(beetle_rotatedN_top10_pc4$mc %in% robot_rotatedN_top10_pc3$mc)
+  
+  match_rotated_beetlePC4_robotPC4 <-
+    beetle_rotatedN_top10_pc4 %>%
+    mutate(comparison = "beetlePC4_robotPC4") %>%
+    filter(beetle_rotatedN_top10_pc4$mc %in% robot_rotatedN_top10_pc4$mc)
+}
 
 match_rotated <- match_rotated_beetlePC1_robotPC1 %>%
   full_join(match_rotated_beetlePC1_robotPC2) %>%
-  full_join(match_rotated_beetlePC1_robotPC3) %>%
   full_join(match_rotated_beetlePC2_robotPC1) %>%
-  full_join(match_rotated_beetlePC2_robotPC2) %>%
-  full_join(match_rotated_beetlePC2_robotPC3) %>%
-  full_join(match_rotated_beetlePC3_robotPC1) %>%
-  full_join(match_rotated_beetlePC3_robotPC2) %>%
-  full_join(match_rotated_beetlePC3_robotPC3)
+  full_join(match_rotated_beetlePC2_robotPC2)
+
+if(nfactors_beetle > 2 & nfactors_robot > 2) {
+  match_rotated <- match_rotated %>%
+    full_join(match_rotated_beetlePC1_robotPC3) %>%
+    full_join(match_rotated_beetlePC2_robotPC3) %>%
+    full_join(match_rotated_beetlePC3_robotPC1) %>%
+    full_join(match_rotated_beetlePC3_robotPC2) %>%
+    full_join(match_rotated_beetlePC3_robotPC3)
+}
+
+if(nfactors_beetle > 3 & nfactors_robot > 3) {
+  match_rotated <- match_rotated %>%
+    full_join(match_rotated_beetlePC1_robotPC4) %>%
+    full_join(match_rotated_beetlePC2_robotPC4) %>%
+    full_join(match_rotated_beetlePC3_robotPC4) %>%
+    full_join(match_rotated_beetlePC4_robotPC1) %>%
+    full_join(match_rotated_beetlePC4_robotPC2) %>%
+    full_join(match_rotated_beetlePC4_robotPC3) %>%
+    full_join(match_rotated_beetlePC4_robotPC4)
+}
 
 top_match_rotated <- match_rotated %>%
   count(comparison) %>%
