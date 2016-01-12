@@ -15,7 +15,8 @@ graphics.off()
 
 # choose datasource: simulated or real data (manually)
 # datasource <- "simulated"
-datasource <- "real"
+# datasource <- "study 1" # 2015-12-15
+datasource <- "study 2" # 2016-01-12
 
 # prepare datasets -------------------------------------------------------------
 
@@ -121,12 +122,17 @@ if(datasource == "simulated") { # simulate data!
                       religion_none, religion_prefno, feedback)
   d <- d_sim
   
-} else if(datasource == "real") { # load in real data
+} else if(datasource == "study 1") { # load in real data from study 1
 
     d_raw <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (2 conditions between)/GGWmod2_v1_clean.csv")
     d <- d_raw
 
-    }
+} else if(datasource == "study 2") {
+      
+  d_raw <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (replication)/GGWmod2_v1_replication_clean.csv")
+  d <- d_raw
+  
+}
 
 ## clean up dataset ----------------------------------------------------------
 
@@ -210,7 +216,7 @@ d_clean <- d_clean_1 %>%
     religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
                                   "multireligious",
                                   as.character(religion_cat2)))) %>%
-  select(subid:gender, feedback:age_approx, religion_cat3) %>%
+  select(subid:gender, feedback:race_cat, religion_cat3) %>%
   rename(religion_cat = religion_cat3)
 
 ## prepare datasets for PCA --------------------------------------------------
