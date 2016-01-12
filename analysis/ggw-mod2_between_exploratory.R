@@ -1,3 +1,61 @@
+# PCA: BEETLE condition, plot participants by component scores -----------------
+
+# get condition by subject
+condition_subid <- d_clean %>%
+  select(subid, condition)
+
+pca_beetle_rotatedN_scores <- pca_beetle_rotatedN$scores %>%
+  data.frame() %>%
+  add_rownames(var = "subid") %>%
+  left_join(condition_subid, by = "subid") %>%
+  gather(dimension, score, starts_with("PC")) %>%
+  mutate(dimension = factor(dimension,
+         levels = c("PC1", "PC2", "PC3"),
+         labels = c("PC1 (BEETLE)", "PC2 (BEETLE)", "PC3 (BEETLE)")))
+
+p_beetle_rotatedN_scores <- ggplot(aes(x = dimension, y = score, color = dimension),
+                                   data = pca_beetle_rotatedN_scores) +
+  geom_hline(y = 0, lty = 3) +
+  geom_jitter(size = 2) +
+  geom_boxplot(width = 0.5, color = "black", alpha = 0,
+               outlier.shape = NA) +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  labs(title = "BEETLE Scores (from rotated PCA)\n",
+       x = "\nDimension",
+       y = "Score\n",
+       color = "Dimension\n")
+p_beetle_rotatedN_scores
+
+# PCA: ROBOT condition, plot participants by component scores -----------------
+
+# get condition by subject
+condition_subid <- d_clean %>%
+  select(subid, condition)
+
+pca_robot_rotatedN_scores <- pca_robot_rotatedN$scores %>%
+  data.frame() %>%
+  add_rownames(var = "subid") %>%
+  left_join(condition_subid, by = "subid") %>%
+  gather(dimension, score, starts_with("PC")) %>%
+  mutate(dimension = factor(dimension,
+                            levels = c("PC1", "PC2", "PC3"),
+                            labels = c("PC1 (ROBOT)", "PC2 (ROBOT)", "PC3 (ROBOT)")))
+
+p_robot_rotatedN_scores <- ggplot(aes(x = dimension, y = score, color = dimension),
+                                   data = pca_robot_rotatedN_scores) +
+  geom_hline(y = 0, lty = 3) +
+  geom_jitter(size = 2) +
+  geom_boxplot(width = 0.5, color = "black", alpha = 0,
+               outlier.shape = NA) +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  labs(title = "ROBOT Scores (from rotated PCA)\n",
+       x = "\nDimension",
+       y = "Score\n",
+       color = "Dimension\n")
+p_robot_rotatedN_scores
+
 # PCA: BOTH condition --------------------------------------------------------
 
 # make dataset for both conditions
@@ -173,7 +231,7 @@ pca_both_varimax_pc4 <- pca_both_varimax_loadings %>%
   select(PC4, mc, mc_cat)
 pca_both_varimax_pc4
 
-# plot participants by component scores ---------------------------------------
+# PCA: BOTH conditions, plot participants by component scores ------------------
 
 # get condition by subject
 condition_subid <- d_clean %>%
