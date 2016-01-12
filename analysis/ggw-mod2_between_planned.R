@@ -287,7 +287,7 @@ pca_beetle_unrotated
 pca_beetle_unrotated$values # examine eignenvalues, consider retaining iff > 1.00
 
 # set number of dimensions to extract (manually)
-nfactors_beetle <- 3
+nfactors_beetle <- 4
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
@@ -363,6 +363,15 @@ pca_beetle_unrotatedN_pc3 <- pca_beetle_unrotatedN_loadings %>%
   select(PC3, mc, mc_cat)
 pca_beetle_unrotatedN_pc3
 
+# ... for PC4
+if(nfactors_beetle > 3) {
+  pca_beetle_unrotatedN_pc4 <- pca_beetle_unrotatedN_loadings %>%
+    mutate(mc = mc_beetle_unrotatedN) %>%
+    arrange(desc(PC4)) %>%
+    select(PC4, mc, mc_cat)
+  pca_beetle_unrotatedN_pc4
+}
+
 ## step 3: run pca with varimax rotation with N dimensions -------------------
 
 # run pca with n dimensions with varimax rotation
@@ -437,6 +446,15 @@ pca_beetle_rotatedN_pc3 <- pca_beetle_rotatedN_loadings %>%
   arrange(desc(PC3)) %>%
   select(PC3, mc, mc_cat)
 pca_beetle_rotatedN_pc3
+
+# ... for PC4
+if(nfactors_beetle > 3) {
+  pca_beetle_rotatedN_pc4 <- pca_beetle_rotatedN_loadings %>%
+    mutate(mc = mc_beetle_rotatedN) %>%
+    arrange(desc(PC4)) %>%
+    select(PC4, mc, mc_cat)
+  pca_beetle_rotatedN_pc4
+}
 
 # PCA: ROBOT condition ---------------------------------------------------------
 
@@ -528,6 +546,15 @@ pca_robot_unrotatedN_pc3 <- pca_robot_unrotatedN_loadings %>%
   select(PC3, mc, mc_cat)
 pca_robot_unrotatedN_pc3
 
+# ... for PC4
+if(nfactors_robot > 3) {
+  pca_robot_unrotatedN_pc4 <- pca_robot_unrotatedN_loadings %>%
+    mutate(mc = mc_robot_unrotatedN) %>%
+    arrange(desc(PC4)) %>%
+    select(PC4, mc, mc_cat)
+  pca_robot_unrotatedN_pc4
+}
+
 ## step 3: run pca with varimax rotation with N dimensions -------------------
 
 # run pca with n dimensions with varimax rotation
@@ -602,6 +629,14 @@ pca_robot_rotatedN_pc3 <- pca_robot_rotatedN_loadings %>%
   arrange(desc(PC3)) %>%
   select(PC3, mc, mc_cat)
 pca_robot_rotatedN_pc3
+
+if(nfactors_robot > 3) {
+  pca_robot_rotatedN_pc4 <- pca_robot_rotatedN_loadings %>%
+    mutate(mc = mc_robot_rotatedN) %>%
+    arrange(desc(PC4)) %>%
+    select(PC4, mc, mc_cat)
+  pca_robot_rotatedN_pc4
+}
 
 # compare dimensions across conditions -----------------------------------------
 
