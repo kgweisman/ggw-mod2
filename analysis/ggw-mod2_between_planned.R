@@ -278,7 +278,7 @@ summary(religion) # test for difference in religion distribution across conditio
 ## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
-# VSS(d_beetle, n = 39)
+VSS(d_beetle, n = 39)
 VSS.scree(d_beetle)
 
 # run unrotated pca with maximum number of dimensions
@@ -325,19 +325,19 @@ pca_beetle_unrotatedN_loadings[c("conscious", "self_aware", "pleasure",
 
 pca_beetle_unrotatedN_loadings$mc_cat <- factor(pca_beetle_unrotatedN_loadings$mc_cat)
 
-pca_beetle_unrotatedN_plot12 <- 
-  ggplot(pca_beetle_unrotatedN_loadings,
-         aes(x = PC1, y = PC2,
-             label = rownames(pca_beetle_unrotatedN_loadings),
-             color = mc_cat)) +
-  geom_text(hjust = 0.5, vjust = 0.5) +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_color_brewer(type = "qual", palette = 2) +
-  labs(title = "BEETLE: factor loadings (first 2 unrotated components)\n",
-       x = "\nPrincipal Component 1",
-       y = "Principal Component 2\n")
-pca_beetle_unrotatedN_plot12
+# pca_beetle_unrotatedN_plot12 <- 
+#   ggplot(pca_beetle_unrotatedN_loadings,
+#          aes(x = PC1, y = PC2,
+#              label = rownames(pca_beetle_unrotatedN_loadings),
+#              color = mc_cat)) +
+#   geom_text(hjust = 0.5, vjust = 0.5) +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_color_brewer(type = "qual", palette = 2) +
+#   labs(title = "BEETLE: factor loadings (first 2 unrotated components)\n",
+#        x = "\nPrincipal Component 1",
+#        y = "Principal Component 2\n")
+# pca_beetle_unrotatedN_plot12
 
 # examine loadings
 mc_beetle_unrotatedN = rownames(pca_beetle_unrotatedN_loadings)
@@ -409,19 +409,19 @@ pca_beetle_rotatedN_loadings[c("conscious", "self_aware", "pleasure",
 
 pca_beetle_rotatedN_loadings$mc_cat <- factor(pca_beetle_rotatedN_loadings$mc_cat)
 
-pca_beetle_rotatedN_plot12 <- 
-  ggplot(pca_beetle_rotatedN_loadings,
-         aes(x = PC1, y = PC2,
-             label = rownames(pca_beetle_rotatedN_loadings),
-             color = mc_cat)) +
-  geom_text(hjust = 0.5, vjust = 0.5) +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_color_brewer(type = "qual", palette = 2) +
-  labs(title = "BEETLE: factor loadings (first 2 rotated components)\n",
-       x = "\nPrincipal Component 1",
-       y = "Principal Component 2\n")
-pca_beetle_rotatedN_plot12
+# pca_beetle_rotatedN_plot12 <- 
+#   ggplot(pca_beetle_rotatedN_loadings,
+#          aes(x = PC1, y = PC2,
+#              label = rownames(pca_beetle_rotatedN_loadings),
+#              color = mc_cat)) +
+#   geom_text(hjust = 0.5, vjust = 0.5) +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_color_brewer(type = "qual", palette = 2) +
+#   labs(title = "BEETLE: factor loadings (first 2 rotated components)\n",
+#        x = "\nPrincipal Component 1",
+#        y = "Principal Component 2\n")
+# pca_beetle_rotatedN_plot12
 
 # examine loadings
 mc_beetle_rotatedN = rownames(pca_beetle_rotatedN_loadings)
@@ -470,7 +470,7 @@ pca_robot_unrotated
 pca_robot_unrotated$values # examine eignenvalues, consider retaining iff > 1.00
 
 # set number of dimensions to extract (manually)
-nfactors_robot <- 3
+nfactors_robot <- 4
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
@@ -508,19 +508,19 @@ pca_robot_unrotatedN_loadings[c("conscious", "self_aware", "pleasure",
 
 pca_robot_unrotatedN_loadings$mc_cat <- factor(pca_robot_unrotatedN_loadings$mc_cat)
 
-pca_robot_unrotatedN_plot12 <- 
-  ggplot(pca_robot_unrotatedN_loadings,
-         aes(x = PC1, y = PC2,
-             label = rownames(pca_robot_unrotatedN_loadings),
-             color = mc_cat)) +
-  geom_text(hjust = 0.5, vjust = 0.5) +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_color_brewer(type = "qual", palette = 2) +
-  labs(title = "ROBOT: factor loadings (first 2 unrotated components)\n",
-       x = "\nPrincipal Component 1",
-       y = "Principal Component 2\n")
-pca_robot_unrotatedN_plot12
+# pca_robot_unrotatedN_plot12 <- 
+#   ggplot(pca_robot_unrotatedN_loadings,
+#          aes(x = PC1, y = PC2,
+#              label = rownames(pca_robot_unrotatedN_loadings),
+#              color = mc_cat)) +
+#   geom_text(hjust = 0.5, vjust = 0.5) +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_color_brewer(type = "qual", palette = 2) +
+#   labs(title = "ROBOT: factor loadings (first 2 unrotated components)\n",
+#        x = "\nPrincipal Component 1",
+#        y = "Principal Component 2\n")
+# pca_robot_unrotatedN_plot12
 
 # examine loadings
 mc_robot_unrotatedN = rownames(pca_robot_unrotatedN_loadings)
@@ -592,19 +592,19 @@ pca_robot_rotatedN_loadings[c("conscious", "self_aware", "pleasure",
 
 pca_robot_rotatedN_loadings$mc_cat <- factor(pca_robot_rotatedN_loadings$mc_cat)
 
-pca_robot_rotatedN_plot12 <- 
-  ggplot(pca_robot_rotatedN_loadings,
-         aes(x = PC1, y = PC2,
-             label = rownames(pca_robot_rotatedN_loadings),
-             color = mc_cat)) +
-  geom_text(hjust = 0.5, vjust = 0.5) +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_color_brewer(type = "qual", palette = 2) +
-  labs(title = "ROBOT: factor loadings (first 2 rotated components)\n",
-       x = "\nPrincipal Component 1",
-       y = "Principal Component 2\n")
-pca_robot_rotatedN_plot12
+# pca_robot_rotatedN_plot12 <- 
+#   ggplot(pca_robot_rotatedN_loadings,
+#          aes(x = PC1, y = PC2,
+#              label = rownames(pca_robot_rotatedN_loadings),
+#              color = mc_cat)) +
+#   geom_text(hjust = 0.5, vjust = 0.5) +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_color_brewer(type = "qual", palette = 2) +
+#   labs(title = "ROBOT: factor loadings (first 2 rotated components)\n",
+#        x = "\nPrincipal Component 1",
+#        y = "Principal Component 2\n")
+# pca_robot_rotatedN_plot12
 
 # examine loadings
 mc_robot_rotatedN = rownames(pca_robot_rotatedN_loadings)
