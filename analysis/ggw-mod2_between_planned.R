@@ -293,10 +293,15 @@ VSS.scree(d_beetle) # scree plot
 # run unrotated pca with maximum number of dimensions
 pca_beetle_unrotated <- principal(d_beetle, nfactors = 39, rotate = "none")
 pca_beetle_unrotated
-pca_beetle_unrotated$values # examine eignenvalues, consider retaining iff > 1.00
+pca_beetle_unrotated$values[pca_beetle_unrotated$values > 1] # examine eignenvalues > 1
+
+# run roated pca with maximum number of dimensions
+pca_beetle_rotated <- principal(d_beetle, nfactors = 39, rotate = "varimax")
+pca_beetle_rotated
+pca_beetle_rotated$values[pca_beetle_rotated$values > 1] # examine eignenvalues > 1
 
 # set number of dimensions to extract (manually)
-nfactors_beetle <- 3
+nfactors_beetle <- 4
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
@@ -474,16 +479,22 @@ if(nfactors_beetle > 3) {
 ## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
-# VSS(d_robot, n = 39)
-VSS.scree(d_robot)
+VSS(d_robot, n = 39, rotate = "none") # unrotated
+VSS(d_robot, n = 39, rotate = "varimax") # rotated
+VSS.scree(d_robot) # scree plot
 
 # run unrotated pca with maximum number of dimensions
 pca_robot_unrotated <- principal(d_robot, nfactors = 39, rotate = "none")
 pca_robot_unrotated
-pca_robot_unrotated$values # examine eignenvalues, consider retaining iff > 1.00
+pca_robot_unrotated$values[pca_robot_unrotated$values > 1] # examine eignenvalues > 1
+
+# run roated pca with maximum number of dimensions
+pca_robot_rotated <- principal(d_robot, nfactors = 39, rotate = "varimax")
+pca_robot_rotated
+pca_robot_rotated$values[pca_robot_rotated$values > 1] # examine eignenvalues > 1
 
 # set number of dimensions to extract (manually)
-nfactors_robot <- 3
+nfactors_robot <- 4
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
