@@ -15,8 +15,8 @@ graphics.off()
 
 # choose datasource: simulated or real data (manually)
 # datasource <- "simulated"
-datasource <- "study 1" # 2015-12-15
-# datasource <- "study 2" # 2016-01-12
+# datasource <- "study 1" # 2015-12-15
+datasource <- "study 2" # 2016-01-12
 # datasource <- "studies 1 & 2" # combine
 
 # prepare datasets -------------------------------------------------------------

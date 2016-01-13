@@ -98,7 +98,7 @@ pca_both_rotated
 pca_both_rotated$values[pca_both_rotated$values > 1] # examine eignenvalues > 1
 
 # set number of dimensions to extract (manually)
-nfactors_both <- 3
+nfactors_both <- 4
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
