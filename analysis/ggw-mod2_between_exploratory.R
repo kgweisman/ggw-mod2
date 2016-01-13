@@ -109,18 +109,18 @@ pca_both_unrotatedN_loadings[c("conscious", "self_aware", "pleasure",
 
 pca_both_unrotatedN_loadings$mc_cat <- factor(pca_both_unrotatedN_loadings$mc_cat)
 
-pca_both_plot <- ggplot(pca_both_unrotatedN_loadings,
-                        aes(x = PC1, y = PC2,
-                            label = rownames(pca_both_unrotatedN_loadings),
-                            color = mc_cat)) +
-  geom_text(hjust = 0.5, vjust = 0.5) +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_color_brewer(type = "qual", palette = 2) +
-  labs(title = "BOTH: factor loadings (first 2 unrotated components)\n",
-       x = "\nPrincipal Component 1",
-       y = "Principal Component 2\n")
-pca_both_plot
+# pca_both_plot <- ggplot(pca_both_unrotatedN_loadings,
+#                         aes(x = PC1, y = PC2,
+#                             label = rownames(pca_both_unrotatedN_loadings),
+#                             color = mc_cat)) +
+#   geom_text(hjust = 0.5, vjust = 0.5) +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_color_brewer(type = "qual", palette = 2) +
+#   labs(title = "BOTH: factor loadings (first 2 unrotated components)\n",
+#        x = "\nPrincipal Component 1",
+#        y = "Principal Component 2\n")
+# pca_both_plot
 
 # examine loadings
 mc_both = rownames(pca_both_unrotatedN_loadings)
@@ -187,18 +187,18 @@ pca_both_varimax_loadings[c("conscious", "self_aware", "pleasure",
 
 pca_both_varimax_loadings$mc_cat <- factor(pca_both_varimax_loadings$mc_cat)
 
-pca_both_plot <- ggplot(pca_both_varimax_loadings,
-                        aes(x = PC1, y = PC2,
-                            label = rownames(pca_both_varimax_loadings),
-                            color = mc_cat)) +
-  geom_text(hjust = 0.5, vjust = 0.5) +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_color_brewer(type = "qual", palette = 2) +
-  labs(title = "BOTH: factor loadings (first 2 rotated components)\n",
-       x = "\nPrincipal Component 1",
-       y = "Principal Component 2\n")
-pca_both_plot
+# pca_both_plot <- ggplot(pca_both_varimax_loadings,
+#                         aes(x = PC1, y = PC2,
+#                             label = rownames(pca_both_varimax_loadings),
+#                             color = mc_cat)) +
+#   geom_text(hjust = 0.5, vjust = 0.5) +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_color_brewer(type = "qual", palette = 2) +
+#   labs(title = "BOTH: factor loadings (first 2 rotated components)\n",
+#        x = "\nPrincipal Component 1",
+#        y = "Principal Component 2\n")
+# pca_both_plot
 
 # examine loadings
 mc_both = rownames(pca_both_varimax_loadings)

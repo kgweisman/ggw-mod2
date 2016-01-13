@@ -278,7 +278,7 @@ summary(religion) # test for difference in religion distribution across conditio
 ## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
-VSS(d_beetle, n = 39, rotate = "varimax")
+# VSS(d_beetle, n = 39, rotate = "varimax")
 VSS.scree(d_beetle)
 
 # run unrotated pca with maximum number of dimensions
@@ -287,7 +287,7 @@ pca_beetle_unrotated
 pca_beetle_unrotated$values # examine eignenvalues, consider retaining iff > 1.00
 
 # set number of dimensions to extract (manually)
-nfactors_beetle <- 4
+nfactors_beetle <- 3
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
@@ -474,7 +474,7 @@ pca_robot_unrotated
 pca_robot_unrotated$values # examine eignenvalues, consider retaining iff > 1.00
 
 # set number of dimensions to extract (manually)
-nfactors_robot <- 4
+nfactors_robot <- 3
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
