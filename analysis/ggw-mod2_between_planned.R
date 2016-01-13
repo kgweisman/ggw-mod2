@@ -15,8 +15,9 @@ graphics.off()
 
 # choose datasource: simulated or real data (manually)
 # datasource <- "simulated"
-# datasource <- "study 1" # 2015-12-15
-datasource <- "study 2" # 2016-01-12
+datasource <- "study 1" # 2015-12-15
+# datasource <- "study 2" # 2016-01-12
+# datasource <- "studies 1 & 2" # combine
 
 # prepare datasets -------------------------------------------------------------
 
@@ -132,6 +133,13 @@ if(datasource == "simulated") { # simulate data!
   d_raw <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (replication)/GGWmod2_v1_replication_clean.csv")
   d <- d_raw
   
+} else if(datasource == "studies 1 & 2") {
+  
+  d_raw1 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (2 conditions between)/GGWmod2_v1_clean.csv")
+  d_raw2 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (replication)/GGWmod2_v1_replication_clean.csv")
+  d <- d_raw1 %>%
+    mutate(yob = as.integer(as.character(yob))) %>%
+    full_join(d_raw2)
 }
 
 ## clean up dataset ----------------------------------------------------------
@@ -278,8 +286,9 @@ summary(religion) # test for difference in religion distribution across conditio
 ## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
-# VSS(d_beetle, n = 39, rotate = "varimax")
-VSS.scree(d_beetle)
+VSS(d_beetle, n = 39, rotate = "none") # unrotated
+VSS(d_beetle, n = 39, rotate = "varimax") # rotated
+VSS.scree(d_beetle) # scree plot
 
 # run unrotated pca with maximum number of dimensions
 pca_beetle_unrotated <- principal(d_beetle, nfactors = 39, rotate = "none")
