@@ -9,6 +9,8 @@ library(devtools)
 library(stats)
 library(knitr)
 library(ggfortify)
+library(ggdendro)
+library(cluster)
 
 # clear workspace
 rm(list = ls(all = T))
@@ -255,7 +257,7 @@ pca_all_rotated
 pca_all_rotated$values[pca_all_rotated$values > 1] # examine eignenvalues > 1
 
 # set number of dimensions to extract (manually)
-nfactors_all <- 4
+nfactors_all <- 2
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
@@ -548,7 +550,7 @@ if(nfactors_all == 4) {
                               labels = c("PC1", "PC2", "PC3", "PC4")))
   
   p_scored <- ggplot(aes(x = dimension, y = score,
-                         group = condition, fill = condition), 
+                         group = condition, fill = dimension), 
                      data = d_scored_long) +
     facet_wrap(~ condition, ncol = 7) +
     geom_bar(stat = "identity", width = 0.8,
@@ -582,7 +584,7 @@ if(nfactors_all == 4) {
                               labels = c("PC1", "PC2", "PC3")))
   
   p_scored <- ggplot(aes(x = dimension, y = score,
-                         group = condition, fill = condition), 
+                         group = condition, fill = dimension), 
                      data = d_scored_long) +
     facet_wrap(~ condition, ncol = 7) +
     geom_bar(stat = "identity", width = 0.8,
