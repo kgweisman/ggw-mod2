@@ -188,10 +188,11 @@ d_all <- data.frame(d_all[,-1], row.names = d_all[,1])
 # sample size
 sample_size <- with(d_clean, table(condition))
 kable(d_clean %>% count(condition))
+total_n <- as.numeric(count(d_clean))
 
 # duration
 duration <- d_clean %>% 
-  group_by(condition) %>%
+  # group_by(condition) %>%
   summarise(min_duration = min(duration, na.rm = T),
             max_duration = max(duration, na.rm = T),
             median_duration = median(duration, na.rm = T),
@@ -202,7 +203,7 @@ summary(lm(as.numeric(duration) ~ condition, data = d_clean)) # test for differe
 
 # approxiate age
 age_approx <- d_clean %>%
-  group_by(condition) %>%
+  # group_by(condition) %>%
   summarise(min_age = min(age_approx, na.rm = T),
             max_age = max(age_approx, na.rm = T),
             median_age = median(age_approx, na.rm = T),
@@ -212,19 +213,27 @@ age_approx
 summary(lm(age_approx ~ condition, data = d_clean)) # test for differences in age across conditions
 
 # gender
-gender <- with(d_clean, table(condition, gender))
-kable(addmargins(gender))
+table(d_clean$gender)
+# gender <- with(d_clean, table(condition, gender))
+# kable(addmargins(gender))
 summary(gender) # test for difference in gender distribution across conditions
 
 # racial/ethnic background
-race_ethn <- with(d_clean, table(condition, race_cat))
-kable(addmargins(race_ethn))
+table(d_clean$race_cat)
+# race_ethn <- with(d_clean, table(condition, race_cat))
+# kable(addmargins(race_ethn))
 summary(race_ethn) # test for difference in race/ethnicity distribution across conditions
 
-# religious background
-education <- with(d_clean, table(condition, education_cat))
-kable(addmargins(education))
-summary(education) # test for difference in education distribution across conditions
+# education
+education <- d_clean %>%
+  # group_by(condition) %>%
+  summarise(min_edu = min(education, na.rm = T),
+            max_edu = max(education, na.rm = T),
+            median_edu = median(education, na.rm = T),
+            mean_edu = mean(education, na.rm = T),
+            sd_edu = sd(education, na.rm = T))
+education
+summary(lm(education ~ condition, data = d_clean)) # test for differences in age across conditions
 
 # PCA: ALL condition --------------------------------------------------------
 
