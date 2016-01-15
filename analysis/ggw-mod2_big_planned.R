@@ -8,6 +8,7 @@ library(ggplot2)
 library(devtools)
 library(stats)
 library(knitr)
+library(ggfortify)
 
 # clear workspace
 rm(list = ls(all = T))
@@ -643,13 +644,10 @@ if(nfactors_all == 4) {
 
 # EXPLORATORY: hierarchical cluster analysis -----------------------------------
 
-# dist_all <- dist(d_all)
-# hclust_all <- hclust(dist_all)
-# ggdendrogram(hclust_all)
-# VSS.scree(d_all)
-# 
-# library(ggfortify)
-# autoplot(clara(d_all, k = 3), frame = TRUE, frame.type = 'norm')
-# autoplot(fanny(d_all, k = 3), frame = TRUE, frame.type = 'norm')
+dist_all <- dist(d_all)
+hclust_all <- hclust(dist_all)
+ggdendrogram(hclust_all)
+autoplot(clara(d_all, k = 3), frame = TRUE, frame.type = 'norm')
+autoplot(fanny(d_all, k = 3), frame = TRUE, frame.type = 'norm')
 
 
