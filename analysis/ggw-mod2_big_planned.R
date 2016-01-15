@@ -53,16 +53,6 @@ if(datasource == "simulated") { # simulate data!
   race_pac_islander <- factor(sample(c(0, 1), 420, replace = T))
   race_white <- factor(sample(c(0, 1), 420, replace = T))
   race_other_prefno <- factor(sample(c(0, 1), 420, replace = T))
-  religion_buddhism <- factor(sample(c(0, 1), 420, replace = T))
-  religion_christianity <- factor(sample(c(0, 1), 420, replace = T))
-  religion_hinduism <- factor(sample(c(0, 1), 420, replace = T))
-  religion_islam <- factor(sample(c(0, 1), 420, replace = T))
-  religion_jainism <- factor(sample(c(0, 1), 420, replace = T))
-  religion_judaism <- factor(sample(c(0, 1), 420, replace = T))
-  religion_sikhism <- factor(sample(c(0, 1), 420, replace = T))
-  religion_other <- factor(sample(c(0, 1), 420, replace = T))
-  religion_none <- factor(sample(c(0, 1), 420, replace = T))
-  religion_prefno <- factor(sample(c(0, 1), 420, replace = T))
   education_less <- factor(sample(c(0, 1), 420, replace = T))
   education_high_school <- factor(sample(c(0, 1), 420, replace = T))
   education_some_college <- factor(sample(c(0, 1), 420, replace = T))
@@ -128,15 +118,11 @@ if(datasource == "simulated") { # simulate data!
                       pleasure, pride, CATCH, yob, gender, race_asian_east, 
                       race_asian_south, race_asian_other, race_black, 
                       race_hispanic, race_middle_eastern, race_native_american, 
-                      race_pac_islander, race_white, race_other_prefno, 
-                      religion_buddhism, religion_christianity, 
-                      religion_hinduism, religion_islam, religion_jainism, 
-                      religion_judaism, religion_sikhism, religion_other, 
-                      religion_none, religion_prefno, education_less,
-                      education_high_school, education_some_college,
-                      education_associates, education_bachelors,
-                      education_some_graduate, education_graduate,
-                      education_prefno, feedback)
+                      race_pac_islander, race_white, race_other_prefno,
+                      education_less, education_high_school, 
+                      education_some_college, education_associates, 
+                      education_bachelors, education_some_graduate, 
+                      education_graduate, education_prefno, feedback)
   d <- d_sim
   
 } else if(datasource == "study 4") { # load in real data from study 1
@@ -197,40 +183,36 @@ d_clean <- d_clean_1 %>%
     race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
                               as.character(race_cat2)))) %>%
   select(subid:end_time, duration, finished:gender, 
-         religion_buddhism:age_approx, race_cat3) %>%
+         education_less:age_approx, race_cat3) %>%
   rename(race_cat = race_cat3) %>%
-  mutate( # deal with religion
-    religion_buddhism = 
-      factor(ifelse(is.na(religion_buddhism), "", "buddhism ")),
-    religion_christianity = 
-      factor(ifelse(is.na(religion_christianity), "", "christianity ")),
-    religion_hinduism = 
-      factor(ifelse(is.na(religion_hinduism), "", "hinduism ")),
-    religion_islam = 
-      factor(ifelse(is.na(religion_islam), "", "islam ")),
-    religion_jainism = 
-      factor(ifelse(is.na(religion_jainism), "", "jainism ")),
-    religion_judaism = 
-      factor(ifelse(is.na(religion_judaism), "", "judaism ")),
-    religion_sikhism = 
-      factor(ifelse(is.na(religion_sikhism), "", "sikhism ")),
-    religion_other = 
-      factor(ifelse(is.na(religion_other), "", "other ")),
-    religion_none = 
-      factor(ifelse(is.na(religion_none), "", "none ")),
-    religion_prefno = 
-      factor(ifelse(is.na(religion_prefno), "", "other_prefno ")),
-    religion_cat = paste0(religion_buddhism, religion_christianity, 
-                          religion_hinduism, religion_islam, religion_jainism,
-                          religion_judaism, religion_sikhism, religion_other, 
-                          religion_none, religion_prefno),
-    religion_cat2 = factor(sub(" +$", "", religion_cat)),
-    religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
+  mutate( # deal with education
+    education_less = 
+      factor(ifelse(is.na(education_less), "", "buddhism ")),
+    education_high_school = 
+      factor(ifelse(is.na(education_high_school), "", "christianity ")),
+    education_some_college = 
+      factor(ifelse(is.na(education_some_college), "", "hinduism ")),
+    education_associates = 
+      factor(ifelse(is.na(education_associates), "", "islam ")),
+    education_bachelors = 
+      factor(ifelse(is.na(education_bachelors), "", "jainism ")),
+    education_some_graduate = 
+      factor(ifelse(is.na(education_some_graduate), "", "judaism ")),
+    education_graduate = 
+      factor(ifelse(is.na(education_graduate), "", "sikhism ")),
+    education_prefno = 
+      factor(ifelse(is.na(education_prefno), "", "other_prefno ")),
+    education_cat = paste0(education_less, education_high_school, 
+                          education_some_college, education_associates, 
+                          education_bachelors, education_some_graduate, 
+                          education_graduate, education_prefno),
+    education_cat2 = factor(sub(" +$", "", education_cat)),
+    education_cat3 = factor(ifelse(grepl(" ", education_cat2) == T, 
                                   "multireligious",
-                                  as.character(religion_cat2)))) %>%
+                                  as.character(education_cat2)))) %>%
   # still need to deal with education ***
-  select(subid:gender, feedback:race_cat, religion_cat3) %>%
-  rename(religion_cat = religion_cat3)
+  select(subid:gender, feedback:race_cat, education_cat3) %>%
+  rename(education_cat = education_cat3)
 
 ## prepare datasets for PCA --------------------------------------------------
 
@@ -253,7 +235,8 @@ duration <- d_clean %>%
             median_duration = median(duration, na.rm = T),
             mean_duration = mean(duration, na.rm = T),
             sd_duration = sd(duration, na.rm = T))
-summary(lm(duration ~ condition, data = d_clean)) # test for differences in duration across conditions
+duration
+summary(lm(as.numeric(duration) ~ condition, data = d_clean)) # test for differences in duration across conditions
 
 # approxiate age
 age_approx <- d_clean %>%
@@ -263,6 +246,7 @@ age_approx <- d_clean %>%
             median_age = median(age_approx, na.rm = T),
             mean_age = mean(age_approx, na.rm = T),
             sd_age = sd(age_approx, na.rm = T))
+age_approx
 summary(lm(age_approx ~ condition, data = d_clean)) # test for differences in age across conditions
 
 # gender
@@ -276,11 +260,9 @@ kable(addmargins(race_ethn))
 summary(race_ethn) # test for difference in race/ethnicity distribution across conditions
 
 # religious background
-religion <- with(d_clean, table(condition, religion_cat))
-kable(addmargins(religion))
-summary(religion) # test for difference in religion distribution across conditions
-
-# need to deal with education ***
+education <- with(d_clean, table(condition, education_cat))
+kable(addmargins(education))
+summary(education) # test for difference in education distribution across conditions
 
 # PCA: ALL condition --------------------------------------------------------
 
