@@ -1,3 +1,83 @@
+# PCA: BEETLE condition, plot participants by component scores -----------------
+
+# get condition by subject
+condition_subid <- d_clean %>%
+  select(subid, condition)
+
+pca_beetle_rotatedNN_scores <- pca_beetle_rotatedNN$scores %>%
+  data.frame() %>%
+  add_rownames(var = "subid") %>%
+  left_join(condition_subid, by = "subid") %>%
+  gather(dimension, score, starts_with("PC"))
+
+if(nfactors_beetle == 3) {
+  pca_beetle_rotatedNN_scores <- pca_beetle_rotatedNN_scores %>%
+    mutate(dimension = factor(dimension,
+                              levels = c("PC1", "PC2", "PC3"),
+                              labels = c("PC1 (BEETLE)", "PC2 (BEETLE)", 
+                                         "PC3 (BEETLE)")))
+} else if(nfactors_beetle == 4) {
+  pca_beetle_rotatedNN_scores <- pca_beetle_rotatedNN_scores %>%
+    mutate(dimension = factor(dimension,
+                              levels = c("PC1", "PC2", "PC3", "PC4"),
+                              labels = c("PC1 (BEETLE)", "PC2 (BEETLE)", 
+                                         "PC3 (BEETLE)", "PC4 (BEETLE)")))
+}
+
+p_beetle_rotatedNN_scores <- ggplot(aes(x = dimension, y = score, color = dimension),
+                                   data = pca_beetle_rotatedNN_scores) +
+  geom_hline(y = 0, lty = 3) +
+  geom_jitter(size = 2) +
+  geom_boxplot(width = 0.5, color = "black", alpha = 0,
+               outlier.shape = NA) +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  labs(title = "BEETLE Scores (from rotated PCA)\n",
+       x = "\nDimension",
+       y = "Score\n",
+       color = "Dimension\n")
+p_beetle_rotatedNN_scores
+
+# PCA: ROBOT condition, plot participants by component scores -----------------
+
+# get condition by subject
+condition_subid <- d_clean %>%
+  select(subid, condition)
+
+pca_robot_rotatedNN_scores <- pca_robot_rotatedNN$scores %>%
+  data.frame() %>%
+  add_rownames(var = "subid") %>%
+  left_join(condition_subid, by = "subid") %>%
+  gather(dimension, score, starts_with("PC"))
+
+if(nfactors_robot == 3) {
+  pca_robot_rotatedNN_scores <- pca_robot_rotatedNN_scores %>%
+    mutate(dimension = factor(dimension,
+                              levels = c("PC1", "PC2", "PC3"),
+                              labels = c("PC1 (ROBOT)", "PC2 (ROBOT)", 
+                                         "PC3 (ROBOT)")))
+} else if(nfactors_robot == 4) {
+  pca_robot_rotatedNN_scores <- pca_robot_rotatedNN_scores %>%
+    mutate(dimension = factor(dimension,
+                              levels = c("PC1", "PC2", "PC3", "PC4"),
+                              labels = c("PC1 (ROBOT)", "PC2 (ROBOT)", 
+                                         "PC3 (ROBOT)", "PC4 (ROBOT)")))
+}
+
+p_robot_rotatedNN_scores <- ggplot(aes(x = dimension, y = score, color = dimension),
+                                  data = pca_robot_rotatedNN_scores) +
+  geom_hline(y = 0, lty = 3) +
+  geom_jitter(size = 2) +
+  geom_boxplot(width = 0.5, color = "black", alpha = 0,
+               outlier.shape = NA) +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  labs(title = "ROBOT Scores (from rotated PCA)\n",
+       x = "\nDimension",
+       y = "Score\n",
+       color = "Dimension\n")
+p_robot_rotatedNN_scores
+
 # PCA: BOTH condition --------------------------------------------------------
 
 # make dataset for both conditions
@@ -7,13 +87,19 @@ d_both <- d_clean %>%
 d_both <- data.frame(d_both[,-1], row.names = d_both[,1])
 
 # use "very simple structure" criterion to examine how many factors to extract
-# VSS(d_both, n = 39)
-VSS.scree(d_both)
+VSS(d_both, n = 39, rotate = "none") # unrotated
+VSS(d_both, n = 39, rotate = "varimax") # rotated
+VSS.scree(d_both) # scree plot
 
 # run unrotated pca with maximum number of factors
 pca_both_unrotated <- principal(d_both, nfactors = 39, rotate = "none")
 pca_both_unrotated
-pca_both_unrotated$values # examine eignenvalues, retain iff > 1.00
+pca_beetle_unrotated$values[pca_beetle_unrotated$values > 1] # examine eignenvalues > 1
+
+# run rotated pca with maximum number of factors
+pca_both_rotatedN <- principal(d_both, nfactors = 39, rotate = "none")
+pca_both_rotatedN
+pca_beetle_rotatedN$values[pca_beetle_rotatedN$values > 1] # examine eignenvalues > 1
 
 # set number of factors to extract (manually)
 nfactors_both <- 3
@@ -52,18 +138,18 @@ pca_both_unrotatedN_loadings[c("conscious", "self_aware", "pleasure",
 
 pca_both_unrotatedN_loadings$mc_cat <- factor(pca_both_unrotatedN_loadings$mc_cat)
 
-pca_both_plot <- ggplot(pca_both_unrotatedN_loadings,
-                        aes(x = PC1, y = PC2,
-                            label = rownames(pca_both_unrotatedN_loadings),
-                            color = mc_cat)) +
-  geom_text(hjust = 0.5, vjust = 0.5) +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_color_brewer(type = "qual", palette = 2) +
-  labs(title = "BOTH: factor loadings (first 2 unrotated components)\n",
-       x = "\nPrincipal Component 1",
-       y = "Principal Component 2\n")
-pca_both_plot
+# pca_both_plot <- ggplot(pca_both_unrotatedN_loadings,
+#                         aes(x = PC1, y = PC2,
+#                             label = rownames(pca_both_unrotatedN_loadings),
+#                             color = mc_cat)) +
+#   geom_text(hjust = 0.5, vjust = 0.5) +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_color_brewer(type = "qual", palette = 2) +
+#   labs(title = "BOTH: factor loadings (first 2 unrotated components)\n",
+#        x = "\nPrincipal Component 1",
+#        y = "Principal Component 2\n")
+# pca_both_plot
 
 # examine loadings
 mc_both = rownames(pca_both_unrotatedN_loadings)
@@ -83,165 +169,145 @@ pca_both_unrotatedN_pc2 <- pca_both_unrotatedN_loadings %>%
 pca_both_unrotatedN_pc2
 
 # ... for PC3
-pca_both_unrotatedN_pc3 <- pca_both_unrotatedN_loadings %>%
-  mutate(mc = mc_both) %>%
-  arrange(desc(PC3)) %>%
-  select(PC3, mc, mc_cat)
-pca_both_unrotatedN_pc3
+if(nfactors_both > 2) {
+  pca_both_unrotatedN_pc3 <- pca_both_unrotatedN_loadings %>%
+    mutate(mc = mc_both) %>%
+    arrange(desc(PC3)) %>%
+    select(PC3, mc, mc_cat)
+  pca_both_unrotatedN_pc3
+}
 
 # ... for PC4
-pca_both_unrotatedN_pc4 <- pca_both_unrotatedN_loadings %>%
-  mutate(mc = mc_both) %>%
-  arrange(desc(PC4)) %>%
-  select(PC4, mc, mc_cat)
-pca_both_unrotatedN_pc4
+if(nfactors_both > 3) {
+  pca_both_unrotatedN_pc4 <- pca_both_unrotatedN_loadings %>%
+    mutate(mc = mc_both) %>%
+    arrange(desc(PC4)) %>%
+    select(PC4, mc, mc_cat)
+  pca_both_unrotatedN_pc4
+}
 
 # run pca with varimax rotation with n factors (as determined above)
-pca_both_varimax <- principal(d_both, nfactors = nfactors_both, rotate = "varimax")
-pca_both_varimax
+pca_both_rotatedN <- principal(d_both, nfactors = nfactors_both, rotate = "varimax")
+pca_both_rotatedN
 
 # plot mental capacities in first two dimensions
-pca_both_varimax_loadings <- 
-  data.frame(pca_both_varimax$loadings[1:40, 1:nfactors_both],
-             row.names = rownames(pca_both_varimax$loadings[1:40, 1:nfactors_both]))
+pca_both_rotatedN_loadings <- 
+  data.frame(pca_both_rotatedN$loadings[1:40, 1:nfactors_both],
+             row.names = rownames(pca_both_rotatedN$loadings[1:40, 1:nfactors_both]))
 
 # code a priori mental capacity categories
-pca_both_varimax_loadings[c("hungry", "tired", "pain", 
+pca_both_rotatedN_loadings[c("hungry", "tired", "pain", 
                             "nauseated", "safe"),
                           "mc_cat"] <- "biological"
-pca_both_varimax_loadings[c("happy", "depressed", "fear", 
+pca_both_rotatedN_loadings[c("happy", "depressed", "fear", 
                             "angry", "calm", "joy"),
                           "mc_cat"] <- "affective"
-pca_both_varimax_loadings[c("sounds", "seeing", "temperature", 
+pca_both_rotatedN_loadings[c("sounds", "seeing", "temperature", 
                             "odors", "depth"),
                           "mc_cat"] <- "perceptual"
-pca_both_varimax_loadings[c("computations", "thoughts", "reasoning", 
+pca_both_rotatedN_loadings[c("computations", "thoughts", "reasoning", 
                             "remembering", "beliefs"),
                           "mc_cat"] <- "cognitive"
-pca_both_varimax_loadings[c("free_will", "choices", "self_restraint", 
+pca_both_rotatedN_loadings[c("free_will", "choices", "self_restraint", 
                             "intentions", "goal"),
                           "mc_cat"] <- "autonomous"
-pca_both_varimax_loadings[c("love", "recognizing", "communicating", "guilt", 
+pca_both_rotatedN_loadings[c("love", "recognizing", "communicating", "guilt", 
                             "disrespected", "embarrassed", "emo_recog"),
                           "mc_cat"] <- "social"
-pca_both_varimax_loadings[c("conscious", "self_aware", "pleasure", 
+pca_both_rotatedN_loadings[c("conscious", "self_aware", "pleasure", 
                             "desires", "morality", "personality", "pride"),
                           "mc_cat"] <- "other"
 
-pca_both_varimax_loadings$mc_cat <- factor(pca_both_varimax_loadings$mc_cat)
+pca_both_rotatedN_loadings$mc_cat <- factor(pca_both_rotatedN_loadings$mc_cat)
 
-pca_both_plot <- ggplot(pca_both_varimax_loadings,
-                        aes(x = PC1, y = PC2,
-                            label = rownames(pca_both_varimax_loadings),
-                            color = mc_cat)) +
-  geom_text(hjust = 0.5, vjust = 0.5) +
-  theme_bw() +
-  theme(text = element_text(size = 12)) +
-  scale_color_brewer(type = "qual", palette = 2) +
-  labs(title = "BOTH: factor loadings (first 2 rotated components)\n",
-       x = "\nPrincipal Component 1",
-       y = "Principal Component 2\n")
-pca_both_plot
+# pca_both_plot <- ggplot(pca_both_rotatedN_loadings,
+#                         aes(x = PC1, y = PC2,
+#                             label = rownames(pca_both_rotatedN_loadings),
+#                             color = mc_cat)) +
+#   geom_text(hjust = 0.5, vjust = 0.5) +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_color_brewer(type = "qual", palette = 2) +
+#   labs(title = "BOTH: factor loadings (first 2 rotated components)\n",
+#        x = "\nPrincipal Component 1",
+#        y = "Principal Component 2\n")
+# pca_both_plot
 
 # examine loadings
-mc_both = rownames(pca_both_varimax_loadings)
+mc_both = rownames(pca_both_rotatedN_loadings)
 
 # ... for PC1
-pca_both_varimax_pc1 <- pca_both_varimax_loadings %>%
+pca_both_rotatedN_pc1 <- pca_both_rotatedN_loadings %>%
   mutate(mc = mc_both) %>%
   arrange(desc(PC1)) %>%
   select(PC1, mc, mc_cat)
-pca_both_varimax_pc1
+pca_both_rotatedN_pc1
 
 # ... for PC2
-pca_both_varimax_pc2 <- pca_both_varimax_loadings %>%
+pca_both_rotatedN_pc2 <- pca_both_rotatedN_loadings %>%
   mutate(mc = mc_both) %>%
   arrange(desc(PC2)) %>%
   select(PC2, mc, mc_cat)
-pca_both_varimax_pc2
+pca_both_rotatedN_pc2
 
 # ... for PC3
-pca_both_varimax_pc3 <- pca_both_varimax_loadings %>%
-  mutate(mc = mc_both) %>%
-  arrange(desc(PC3)) %>%
-  select(PC3, mc, mc_cat)
-pca_both_varimax_pc3
+if(nfactors_both > 2) {
+  pca_both_rotatedN_pc3 <- pca_both_rotatedN_loadings %>%
+    mutate(mc = mc_both) %>%
+    arrange(desc(PC3)) %>%
+    select(PC3, mc, mc_cat)
+  pca_both_rotatedN_pc3
+}
 
 # ... for PC4
-pca_both_varimax_pc4 <- pca_both_varimax_loadings %>%
-  mutate(mc = mc_both) %>%
-  arrange(desc(PC4)) %>%
-  select(PC4, mc, mc_cat)
-pca_both_varimax_pc4
+if(nfactors_both > 3) {
+  pca_both_rotatedN_pc4 <- pca_both_rotatedN_loadings %>%
+    mutate(mc = mc_both) %>%
+    arrange(desc(PC4)) %>%
+    select(PC4, mc, mc_cat)
+  pca_both_rotatedN_pc4
+}
 
-# plot participants by component scores ---------------------------------------
+# PCA: BOTH target, plot participants by component scores -----------------
 
-# get condition by subject
-pca_both_varimax_scores <- pca_both_varimax$scores %>%
+# get target by subject
+pca_both_rotatedN_scores <- pca_both_rotatedN$scores %>%
   data.frame() %>%
   add_rownames(var = "subid") %>%
-  mutate(target = factor(ifelse(grepl("robot", subid), "robot", "beetle")))
+  mutate(target = factor(
+    ifelse(grepl("robot", subid), "robot",
+           ifelse(grepl("beetle", subid), "beetle", NA)))) %>%
+  gather(dimension, score, starts_with("PC"))
 
-p_both_varimax_scores_12 <- ggplot(aes(x = PC1, y = PC2, color = target),
-                                   data = pca_both_varimax_scores) +
-  geom_point(size = 4) +
+if(nfactors_both == 3) {
+  pca_both_rotatedN_scores <- pca_both_rotatedN_scores %>%
+    mutate(dimension = factor(dimension,
+                              levels = c("PC1", "PC2", "PC3"),
+                              labels = c("PC1 (BOTH)", "PC2 (BOTH)", 
+                                         "PC3 (BOTH)")))
+} else if(nfactors_both == 4) {
+  pca_both_rotatedN_scores <- pca_both_rotatedN_scores %>%
+    mutate(dimension = factor(dimension,
+                              levels = c("PC1", "PC2", "PC3", "PC4"),
+                              labels = c("PC1 (BOTH)", "PC2 (BOTH)", 
+                                         "PC3 (BOTH)", "PC4 (BOTH)")))
+}
+
+p_both_rotatedN_scores <- ggplot(aes(x = dimension, y = score, 
+                                     color = dimension),
+                                 data = pca_both_rotatedN_scores) +
+  facet_grid(~target) +
+  geom_hline(y = 0, lty = 3) +
+  geom_jitter(size = 2) +
+  geom_boxplot(width = 0.5, color = "black", alpha = 0,
+               outlier.shape = NA) +
   theme_bw() +
   theme(text = element_text(size = 20)) +
-  labs(title = "Scores: PC1 vs. PC2 (from rotated PCA)\n",
-       x = "\nPC1",
-       y = "PC2\n")
-
-p_both_varimax_scores_13 <- ggplot(aes(x = PC1, y = PC3, color = target),
-                                   data = pca_both_varimax_scores) +
-  geom_point(size = 4) +
-  theme_bw() +
-  theme(text = element_text(size = 20)) +
-  labs(title = "Scores: PC1 vs. PC3 (from rotated PCA)\n",
-       x = "\nPC1",
-       y = "PC3\n")
-
-p_both_varimax_scores_14 <- ggplot(aes(x = PC1, y = PC4, color = target),
-                                   data = pca_both_varimax_scores) +
-  geom_point(size = 4) +
-  theme_bw() +
-  theme(text = element_text(size = 20)) +
-  labs(title = "Scores: PC1 vs. PC4 (from rotated PCA)\n",
-       x = "\nPC1",
-       y = "PC4\n")
-
-p_both_varimax_scores_23 <- ggplot(aes(x = PC2, y = PC3, color = target),
-                                   data = pca_both_varimax_scores) +
-  geom_point(size = 4) +
-  theme_bw() +
-  theme(text = element_text(size = 20)) +
-  labs(title = "Scores: PC2 vs. PC3 (from rotated PCA)\n",
-       x = "\nPC2",
-       y = "PC3\n")
-
-p_both_varimax_scores_24 <- ggplot(aes(x = PC2, y = PC4, color = target),
-                                   data = pca_both_varimax_scores) +
-  geom_point(size = 4) +
-  theme_bw() +
-  theme(text = element_text(size = 20)) +
-  labs(title = "Scores: PC2 vs. PC4 (from rotated PCA)\n",
-       x = "\nPC2",
-       y = "PC4\n")
-
-p_both_varimax_scores_34 <- ggplot(aes(x = PC3, y = PC4, color = target),
-                                   data = pca_both_varimax_scores) +
-  geom_point(size = 4) +
-  theme_bw() +
-  theme(text = element_text(size = 20)) +
-  labs(title = "Scores: PC3 vs. PC4 (from rotated PCA)\n",
-       x = "\nPC3",
-       y = "PC4\n")
-
-p_both_varimax_scores_12
-p_both_varimax_scores_13
-p_both_varimax_scores_14
-p_both_varimax_scores_23
-p_both_varimax_scores_24
-p_both_varimax_scores_34
+  labs(title = "BOTH Scores (from rotated PCA)\n",
+       x = "\nDimension",
+       y = "Score\n",
+       color = "Dimension\n")
+p_both_rotatedN_scores
 
 # EXPLORATORY: hand-calculate "scores" on dimensions for each target? ---------
 
@@ -291,8 +357,8 @@ rating_sum <- d_long %>%
 rating_sum
 
 # extract factor loadings
-both_PC <- cbind(mc = rownames(pca_both_varimax_loadings),
-                 pca_both_varimax_loadings)
+both_PC <- cbind(mc = rownames(pca_both_rotatedN_loadings),
+                 pca_both_rotatedN_loadings)
 
 # combine!
 d_scoring_pre <- full_join(rating_sum, both_PC)

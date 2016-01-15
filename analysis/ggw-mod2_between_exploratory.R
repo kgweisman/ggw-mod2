@@ -80,6 +80,11 @@ p_robot_rotatedN_scores
 
 # PCA: BOTH conditions -------------------------------------------------------
 
+# make dataset for both conditions
+d_both <- d_clean %>%
+  select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3! 
+d_both <- data.frame(d_both[,-1], row.names = d_both[,1])
+
 ## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
@@ -98,7 +103,7 @@ pca_both_rotated
 pca_both_rotated$values[pca_both_rotated$values > 1] # examine eignenvalues > 1
 
 # set number of dimensions to extract (manually)
-nfactors_both <- 4
+nfactors_both <- 3
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
