@@ -15,8 +15,8 @@ rm(list = ls(all = T))
 graphics.off()
 
 # choose datasource: simulated or real data (manually)
-datasource <- "simulated"
-# datasource <- "study 4" # 2016-01-14 (between, 21 characters)
+# datasource <- "simulated"
+datasource <- "study 4" # 2016-01-14 (between, 21 characters)
 
 # prepare datasets -------------------------------------------------------------
 
@@ -53,14 +53,7 @@ if(datasource == "simulated") { # simulate data!
   race_pac_islander <- factor(sample(c(0, 1), 420, replace = T))
   race_white <- factor(sample(c(0, 1), 420, replace = T))
   race_other_prefno <- factor(sample(c(0, 1), 420, replace = T))
-  education_less <- factor(sample(c(0, 1), 420, replace = T))
-  education_high_school <- factor(sample(c(0, 1), 420, replace = T))
-  education_some_college <- factor(sample(c(0, 1), 420, replace = T))
-  education_associates <- factor(sample(c(0, 1), 420, replace = T))
-  education_bachelors <- factor(sample(c(0, 1), 420, replace = T))
-  education_some_graduate <- factor(sample(c(0, 1), 420, replace = T))
-  education_graduate <- factor(sample(c(0, 1), 420, replace = T))
-  education_prefno <- factor(sample(c(0, 1), 420, replace = T))
+  education <- as.integer(sample(0:8, 420, replace = T))
   feedback <- sample(c("blahblah", "yadayada", ""), 420, replace = T)
   
   # randomly generate responses to test questions
@@ -119,15 +112,12 @@ if(datasource == "simulated") { # simulate data!
                       race_asian_south, race_asian_other, race_black, 
                       race_hispanic, race_middle_eastern, race_native_american, 
                       race_pac_islander, race_white, race_other_prefno,
-                      education_less, education_high_school, 
-                      education_some_college, education_associates, 
-                      education_bachelors, education_some_graduate, 
-                      education_graduate, education_prefno, feedback)
+                      education, feedback)
   d <- d_sim
   
 } else if(datasource == "study 4") { # load in real data from study 1
   
-  d_raw <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v3 (21 conditions between)/GGWmod2_v3_clean.csv")
+  d_raw <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v3 (21 conditions between)/GGWmod2_v3_many_characters_clean.csv")
   d <- d_raw
   
 }
@@ -183,36 +173,8 @@ d_clean <- d_clean_1 %>%
     race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
                               as.character(race_cat2)))) %>%
   select(subid:end_time, duration, finished:gender, 
-         education_less:age_approx, race_cat3) %>%
-  rename(race_cat = race_cat3) %>%
-  mutate( # deal with education
-    education_less = 
-      factor(ifelse(is.na(education_less), "", "buddhism ")),
-    education_high_school = 
-      factor(ifelse(is.na(education_high_school), "", "christianity ")),
-    education_some_college = 
-      factor(ifelse(is.na(education_some_college), "", "hinduism ")),
-    education_associates = 
-      factor(ifelse(is.na(education_associates), "", "islam ")),
-    education_bachelors = 
-      factor(ifelse(is.na(education_bachelors), "", "jainism ")),
-    education_some_graduate = 
-      factor(ifelse(is.na(education_some_graduate), "", "judaism ")),
-    education_graduate = 
-      factor(ifelse(is.na(education_graduate), "", "sikhism ")),
-    education_prefno = 
-      factor(ifelse(is.na(education_prefno), "", "other_prefno ")),
-    education_cat = paste0(education_less, education_high_school, 
-                          education_some_college, education_associates, 
-                          education_bachelors, education_some_graduate, 
-                          education_graduate, education_prefno),
-    education_cat2 = factor(sub(" +$", "", education_cat)),
-    education_cat3 = factor(ifelse(grepl(" ", education_cat2) == T, 
-                                  "multireligious",
-                                  as.character(education_cat2)))) %>%
-  # still need to deal with education ***
-  select(subid:gender, feedback:race_cat, education_cat3) %>%
-  rename(education_cat = education_cat3)
+         education:age_approx, race_cat3) %>%
+  rename(race_cat = race_cat3)
 
 ## prepare datasets for PCA --------------------------------------------------
 
