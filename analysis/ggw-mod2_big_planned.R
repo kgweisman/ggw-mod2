@@ -281,4 +281,375 @@ summary(religion) # test for difference in religion distribution across conditio
 
 # need to deal with education ***
 
+# PCA: ALL condition --------------------------------------------------------
+
+## step 1: determine how many dimensions to extract --------------------------
+
+# use "very simple structure" criterion
+# VSS(d_all, n = 39, rotate = "none") # unrotated
+# VSS(d_all, n = 39, rotate = "varimax") # rotated
+VSS.scree(d_all) # scree plot
+
+# run unrotated pca with maximum number of dimensions
+pca_all_unrotated <- principal(d_all, nfactors = 39, rotate = "none")
+pca_all_unrotated
+pca_all_unrotated$values[pca_all_unrotated$values > 1] # examine eignenvalues > 1
+
+# run roated pca with maximum number of dimensions
+pca_all_rotated <- principal(d_all, nfactors = 39, rotate = "varimax")
+pca_all_rotated
+pca_all_rotated$values[pca_all_rotated$values > 1] # examine eignenvalues > 1
+
+# set number of dimensions to extract (manually)
+nfactors_all <- 4
+
+## step 2: run pca without rotation with N dimensions ------------------------
+
+# run unrotated pca with n dimensions
+pca_all_unrotatedN <- principal(d_all, nfactors = nfactors_all, rotate = "none")
+pca_all_unrotatedN
+
+# plot mental capacities in first two dimensions
+pca_all_unrotatedN_loadings <- 
+  data.frame(pca_all_unrotatedN$loadings[1:40, 1:nfactors_all],
+             row.names = rownames(pca_all_unrotatedN$loadings[1:40, 1:nfactors_all]))
+
+# code a priori mental capacity categories
+pca_all_unrotatedN_loadings[c("hungry", "tired", "pain", 
+                                 "nauseated", "safe"),
+                               "mc_cat"] <- "biological"
+pca_all_unrotatedN_loadings[c("happy", "depressed", "fear", 
+                                 "angry", "calm", "joy"),
+                               "mc_cat"] <- "affective"
+pca_all_unrotatedN_loadings[c("sounds", "seeing", "temperature", 
+                                 "odors", "depth"),
+                               "mc_cat"] <- "perceptual"
+pca_all_unrotatedN_loadings[c("computations", "thoughts", "reasoning", 
+                                 "remembering", "beliefs"),
+                               "mc_cat"] <- "cognitive"
+pca_all_unrotatedN_loadings[c("free_will", "choices", "self_restraint", 
+                                 "intentions", "goal"),
+                               "mc_cat"] <- "autonomous"
+pca_all_unrotatedN_loadings[c("love", "recognizing", "communicating", "guilt", 
+                                 "disrespected", "embarrassed", "emo_recog"),
+                               "mc_cat"] <- "social"
+pca_all_unrotatedN_loadings[c("conscious", "self_aware", "pleasure", 
+                                 "desires", "morality", "personality", "pride"),
+                               "mc_cat"] <- "other"
+
+pca_all_unrotatedN_loadings$mc_cat <- factor(pca_all_unrotatedN_loadings$mc_cat)
+
+# pca_all_unrotatedN_plot12 <- 
+#   ggplot(pca_all_unrotatedN_loadings,
+#          aes(x = PC1, y = PC2,
+#              label = rownames(pca_all_unrotatedN_loadings),
+#              color = mc_cat)) +
+#   geom_text(hjust = 0.5, vjust = 0.5) +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_color_brewer(type = "qual", palette = 2) +
+#   labs(title = "ALL: factor loadings (first 2 unrotated components)\n",
+#        x = "\nPrincipal Component 1",
+#        y = "Principal Component 2\n")
+# pca_all_unrotatedN_plot12
+
+# examine loadings
+mc_all_unrotatedN = rownames(pca_all_unrotatedN_loadings)
+
+# ... for PC1
+pca_all_unrotatedN_pc1 <- pca_all_unrotatedN_loadings %>%
+  mutate(mc = mc_all_unrotatedN) %>%
+  arrange(desc(PC1)) %>%
+  select(PC1, mc, mc_cat)
+pca_all_unrotatedN_pc1
+
+# ... for PC2
+pca_all_unrotatedN_pc2 <- pca_all_unrotatedN_loadings %>%
+  mutate(mc = mc_all_unrotatedN) %>%
+  arrange(desc(PC2)) %>%
+  select(PC2, mc, mc_cat)
+pca_all_unrotatedN_pc2
+
+# ... for PC3
+if(nfactors_all > 2) {
+  pca_all_unrotatedN_pc3 <- pca_all_unrotatedN_loadings %>%
+    mutate(mc = mc_all_unrotatedN) %>%
+    arrange(desc(PC3)) %>%
+    select(PC3, mc, mc_cat)
+  pca_all_unrotatedN_pc3
+}
+
+# ... for PC4
+if(nfactors_all > 3) {
+  pca_all_unrotatedN_pc4 <- pca_all_unrotatedN_loadings %>%
+    mutate(mc = mc_all_unrotatedN) %>%
+    arrange(desc(PC4)) %>%
+    select(PC4, mc, mc_cat)
+  pca_all_unrotatedN_pc4
+}
+
+## step 3: run pca with varimax rotation with N dimensions -------------------
+
+# run pca with n dimensions with varimax rotation
+pca_all_rotatedN <- principal(d_all, nfactors = nfactors_all, 
+                                 rotate = "varimax")
+pca_all_rotatedN
+
+# plot mental capacities in first two dimensions
+pca_all_rotatedN_loadings <- 
+  data.frame(pca_all_rotatedN$loadings[1:40, 1:nfactors_all],
+             row.names = rownames(pca_all_rotatedN$loadings[1:40, 1:nfactors_all]))
+
+# code a priori mental capacity categories
+pca_all_rotatedN_loadings[c("hungry", "tired", "pain", 
+                               "nauseated", "safe"),
+                             "mc_cat"] <- "biological"
+pca_all_rotatedN_loadings[c("happy", "depressed", "fear", 
+                               "angry", "calm", "joy"),
+                             "mc_cat"] <- "affective"
+pca_all_rotatedN_loadings[c("sounds", "seeing", "temperature", 
+                               "odors", "depth"),
+                             "mc_cat"] <- "perceptual"
+pca_all_rotatedN_loadings[c("computations", "thoughts", "reasoning", 
+                               "remembering", "beliefs"),
+                             "mc_cat"] <- "cognitive"
+pca_all_rotatedN_loadings[c("free_will", "choices", "self_restraint", 
+                               "intentions", "goal"),
+                             "mc_cat"] <- "autonomous"
+pca_all_rotatedN_loadings[c("love", "recognizing", "communicating", "guilt", 
+                               "disrespected", "embarrassed", "emo_recog"),
+                             "mc_cat"] <- "social"
+pca_all_rotatedN_loadings[c("conscious", "self_aware", "pleasure", 
+                               "desires", "morality", "personality", "pride"),
+                             "mc_cat"] <- "other"
+
+pca_all_rotatedN_loadings$mc_cat <- factor(pca_all_rotatedN_loadings$mc_cat)
+
+# pca_all_rotatedN_plot12 <- 
+#   ggplot(pca_all_rotatedN_loadings,
+#          aes(x = PC1, y = PC2,
+#              label = rownames(pca_all_rotatedN_loadings),
+#              color = mc_cat)) +
+#   geom_text(hjust = 0.5, vjust = 0.5) +
+#   theme_bw() +
+#   theme(text = element_text(size = 12)) +
+#   scale_color_brewer(type = "qual", palette = 2) +
+#   labs(title = "ALL: factor loadings (first 2 rotated components)\n",
+#        x = "\nPrincipal Component 1",
+#        y = "Principal Component 2\n")
+# pca_all_rotatedN_plot12
+
+# examine loadings
+mc_all_rotatedN = rownames(pca_all_rotatedN_loadings)
+
+# ... for PC1
+pca_all_rotatedN_pc1 <- pca_all_rotatedN_loadings %>%
+  mutate(mc = mc_all_rotatedN) %>%
+  arrange(desc(PC1)) %>%
+  select(PC1, mc, mc_cat)
+pca_all_rotatedN_pc1
+
+# ... for PC2
+pca_all_rotatedN_pc2 <- pca_all_rotatedN_loadings %>%
+  mutate(mc = mc_all_rotatedN) %>%
+  arrange(desc(PC2)) %>%
+  select(PC2, mc, mc_cat)
+pca_all_rotatedN_pc2
+
+# ... for PC3
+if(nfactors_all > 2) {
+  pca_all_rotatedN_pc3 <- pca_all_rotatedN_loadings %>%
+    mutate(mc = mc_all_rotatedN) %>%
+    arrange(desc(PC3)) %>%
+    select(PC3, mc, mc_cat)
+  pca_all_rotatedN_pc3
+}
+
+# ... for PC4
+if(nfactors_all > 3) {
+  pca_all_rotatedN_pc4 <- pca_all_rotatedN_loadings %>%
+    mutate(mc = mc_all_rotatedN) %>%
+    arrange(desc(PC4)) %>%
+    select(PC4, mc, mc_cat)
+  pca_all_rotatedN_pc4
+}
+
+# PCA: ALL condition, plot participants by component scores -----------------
+
+# get condition by subject
+condition_subid <- d_clean %>%
+  select(subid, condition)
+
+pca_all_rotatedN_scores <- pca_all_rotatedN$scores %>%
+  data.frame() %>%
+  add_rownames(var = "subid") %>%
+  left_join(condition_subid, by = "subid") %>%
+  gather(dimension, score, starts_with("PC"))
+
+if(nfactors_all == 3) {
+  pca_all_rotatedN_scores <- pca_all_rotatedN_scores %>%
+    mutate(dimension = factor(dimension,
+                              levels = c("PC1", "PC2", "PC3"),
+                              labels = c("PC1 (ALL)", "PC2 (ALL)", 
+                                         "PC3 (ALL)")))
+} else if(nfactors_all == 4) {
+  pca_all_rotatedN_scores <- pca_all_rotatedN_scores %>%
+    mutate(dimension = factor(dimension,
+                              levels = c("PC1", "PC2", "PC3", "PC4"),
+                              labels = c("PC1 (ALL)", "PC2 (ALL)", 
+                                         "PC3 (ALL)", "PC4 (ALL)")))
+}
+
+p_all_rotatedN_scores <- ggplot(aes(x = dimension, y = score, 
+                                     color = dimension),
+                                 data = pca_all_rotatedN_scores) +
+  facet_wrap(~ condition, ncol = 7) +
+  geom_hline(y = 0, lty = 3) +
+  geom_jitter(size = 2) +
+  geom_boxplot(width = 0.5, color = "black", alpha = 0,
+               outlier.shape = NA) +
+  theme_bw() +
+  theme(text = element_text(size = 20)) +
+  labs(title = "ALL Scores (from rotated PCA)\n",
+       x = "\nDimension",
+       y = "Score\n",
+       color = "Dimension\n")
+p_all_rotatedN_scores
+
+# EXPLORATORY: hand-calculate "scores" on dimensions for each condition? ---------
+
+d_long <- d_clean %>%
+  gather(mc, rating, happy:pride) %>%
+  mutate(mc_cat = 
+           factor(
+             ifelse(mc %in% 
+                      c("hungry", "tired", "pain", "nauseated", "safe"),
+                    "biological",
+                    ifelse(mc %in% 
+                             c("happy", "depressed", "fear", "angry", 
+                               "calm", "joy"),
+                           "affective",
+                           ifelse(mc %in% 
+                                    c("sounds", "seeing", "temperature",
+                                      "odors", "depth"),
+                                  "perceptual",
+                                  ifelse(mc %in% 
+                                           c("computations", "thoughts", 
+                                             "reasoning", "remembering", 
+                                             "beliefs"),
+                                         "cognitive",
+                                         ifelse(mc %in% 
+                                                  c("free_will", "choices", 
+                                                    "self_restraint",
+                                                    "intentions", "goal"),
+                                                "autonomous",
+                                                ifelse(mc %in% c("love", 
+                                                                 "recognizing", 
+                                                                 "communicating", 
+                                                                 "guilt",
+                                                                 "disrespected", 
+                                                                 "embarrassed", 
+                                                                 "emo_recog"),
+                                                       "social",
+                                                       "other"))))))))
+
+# summarize ratings by condition and mc
+rating_sum <- d_long %>%
+  group_by(condition, mc) %>%
+  summarise(min = min(rating),
+            max = max(rating),
+            median = median(rating),
+            mean = mean(rating),
+            sd = sd(rating))
+rating_sum
+
+# extract factor loadings
+all_PC <- cbind(mc = rownames(pca_all_rotatedN_loadings),
+                 pca_all_rotatedN_loadings)
+
+# combine!
+d_scoring_pre <- full_join(rating_sum, all_PC)
+
+if(nfactors_all == 4) {
+  # score!
+  d_scored <- d_scoring_pre %>%
+    mutate(PC1_score = PC1 * mean,
+           PC2_score = PC2 * mean,
+           PC3_score = PC3 * mean,
+           PC4_score = PC4 * mean) %>%
+    group_by(condition) %>%
+    summarise(PC1_sum = sum(PC1_score),
+              PC2_sum = sum(PC2_score),
+              PC3_sum = sum(PC3_score),
+              PC4_sum = sum(PC4_score)) %>%
+    data.frame()
+  d_scored
+  
+  # plot scores
+  
+  d_scored_long <- d_scored %>%
+    gather(PC, score, -condition) %>%
+    mutate(dimension = factor(PC,
+                              levels = c("PC1_sum", "PC2_sum", "PC3_sum", "PC4_sum"),
+                              labels = c("PC1", "PC2", "PC3", "PC4")))
+  
+  p_scored <- ggplot(aes(x = dimension, y = score,
+                         group = condition, fill = condition), 
+                     data = d_scored_long) +
+    facet_wrap(~ condition, ncol = 7) +
+    geom_bar(stat = "identity", width = 0.8,
+             position = position_dodge(width = 0.9)) +
+    theme_bw() +
+    theme(text = element_text(size = 20)) +
+    labs(title = "Hand-calculated scores by character\nfrom large PCA with varimax rotation\n",
+         x = "\nDimension",
+         y = "Score\n")
+  p_scored
+} else if(nfactors_all == 3) {
+  
+  # score!
+  d_scored <- d_scoring_pre %>%
+    mutate(PC1_score = PC1 * mean,
+           PC2_score = PC2 * mean,
+           PC3_score = PC3 * mean) %>%
+    group_by(condition) %>%
+    summarise(PC1_sum = sum(PC1_score),
+              PC2_sum = sum(PC2_score),
+              PC3_sum = sum(PC3_score)) %>%
+    data.frame()
+  d_scored
+  
+  # plot scores
+  
+  d_scored_long <- d_scored %>%
+    gather(PC, score, -condition) %>%
+    mutate(dimension = factor(PC,
+                              levels = c("PC1_sum", "PC2_sum", "PC3_sum"),
+                              labels = c("PC1", "PC2", "PC3")))
+  
+  p_scored <- ggplot(aes(x = dimension, y = score,
+                         group = condition, fill = condition), 
+                     data = d_scored_long) +
+    facet_wrap(~ condition, ncol = 7) +
+    geom_bar(stat = "identity", width = 0.8,
+             position = position_dodge(width = 0.9)) +
+    theme_bw() +
+    theme(text = element_text(size = 20)) +
+    labs(title = "Hand-calculated scores by character\nfrom large PCA with varimax rotation\n",
+         x = "\nDimension",
+         y = "Score\n")
+  p_scored
+}
+
+# EXPLORATORY: hierarchical cluster analysis -----------------------------------
+
+# dist_all <- dist(d_all)
+# hclust_all <- hclust(dist_all)
+# ggdendrogram(hclust_all)
+# VSS.scree(d_all)
+# 
+# library(ggfortify)
+# autoplot(clara(d_all, k = 3), frame = TRUE, frame.type = 'norm')
+# autoplot(fanny(d_all, k = 3), frame = TRUE, frame.type = 'norm')
+
 
