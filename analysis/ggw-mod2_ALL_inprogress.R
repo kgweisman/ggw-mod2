@@ -484,7 +484,7 @@ if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
 
 # STILL NEED TO DEAL WITH EDUCATION FOR STUDY 4
 
-#################################################### FACTOR ANALYSIS ###########
+######################################## EXPLORATORY FACTOR ANALYSIS ###########
 
 # make function for determining how many factors to extract
 howManyFactors <- function(data) {
@@ -666,7 +666,7 @@ if(nfactors_all > 1) {
   }
 }
 
-############################################################## PRINT ###########
+# print ------------------------------------------------------------------------
 
 if(datasource %in% c("study 1", "study 2", "studies 1 & 2", "study 3")) {
   # BEETLE condition
@@ -694,3 +694,8 @@ if(nfactors_all > 1) {efa_all_rotatedN_F2}
 if(nfactors_all > 2) {efa_all_rotatedN_F3}
 if(nfactors_all > 3) {efa_all_rotatedN_F4}
 
+######################################## EXPLORATORY FACTOR ANALYSIS ###########
+
+# visual =~ x1 + x2 + x3
+# textual =~ x4 + x5 + x6
+# speed =~ x7 + x8 + x9
