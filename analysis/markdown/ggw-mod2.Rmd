@@ -1,0 +1,516 @@
+---
+title: "GGW-mod2: Factor Analysis"
+output:
+  html_document:
+    toc: true
+    theme: flatly
+---
+
+# Setup
+
+```{r set up workspace, echo = F}
+# load libraries
+library(devtools)
+library(psych)
+library(stats)
+library(nFactors)
+library(ggplot2)
+library(knitr)
+library(tidyr)
+library(dplyr)
+
+# clear workspace
+rm(list = ls(all = T))
+graphics.off()
+```
+
+```{r make functions, echo = F}
+# make cleanup function
+cleanup <- function(datasource) {
+  if(datasource %in% c("study 1", "study 2")) {
+    
+    # set target dataset
+    if(datasource == "study 1"){d <- d_raw_study1}
+    if(datasource == "study 2"){d <- d_raw_study2}
+    
+    # enact exclusionary criteria
+    d_clean_1 <- d %>%
+      mutate(finished_mod = ifelse(is.na(CATCH), 0,
+                                   ifelse(finished == 1, 1,
+                                          0.5))) %>%
+      filter(CATCH == 1, # exclude Ps who fail catch trials 
+             finished_mod != 0) %>% # exclude Ps who did not complete task
+      mutate(yob_correct = as.numeric(
+        ifelse(as.numeric(as.character(yob)) > 1900 & 
+                 as.numeric(as.character(yob)) < 2000, 
+               as.numeric(as.character(yob)), NA)), # correct formatting in yob
+        age_approx = 2015 - yob_correct) %>% # calculate approximate age
+      mutate(gender = factor(gender, levels = c(1, 2, 0), 
+                             labels = c("m", "f", "other"))) %>%
+      filter(age_approx >= 18) # exclude Ps who are younger than 18 years
+    
+    # recode background and demographic variables
+    d_clean <- d_clean_1 %>%
+      mutate( # deal with study number
+        study = factor(study)) %>%
+      mutate( # deal with study duration
+        duration = strptime(end_time, "%I:%M:%S") - 
+          strptime(start_time, "%I:%M:%S")) %>%
+      mutate( # deal with race
+        race_asian_east = 
+          factor(ifelse(is.na(race_asian_east), "", "asian_east ")),
+        race_asian_south = 
+          factor(ifelse(is.na(race_asian_south), "", "asian_south ")),
+        race_asian_other = 
+          factor(ifelse(is.na(race_asian_other), "", "asian_other ")),
+        race_black = 
+          factor(ifelse(is.na(race_black), "", "black ")),
+        race_hispanic = 
+          factor(ifelse(is.na(race_hispanic), "", "hispanic ")),
+        race_middle_eastern = 
+          factor(ifelse(is.na(race_middle_eastern), "", "middle_eastern ")),
+        race_native_american = 
+          factor(ifelse(is.na(race_native_american), "", "native_american ")),
+        race_pac_islander = 
+          factor(ifelse(is.na(race_pac_islander), "", "pac_islander ")),
+        race_white = 
+          factor(ifelse(is.na(race_white), "", "white ")),
+        race_other_prefno = 
+          factor(ifelse(is.na(race_other_prefno), "", "other_prefno ")),
+        race_cat = paste0(race_asian_east, race_asian_south, race_asian_other,
+                          race_black, race_hispanic, race_middle_eastern,
+                          race_native_american, race_pac_islander, race_white,
+                          race_other_prefno),
+        race_cat2 = factor(sub(" +$", "", race_cat)),
+        race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
+                                  as.character(race_cat2)))) %>%
+      select(study, subid:end_time, duration, finished:gender, 
+             religion_buddhism:age_approx, race_cat3) %>%
+      rename(race_cat = race_cat3) %>%
+      mutate( # deal with religion
+        religion_buddhism = 
+          factor(ifelse(is.na(religion_buddhism), "", "buddhism ")),
+        religion_christianity = 
+          factor(ifelse(is.na(religion_christianity), "", "christianity ")),
+        religion_hinduism = 
+          factor(ifelse(is.na(religion_hinduism), "", "hinduism ")),
+        religion_islam = 
+          factor(ifelse(is.na(religion_islam), "", "islam ")),
+        religion_jainism = 
+          factor(ifelse(is.na(religion_jainism), "", "jainism ")),
+        religion_judaism = 
+          factor(ifelse(is.na(religion_judaism), "", "judaism ")),
+        religion_sikhism = 
+          factor(ifelse(is.na(religion_sikhism), "", "sikhism ")),
+        religion_other = 
+          factor(ifelse(is.na(religion_other), "", "other ")),
+        religion_none = 
+          factor(ifelse(is.na(religion_none), "", "none ")),
+        religion_prefno = 
+          factor(ifelse(is.na(religion_prefno), "", "other_prefno ")),
+        religion_cat = paste0(religion_buddhism, religion_christianity, 
+                              religion_hinduism, religion_islam, 
+                              religion_jainism, religion_judaism, 
+                              religion_sikhism, religion_other, 
+                              religion_none, religion_prefno),
+        religion_cat2 = factor(sub(" +$", "", religion_cat)),
+        religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
+                                      "multireligious",
+                                      as.character(religion_cat2)))) %>%
+      select(study:gender, feedback:race_cat, religion_cat3) %>%
+      rename(religion_cat = religion_cat3)
+    
+    # remove extraneous dfs and variables
+    rm(d, d_clean_1)
+  }
+  
+  if(datasource == "study 3") {
+    
+    # set target dataset
+    d <- d_raw_study3
+    
+    # enact exclusionary criteria
+    d_clean_1 <- d %>%
+      mutate(finished_mod = ifelse(is.na(CATCH..characterL) | 
+                                     is.na(CATCH..characterR), 0,
+                                   ifelse(finished == 1, 1,
+                                          0.5))) %>%
+      filter(CATCH..characterL == 5, # exclude Ps who fail catch trials 
+             CATCH..characterR == 5,
+             finished_mod != 0) %>% # exclude Ps who did not complete task
+      mutate(yob_correct = as.numeric(
+        ifelse(as.numeric(as.character(yob)) > 1900 & 
+                 as.numeric(as.character(yob)) < 2000, 
+               as.numeric(as.character(yob)), NA)), # correct formatting in yob
+        age_approx = 2015 - yob_correct) %>% # calculate approximate age
+      mutate(gender = factor(gender, levels = c(1, 2, 0), 
+                             labels = c("m", "f", "other"))) %>%
+      filter(age_approx >= 18) # exclude Ps who are younger than 18 years
+    
+    # recode background and demographic variables
+    d_clean_2 <- d_clean_1 %>%
+      mutate( # deal with study number
+        study = factor(study)) %>%
+      mutate( # deal with study duration
+        duration = strptime(end_time, "%I:%M:%S") - 
+          strptime(start_time, "%I:%M:%S")) %>%
+      mutate( # deal with race
+        race_asian_east = 
+          factor(ifelse(is.na(race_asian_east), "", "asian_east ")),
+        race_asian_south = 
+          factor(ifelse(is.na(race_asian_south), "", "asian_south ")),
+        race_asian_other = 
+          factor(ifelse(is.na(race_asian_other), "", "asian_other ")),
+        race_black = 
+          factor(ifelse(is.na(race_black), "", "black ")),
+        race_hispanic = 
+          factor(ifelse(is.na(race_hispanic), "", "hispanic ")),
+        race_middle_eastern = 
+          factor(ifelse(is.na(race_middle_eastern), "", "middle_eastern ")),
+        race_native_american = 
+          factor(ifelse(is.na(race_native_american), "", "native_american ")),
+        race_pac_islander = 
+          factor(ifelse(is.na(race_pac_islander), "", "pac_islander ")),
+        race_white = 
+          factor(ifelse(is.na(race_white), "", "white ")),
+        race_other_prefno = 
+          factor(ifelse(is.na(race_other_prefno), "", "other_prefno ")),
+        race_cat = paste0(race_asian_east, race_asian_south, race_asian_other,
+                          race_black, race_hispanic, race_middle_eastern,
+                          race_native_american, race_pac_islander, race_white,
+                          race_other_prefno),
+        race_cat2 = factor(sub(" +$", "", race_cat)),
+        race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
+                                  as.character(race_cat2)))) %>%
+      select(study, subid:end_time, duration, finished:gender, 
+             religion_buddhism:age_approx, race_cat3) %>%
+      rename(race_cat = race_cat3) %>%
+      mutate( # deal with religion
+        religion_buddhism = 
+          factor(ifelse(is.na(religion_buddhism), "", "buddhism ")),
+        religion_christianity = 
+          factor(ifelse(is.na(religion_christianity), "", "christianity ")),
+        religion_hinduism = 
+          factor(ifelse(is.na(religion_hinduism), "", "hinduism ")),
+        religion_islam = 
+          factor(ifelse(is.na(religion_islam), "", "islam ")),
+        religion_jainism = 
+          factor(ifelse(is.na(religion_jainism), "", "jainism ")),
+        religion_judaism = 
+          factor(ifelse(is.na(religion_judaism), "", "judaism ")),
+        religion_sikhism = 
+          factor(ifelse(is.na(religion_sikhism), "", "sikhism ")),
+        religion_other = 
+          factor(ifelse(is.na(religion_other), "", "other ")),
+        religion_none = 
+          factor(ifelse(is.na(religion_none), "", "none ")),
+        religion_prefno = 
+          factor(ifelse(is.na(religion_prefno), "", "other_prefno ")),
+        religion_cat = paste0(religion_buddhism, religion_christianity, 
+                              religion_hinduism, religion_islam, 
+                              religion_jainism, religion_judaism, 
+                              religion_sikhism, religion_other, 
+                              religion_none, religion_prefno),
+        religion_cat2 = factor(sub(" +$", "", religion_cat)),
+        religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
+                                      "multireligious",
+                                      as.character(religion_cat2)))) %>%
+      select(study:gender, feedback:race_cat, religion_cat3) %>%
+      rename(religion_cat = religion_cat3)
+    
+    # rename response variables
+    d_clean_3 <- d_clean_2
+    names(d_clean_3) <- gsub("get", "", names(d_clean_3))
+    names(d_clean_3) <- gsub("\\.", "", names(d_clean_3))
+    names(d_clean_3) <- gsub("char", "_char", names(d_clean_3))
+    names(d_clean_3)[names(d_clean_3) %in% c("_characterL", "_characterR")] <- 
+      c("characterL", "characterR")
+    
+    # recode response variables (center)
+    d_clean_4 <- d_clean_3
+    for(i in 11:92) {
+      d_clean_4[,i] <- d_clean_4[,i] - 4 # transform from 1 to 7 --> -3 to 3
+    }
+    
+    # recode characterL vs. characterR as beetle vs. robot
+    d_clean_5_demo <- d_clean_4 %>%
+      select(study:condition, yob:religion_cat)
+    
+    d_clean_5_characterL <- d_clean_4 %>%
+      mutate(target = characterL) %>%
+      select(study, subid, target, happy_characterL:CATCH_characterL)
+    names(d_clean_5_characterL) <- gsub("_characterL", "", 
+                                        names(d_clean_5_characterL))
+    
+    d_clean_5_characterR <- d_clean_4 %>%
+      mutate(target = characterR) %>%
+      select(study, subid, target, happy_characterR:CATCH_characterR)
+    names(d_clean_5_characterR) <- gsub("_characterR", "", 
+                                        names(d_clean_5_characterR))
+    
+    d_clean <- d_clean_5_characterL %>%
+      full_join(d_clean_5_characterR) %>%
+      full_join(d_clean_5_demo) %>%
+      select(study, subid, date:religion_cat, target:CATCH)
+    
+    # remove extraneous dfs and variables
+    rm(d, d_clean_1, d_clean_2, d_clean_3, d_clean_4, d_clean_5_characterL, 
+       d_clean_5_characterR, d_clean_5_demo, i)
+  }
+  
+  if(datasource == "study 4") {
+    
+    # set target dataset
+    d <- d_raw_study4
+
+        # enact exclusionary criteria
+    d_clean_1 <- d %>%
+      mutate(finished_mod = ifelse(is.na(CATCH), 0,
+                                   ifelse(finished == 1, 1,
+                                          0.5))) %>%
+      filter(CATCH == 1, # exclude Ps who fail catch trials 
+             finished_mod != 0) %>% # exclude Ps who did not complete task
+      mutate(yob_correct = as.numeric(
+        ifelse(as.numeric(as.character(yob)) > 1900 & 
+                 as.numeric(as.character(yob)) < 2000, 
+               as.numeric(as.character(yob)), NA)), # correct formatting in yob
+        age_approx = 2015 - yob_correct) %>% # calculate approximate age
+      mutate(gender = factor(gender, levels = c(1, 2, 0), 
+                             labels = c("m", "f", "other"))) %>%
+      filter(age_approx >= 18) # exclude Ps who are younger than 18 years
+    
+    # recode one character
+    d_clean_2 <- d_clean_1 %>%
+      mutate(condition = factor(ifelse(
+        grepl("vegetative", as.character(condition)), "pvs",
+        ifelse(grepl("blue", as.character(condition)), "bluejay",
+               as.character(condition)))))
+    
+    # recode background and demographic variables
+    d_clean <- d_clean_2 %>%
+      mutate( # deal with study number
+        study = factor(study)) %>%
+      mutate( # deal with study duration
+        duration = strptime(end_time, "%I:%M:%S") - 
+          strptime(start_time, "%I:%M:%S")) %>%
+      mutate( # deal with race
+        race_asian_east = 
+          factor(ifelse(is.na(race_asian_east), "", "asian_east ")),
+        race_asian_south = 
+          factor(ifelse(is.na(race_asian_south), "", "asian_south ")),
+        race_asian_other = 
+          factor(ifelse(is.na(race_asian_other), "", "asian_other ")),
+        race_black = 
+          factor(ifelse(is.na(race_black), "", "black ")),
+        race_hispanic = 
+          factor(ifelse(is.na(race_hispanic), "", "hispanic ")),
+        race_middle_eastern = 
+          factor(ifelse(is.na(race_middle_eastern), "", "middle_eastern ")),
+        race_native_american = 
+          factor(ifelse(is.na(race_native_american), "", "native_american ")),
+        race_pac_islander = 
+          factor(ifelse(is.na(race_pac_islander), "", "pac_islander ")),
+        race_white = 
+          factor(ifelse(is.na(race_white), "", "white ")),
+        race_other_prefno = 
+          factor(ifelse(is.na(race_other_prefno), "", "other_prefno ")),
+        race_cat = paste0(race_asian_east, race_asian_south, race_asian_other,
+                          race_black, race_hispanic, race_middle_eastern,
+                          race_native_american, race_pac_islander, race_white,
+                          race_other_prefno),
+        race_cat2 = factor(sub(" +$", "", race_cat)),
+        race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
+                                  as.character(race_cat2)))) %>%
+      select(study, subid:end_time, duration, finished:gender, 
+             education:age_approx, race_cat3) %>%
+      rename(race_cat = race_cat3)
+    
+    # remove extraneous dfs and variables
+    rm(d, d_clean_1, d_clean_2)
+  }
+  
+  # return cleaned dataset
+  return(d_clean)
+}
+
+# make function for stripping dataframes for dimension reduction
+makeDRDF <- function(datasource, chosenCondition) {
+  
+  # set target dataset
+  if(datasource == "study 1"){d <- d1}
+  if(datasource == "study 2"){d <- d2}
+  if(datasource == "study 3"){
+    # rename variables for ease of function applpication
+    d <- d3 %>%
+      rename(order = condition,
+             condition = target)
+    
+    # rename subids by condition if collapses across conditions
+    d <- d %>%
+      mutate(subid = paste(condition, subid, sep = "_"))
+  }
+  if(datasource == "study 4"){d <- d4}
+  
+  # filter by condition if specified
+  if(chosenCondition %in% c("beetle", "robot")) {
+    d <- d %>% filter(condition == chosenCondition)
+  }
+  
+  # make stripped dataframe for dimension reduction analyses
+  d_strip <- d %>%
+    select(subid, happy:pride)
+  d_strip <- data.frame(d_strip[,-1], row.names = d_strip[,1])
+  
+  # return stripped dataframe
+  return(d_strip)
+}
+
+# make demographics functions
+demoSampleSize <- function(datasource) {
+
+  # set target dataset
+  if(datasource == "study 1"){d <- d1}
+  if(datasource == "study 2"){d <- d2}
+  if(datasource == "study 3"){
+    # rename variables for ease of function applpication
+    d <- d3 %>%
+      rename(order = condition,
+             condition = target)
+  }
+  if(datasource == "study 4"){d <- d4}
+
+  # get sample size per condition
+  sample_size <- vector()
+  for(i in levels(d$condition)) {
+    sample_size[as.character(i)] <- 
+      as.numeric(d %>% filter(condition == i) %>% select(subid) %>% 
+                   unique() %>% count())
+  }
+
+  # add total sample size  
+  sample_size["all"] <- as.numeric(d %>% select(subid) %>% unique() %>% count())
+  
+  # make into dataframe for using kable
+  sample_size <- data.frame(sample_size) %>%
+    add_rownames() %>%
+    rename(condition = rowname,
+           n = sample_size)
+  
+  # return dataframe for using kable
+  return(sample_size)
+}
+
+# STILL NEED: DURATION, AGE, GENDER, RACE, RELIGION, EDUCATION
+```
+
+# Data preparation
+
+```{r load in data, echo = F}
+# study 1 (2015-12-15, 2 conditions, between-subjects)
+d_raw_study1 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (2 conditions between)/GGWmod2_v1_clean.csv") %>%
+  mutate(study = "study 1")
+
+# study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
+d_raw_study2 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (replication)/GGWmod2_v1_replication_clean.csv") %>%
+  mutate(study = "study 2")
+
+# study 3 (2016-01-10, 2 conditions, within-subjects)
+d_raw_study3 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v2 (2 conditions within)/GGWmod2_v2_withinsubjects_clean.csv") %>%
+  mutate(study = "study 3")
+
+# study 4 (2016-01-14, 21 conditions, between-subjects)
+d_raw_study4 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v3 (21 conditions between)/GGWmod2_v3_many_characters_clean.csv") %>%
+  mutate(study = "study 4")
+```
+
+```{r clean up data, echo = F}
+# clean up datasets
+d1 <- cleanup("study 1")
+d2 <- cleanup("study 2")
+d3 <- cleanup("study 3")
+d4 <- cleanup("study 4")
+```
+
+```{r make dataframes for dimension reduction, echo = F}
+# make dataframes for study 1
+d1_beetle <- makeDRDF("study 1", "beetle")
+d1_robot <- makeDRDF("study 1", "robot")
+d1_all <- makeDRDF("study 1", "all")
+
+# make dataframes for study 2
+d2_beetle <- makeDRDF("study 2", "beetle")
+d2_robot <- makeDRDF("study 2", "robot")
+d2_all <- makeDRDF("study 2", "all")
+
+# make dataframes for study 3
+d3_beetle <- makeDRDF("study 3", "beetle")
+d3_robot <- makeDRDF("study 3", "robot")
+d3_all <- makeDRDF("study 3", "all")
+
+# make dataframes for study 4
+d4_all <- makeDRDF("study 4", "all")
+```
+
+# Study 1 (2015-12-15, 2 conditions, between-subjects)
+
+## Demographics
+
+```{r s1 demographics, echo = F}
+# sample size
+kable(demoSampleSize("study 1"), align = "l", caption = "Study 1: Sample Size")
+```
+
+## Analyses
+
+### Exploratory factor analysis: BEETLE condition
+
+### Exploratory factor analysis: ROBOT condition
+
+### Exploratory factor analysis: ALL conditions
+
+# Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
+
+## Demographics
+
+```{r s2 demographics, echo = F}
+# sample size
+kable(demoSampleSize("study 2"), align = "l", caption = "Study 2: Sample Size")
+```
+
+## Analyses
+
+### Confirmatory factor analysis: BEETLE condition
+
+### Confirmatory factor analysis: ROBOT condition
+
+### Confirmatory factor analysis: ALL conditions
+
+# Study 3 (2016-01-10, 2 conditions, within-subjects)
+
+## Demographics
+
+```{r s3 demographics, echo = F}
+# sample size
+kable(demoSampleSize("study 3"), align = "l", caption = "Study 3: Sample Size")
+```
+
+## Analyses
+
+### Confirmatory factor analysis: BEETLE condition
+
+### Confirmatory factor analysis: ROBOT condition
+
+### Confirmatory factor analysis: ALL conditions
+
+# Study 4 (2016-01-14, 21 conditions, between-subjects)
+
+## Demographics
+
+```{r s4 demographics, echo = F}
+# sample size
+kable(demoSampleSize("study 4"), align = "l", caption = "Study 4: Sample Size")
+```
+
+## Analyses
+
+### Confirmatory factor analysis: ALL conditions
