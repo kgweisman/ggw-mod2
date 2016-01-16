@@ -16,8 +16,8 @@ graphics.off()
 # choose datasource: simulated or real data (manually)
 # datasource <- "simulated"
 # datasource <- "study 1" # 2015-12-15 (between)
-# datasource <- "study 2" # 2016-01-12 (between rep)
-datasource <- "studies 1 & 2" # combine
+datasource <- "study 2" # 2016-01-12 (between rep)
+# datasource <- "studies 1 & 2" # combine
 
 # prepare datasets -------------------------------------------------------------
 
@@ -286,8 +286,8 @@ summary(religion) # test for difference in religion distribution across conditio
 ## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
-VSS(d_beetle, n = 39, rotate = "none") # unrotated
-VSS(d_beetle, n = 39, rotate = "varimax") # rotated
+# VSS(d_beetle, n = 39, rotate = "none") # unrotated
+# VSS(d_beetle, n = 39, rotate = "varimax") # rotated
 VSS.scree(d_beetle) # scree plot
 
 # run unrotated pca with maximum number of dimensions
@@ -301,7 +301,7 @@ pca_beetle_rotated
 pca_beetle_rotated$values[pca_beetle_rotated$values > 1] # examine eignenvalues > 1
 
 # set number of dimensions to extract (manually)
-nfactors_beetle <- 4
+nfactors_beetle <- 1
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
@@ -310,9 +310,20 @@ pca_beetle_unrotatedN <- principal(d_beetle, nfactors = nfactors_beetle, rotate 
 pca_beetle_unrotatedN
 
 # plot mental capacities in first two dimensions
-pca_beetle_unrotatedN_loadings <- 
-  data.frame(pca_beetle_unrotatedN$loadings[1:40, 1:nfactors_beetle],
-             row.names = rownames(pca_beetle_unrotatedN$loadings[1:40, 1:nfactors_beetle]))
+if(nfactors_beetle == 1) {
+  
+  pca_beetle_unrotatedN_loadings <- 
+    data.frame(pca_beetle_unrotatedN$loadings[1:40, "PC1"],
+               row.names = rownames(pca_beetle_unrotatedN$loadings)) %>%
+    rename(PC1 = pca_beetle_unrotatedN.loadings.1.40...PC1..)
+  
+} else {
+  
+  pca_beetle_unrotatedN_loadings <- 
+    data.frame(pca_beetle_unrotatedN$loadings[1:40, 1:nfactors_beetle],
+               row.names = rownames(pca_beetle_unrotatedN$loadings[1:40, 1:nfactors_beetle]))
+  
+}
 
 # code a priori mental capacity categories
 pca_beetle_unrotatedN_loadings[c("hungry", "tired", "pain", 
@@ -396,9 +407,20 @@ pca_beetle_rotatedN <- principal(d_beetle, nfactors = nfactors_beetle,
 pca_beetle_rotatedN
 
 # plot mental capacities in first two dimensions
-pca_beetle_rotatedN_loadings <- 
-  data.frame(pca_beetle_rotatedN$loadings[1:40, 1:nfactors_beetle],
-             row.names = rownames(pca_beetle_rotatedN$loadings[1:40, 1:nfactors_beetle]))
+if(nfactors_beetle == 1) {
+  
+  pca_beetle_rotatedN_loadings <- 
+    data.frame(pca_beetle_rotatedN$loadings[1:40, "PC1"],
+               row.names = rownames(pca_beetle_rotatedN$loadings)) %>%
+    rename(PC1 = pca_beetle_rotatedN.loadings.1.40...PC1..)
+  
+} else {
+  
+  pca_beetle_rotatedN_loadings <- 
+    data.frame(pca_beetle_rotatedN$loadings[1:40, 1:nfactors_beetle],
+               row.names = rownames(pca_beetle_rotatedN$loadings[1:40, 1:nfactors_beetle]))
+  
+}
 
 # code a priori mental capacity categories
 pca_beetle_rotatedN_loadings[c("hungry", "tired", "pain", 
@@ -479,8 +501,8 @@ if(nfactors_beetle > 3) {
 ## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
-VSS(d_robot, n = 39, rotate = "none") # unrotated
-VSS(d_robot, n = 39, rotate = "varimax") # rotated
+# VSS(d_robot, n = 39, rotate = "none") # unrotated
+# VSS(d_robot, n = 39, rotate = "varimax") # rotated
 VSS.scree(d_robot) # scree plot
 
 # run unrotated pca with maximum number of dimensions
@@ -494,7 +516,7 @@ pca_robot_rotated
 pca_robot_rotated$values[pca_robot_rotated$values > 1] # examine eignenvalues > 1
 
 # set number of dimensions to extract (manually)
-nfactors_robot <- 4
+nfactors_robot <- 1
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
@@ -503,9 +525,20 @@ pca_robot_unrotatedN <- principal(d_robot, nfactors = nfactors_robot, rotate = "
 pca_robot_unrotatedN
 
 # plot mental capacities in first two dimensions
-pca_robot_unrotatedN_loadings <- 
-  data.frame(pca_robot_unrotatedN$loadings[1:40, 1:nfactors_robot],
-             row.names = rownames(pca_robot_unrotatedN$loadings[1:40, 1:nfactors_robot]))
+if(nfactors_robot == 1) {
+  
+  pca_robot_unrotatedN_loadings <- 
+    data.frame(pca_robot_unrotatedN$loadings[1:40, "PC1"],
+               row.names = rownames(pca_robot_unrotatedN$loadings)) %>%
+    rename(PC1 = pca_robot_unrotatedN.loadings.1.40...PC1..)
+  
+} else {
+  
+  pca_robot_unrotatedN_loadings <- 
+    data.frame(pca_robot_unrotatedN$loadings[1:40, 1:nfactors_robot],
+               row.names = rownames(pca_robot_unrotatedN$loadings[1:40, 1:nfactors_robot]))
+  
+}
 
 # code a priori mental capacity categories
 pca_robot_unrotatedN_loadings[c("hungry", "tired", "pain", 
@@ -589,9 +622,20 @@ pca_robot_rotatedN <- principal(d_robot, nfactors = nfactors_robot,
 pca_robot_rotatedN
 
 # plot mental capacities in first two dimensions
-pca_robot_rotatedN_loadings <- 
-  data.frame(pca_robot_rotatedN$loadings[1:40, 1:nfactors_robot],
-             row.names = rownames(pca_robot_rotatedN$loadings[1:40, 1:nfactors_robot]))
+if(nfactors_robot == 1) {
+  
+  pca_robot_rotatedN_loadings <- 
+    data.frame(pca_robot_rotatedN$loadings[1:40, "PC1"],
+               row.names = rownames(pca_robot_rotatedN$loadings)) %>%
+    rename(PC1 = pca_robot_rotatedN.loadings.1.40...PC1..)
+  
+} else {
+  
+  pca_robot_rotatedN_loadings <- 
+    data.frame(pca_robot_rotatedN$loadings[1:40, 1:nfactors_robot],
+               row.names = rownames(pca_robot_rotatedN$loadings[1:40, 1:nfactors_robot]))
+  
+}
 
 # code a priori mental capacity categories
 pca_robot_rotatedN_loadings[c("hungry", "tired", "pain", 

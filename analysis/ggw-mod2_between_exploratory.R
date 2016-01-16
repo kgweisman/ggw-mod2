@@ -88,8 +88,8 @@ d_both <- data.frame(d_both[,-1], row.names = d_both[,1])
 ## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
-VSS(d_both, n = 39, rotate = "none") # unrotated
-VSS(d_both, n = 39, rotate = "varimax") # rotated
+# VSS(d_both, n = 39, rotate = "none") # unrotated
+# VSS(d_both, n = 39, rotate = "varimax") # rotated
 VSS.scree(d_both) # scree plot
 
 # run unrotated pca with maximum number of dimensions
@@ -103,7 +103,7 @@ pca_both_rotated
 pca_both_rotated$values[pca_both_rotated$values > 1] # examine eignenvalues > 1
 
 # set number of dimensions to extract (manually)
-nfactors_both <- 3
+nfactors_both <- 1
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
@@ -112,9 +112,20 @@ pca_both_unrotatedN <- principal(d_both, nfactors = nfactors_both, rotate = "non
 pca_both_unrotatedN
 
 # plot mental capacities in first two dimensions
-pca_both_unrotatedN_loadings <- 
-  data.frame(pca_both_unrotatedN$loadings[1:40, 1:nfactors_both],
-             row.names = rownames(pca_both_unrotatedN$loadings[1:40, 1:nfactors_both]))
+if(nfactors_both == 1) {
+  
+  pca_both_unrotatedN_loadings <- 
+    data.frame(pca_both_unrotatedN$loadings[1:40, "PC1"],
+               row.names = rownames(pca_both_unrotatedN$loadings)) %>%
+    rename(PC1 = pca_both_unrotatedN.loadings.1.40...PC1..)
+  
+} else {
+  
+  pca_both_unrotatedN_loadings <- 
+    data.frame(pca_both_unrotatedN$loadings[1:40, 1:nfactors_both],
+               row.names = rownames(pca_both_unrotatedN$loadings[1:40, 1:nfactors_both]))
+  
+}
 
 # code a priori mental capacity categories
 pca_both_unrotatedN_loadings[c("hungry", "tired", "pain", 
@@ -198,9 +209,20 @@ pca_both_rotatedN <- principal(d_both, nfactors = nfactors_both,
 pca_both_rotatedN
 
 # plot mental capacities in first two dimensions
-pca_both_rotatedN_loadings <- 
-  data.frame(pca_both_rotatedN$loadings[1:40, 1:nfactors_both],
-             row.names = rownames(pca_both_rotatedN$loadings[1:40, 1:nfactors_both]))
+if(nfactors_both == 1) {
+  
+  pca_both_rotatedN_loadings <- 
+    data.frame(pca_both_rotatedN$loadings[1:40, "PC1"],
+               row.names = rownames(pca_both_rotatedN$loadings)) %>%
+    rename(PC1 = pca_both_rotatedN.loadings.1.40...PC1..)
+  
+} else {
+  
+  pca_both_rotatedN_loadings <- 
+    data.frame(pca_both_rotatedN$loadings[1:40, 1:nfactors_both],
+               row.names = rownames(pca_both_rotatedN$loadings[1:40, 1:nfactors_both]))
+  
+}
 
 # code a priori mental capacity categories
 pca_both_rotatedN_loadings[c("hungry", "tired", "pain", 
@@ -427,6 +449,37 @@ if(nfactors_both == 4) {
     mutate(dimension = factor(PC,
                               levels = c("PC1_sum", "PC2_sum", "PC3_sum"),
                               labels = c("PC1", "PC2", "PC3")))
+  
+  p_scored <- ggplot(aes(x = dimension, y = score,
+                         group = condition, fill = condition), 
+                     data = d_scored_long) +
+    geom_bar(stat = "identity", width = 0.8,
+             position = position_dodge(width = 0.9)) +
+    theme_bw() +
+    theme(text = element_text(size = 20)) +
+    labs(title = "Hand-calculated scores by character\nfrom large PCA with varimax rotation\n",
+         x = "\nDimension",
+         y = "Score\n")
+  p_scored
+} else if(nfactors_both == 2) {
+  
+  # score!
+  d_scored <- d_scoring_pre %>%
+    mutate(PC1_score = PC1 * mean,
+           PC2_score = PC2 * mean) %>%
+    group_by(condition) %>%
+    summarise(PC1_sum = sum(PC1_score),
+              PC2_sum = sum(PC2_score)) %>%
+    data.frame()
+  d_scored
+  
+  # plot scores
+  
+  d_scored_long <- d_scored %>%
+    gather(PC, score, -condition) %>%
+    mutate(dimension = factor(PC,
+                              levels = c("PC1_sum", "PC2_sum"),
+                              labels = c("PC1", "PC2")))
   
   p_scored <- ggplot(aes(x = dimension, y = score,
                          group = condition, fill = condition), 

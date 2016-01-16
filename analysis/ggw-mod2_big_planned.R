@@ -257,7 +257,7 @@ pca_all_rotated
 pca_all_rotated$values[pca_all_rotated$values > 1] # examine eignenvalues > 1
 
 # set number of dimensions to extract (manually)
-nfactors_all <- 2
+nfactors_all <- 1
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
@@ -266,9 +266,20 @@ pca_all_unrotatedN <- principal(d_all, nfactors = nfactors_all, rotate = "none")
 pca_all_unrotatedN
 
 # plot mental capacities in first two dimensions
-pca_all_unrotatedN_loadings <- 
-  data.frame(pca_all_unrotatedN$loadings[1:40, 1:nfactors_all],
-             row.names = rownames(pca_all_unrotatedN$loadings[1:40, 1:nfactors_all]))
+if(nfactors_all == 1) {
+  
+  pca_all_unrotatedN_loadings <- 
+    data.frame(pca_all_unrotatedN$loadings[1:40, "PC1"],
+               row.names = rownames(pca_all_unrotatedN$loadings)) %>%
+    rename(PC1 = pca_all_unrotatedN.loadings.1.40...PC1..)
+  
+} else {
+  
+  pca_all_unrotatedN_loadings <- 
+    data.frame(pca_all_unrotatedN$loadings[1:40, 1:nfactors_all],
+               row.names = rownames(pca_all_unrotatedN$loadings[1:40, 1:nfactors_all]))
+  
+}
 
 # code a priori mental capacity categories
 pca_all_unrotatedN_loadings[c("hungry", "tired", "pain", 
@@ -352,9 +363,20 @@ pca_all_rotatedN <- principal(d_all, nfactors = nfactors_all,
 pca_all_rotatedN
 
 # plot mental capacities in first two dimensions
-pca_all_rotatedN_loadings <- 
-  data.frame(pca_all_rotatedN$loadings[1:40, 1:nfactors_all],
-             row.names = rownames(pca_all_rotatedN$loadings[1:40, 1:nfactors_all]))
+if(nfactors_all == 1) {
+  
+  pca_all_rotatedN_loadings <- 
+    data.frame(pca_all_rotatedN$loadings[1:40, "PC1"],
+               row.names = rownames(pca_all_rotatedN$loadings)) %>%
+    rename(PC1 = pca_all_rotatedN.loadings.1.40...PC1..)
+  
+} else {
+  
+  pca_all_rotatedN_loadings <- 
+    data.frame(pca_all_rotatedN$loadings[1:40, 1:nfactors_all],
+               row.names = rownames(pca_all_rotatedN$loadings[1:40, 1:nfactors_all]))
+  
+}
 
 # code a priori mental capacity categories
 pca_all_rotatedN_loadings[c("hungry", "tired", "pain", 

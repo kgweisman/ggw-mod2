@@ -102,7 +102,7 @@ pca_both_rotatedN
 pca_beetle_rotatedN$values[pca_beetle_rotatedN$values > 1] # examine eignenvalues > 1
 
 # set number of factors to extract (manually)
-nfactors_both <- 3
+nfactors_both <- 2
 
 # run pca without rotation with n factors (as determined above)
 pca_both_unrotatedN <- principal(d_both, nfactors = nfactors_both, rotate = "none")

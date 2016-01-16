@@ -394,8 +394,8 @@ summary(religion) # test for difference in religion distribution across conditio
 ## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
-VSS(d_beetle, n = 39, rotation = "none") # unrotated
-VSS(d_beetle, n = 39, rotation = "varimax") # rotated
+# VSS(d_beetle, n = 39, rotation = "none") # unrotated
+# VSS(d_beetle, n = 39, rotation = "varimax") # rotated
 VSS.scree(d_beetle)
 
 # run unrotated pca with maximum number of dimensions
@@ -409,7 +409,7 @@ pca_beetle_rotated
 pca_beetle_rotated$values[pca_beetle_rotated$values > 1] # examine eignenvalues > 1
 
 # set number of dimensions to extract (manually)
-nfactors_beetle <- 4
+nfactors_beetle <- 2
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
@@ -587,8 +587,8 @@ if(nfactors_beetle > 3) {
 ## step 1: determine how many dimensions to extract --------------------------
 
 # use "very simple structure" criterion
-VSS(d_robot, n = 39, rotation = "none") # unrotated
-VSS(d_robot, n = 39, rotation = "varimax") # rotated
+# VSS(d_robot, n = 39, rotation = "none") # unrotated
+# VSS(d_robot, n = 39, rotation = "varimax") # rotated
 VSS.scree(d_robot)
 
 # run unrotated pca with maximum number of dimensions
@@ -602,7 +602,7 @@ pca_robot_rotated
 pca_robot_rotated$values[pca_robot_rotated$values > 1] # examine eignenvalues > 1
 
 # set number of dimensions to extract (manually)
-nfactors_robot <- 4
+nfactors_robot <- 2
 
 ## step 2: run pca without rotation with N dimensions ------------------------
 
