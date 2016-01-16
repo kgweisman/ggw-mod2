@@ -8,17 +8,18 @@ library(ggplot2)
 library(devtools)
 library(stats)
 library(knitr)
+library(nFactors)
 
 # clear workspace
 rm(list = ls(all = T))
 graphics.off()
 
 # choose datasource (manually)
-# datasource <- "study 1" # 2015-12-15 (between)
+datasource <- "study 1" # 2015-12-15 (between)
 # datasource <- "study 2" # 2016-01-12 (between rep)
 # datasource <- "studies 1 & 2" # combine
 # datasource <- "study 3" # 2016-01-10 (within)
-datasource <- "study 4" # 2016-01-14 (between, 21 characters)
+# datasource <- "study 4" # 2016-01-14 (between, 21 characters)
 
 # prepare datasets -------------------------------------------------------------
 
@@ -436,7 +437,7 @@ if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
   # test for differences in age across conditions
   age_diff <- t.test(age_approx ~ condition,
                      data = d_clean %>%
-                       select(condition, subid, duration) %>%
+                       select(condition, subid, age_approx) %>%
                        unique()) 
 }
 
@@ -478,4 +479,4 @@ if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
 
 # STILL NEED TO DEAL WITH EDUCATION FOR STUDY 4
 
-
+# 
