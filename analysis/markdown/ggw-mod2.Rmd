@@ -406,17 +406,24 @@ howManyFactors <- function (df) {
   # count eigenvalues > 1.0 (using correlation matrix)
   countEigen <- function(df) {
     eigenVals <- eigen(cor(df))$values
-    nLarge <- length(eigenVals[eigenVals > 1])
-    return(nLarge)
+    nGreaterThan1 <- length(eigenVals[eigenVals > 1.00])
+    nGreaterThan5Per <- length(eigenVals[eigenVals/40 > 0.05])
+    results <- c("cutoff" = nGreaterThan1, "propVar" = nGreaterThan5Per)
+    return(results)
   }
-  
+
   # scree plot: look for elbow
-  scree_df <- scree(df, main = "Scree plot: Study 1, BEETLE condition")
+  scree_df <- scree(df, main = "Scree plot")
   
   # eigenvalues: count how many > 1
-  eigen_df <- countEigen(df)
+  text(x = 20, y = 12, 
+       labels = paste(countEigen(df)["cutoff"], 
+                      "eigenvalues > 1.00 (for EFA)"))
+
+  # eigenvalues: count how account for > 5% variance
   text(x = 20, y = 10, 
-       labels = paste(eigen_df, "eigenvalues > 1 (for EFA)"))
+       labels = paste(countEigen(df)["propVar"], 
+                      "eigenvalues > 5% variance (for EFA)"))
   
   # very simple structure: look at different indices
   # vss_unrotated_df <- VSS(df, n = 15, 
@@ -430,7 +437,7 @@ getFactorLoadings <- function(efa) {
   factorLoadingsList <- list()
   for(i in 1:efa$factors) {
     factorNum <- paste0("F", i)
-    df <- data.frame(X = sort(efa$loadings[,1], decreasing = T))
+    df <- data.frame(X = sort(loadings(efa)[,i], decreasing = T))
     names(df) <- factorNum
     factorLoadingsList[[i]] <- df
   }
@@ -507,7 +514,7 @@ howManyFactors(d1_beetle)
 
 ```{r s1 beetle set nfactors, echo = F}
 # set number of factors to extract
-nfactors_d1_beetle <- 3
+nfactors_d1_beetle <- 2
 ```
 
 #### Step 2: Run EFA without rotation
@@ -517,22 +524,162 @@ nfactors_d1_beetle <- 3
 efa_d1_beetle_unrotatedN <- factanal(d1_beetle, nfactors_d1_beetle, r = "none")
 print(efa_d1_beetle_unrotatedN)
 
-# examine loadings for each factor
+# get loadings for each factor
 efa_d1_beetle_unrotatedN_loadings <- getFactorLoadings(efa_d1_beetle_unrotatedN)
-print(efa_d1_beetle_unrotatedN_loadings)
 ```
 
 #### Step 3: Run EFA with varimax rotation
 
 ```{r s1 beetle varimax rotation, echo = F}
 # run EFA with rotation with N factors
+efa_d1_beetle_rotatedN <- factanal(d1_beetle, nfactors_d1_beetle, r = "none")
+print(efa_d1_beetle_rotatedN)
 
+# get loadings for each factor
+efa_d1_beetle_rotatedN_loadings <- getFactorLoadings(efa_d1_beetle_rotatedN)
+```
+
+##### Factor 1
+
+```{r s1 beetle varimax rotation F1, echo = F}
+# examine factor 1
+kable(efa_d1_beetle_rotatedN_loadings[[1]], 
+      align = "l", caption = "Study 1, BEETLE condition: Rotated Factor 1")
+```
+
+##### Factor 2
+
+```{r s1 beetle varimax rotation F2, echo = F}
+# examine factor 2
+kable(efa_d1_beetle_rotatedN_loadings[[2]], 
+      align = "l", caption = "Study 1, BEETLE condition: Rotated Factor 2")
+```
+
+##### Factor 3 (*not applicable*)
+
+```{r s1 beetle varimax rotation F3, echo = F}
+# # examine factor 3
+# kable(efa_d1_beetle_rotatedN_loadings[[3]], 
+#       align = "l", caption = "Study 1, BEETLE condition: Rotated Factor 3")
 ```
 
 ### Exploratory factor analysis: ROBOT condition
 
+#### Step 1: Determine how many factors to extract
+
+```{r s1 robot how many factors, echo = F}
+howManyFactors(d1_robot)
+```
+
+```{r s1 robot set nfactors, echo = F}
+# set number of factors to extract
+nfactors_d1_robot <- 2
+```
+
+#### Step 2: Run EFA without rotation
+
+```{r s1 robot no rotation, echo = F}
+# run EFA without rotation with N factors
+efa_d1_robot_unrotatedN <- factanal(d1_robot, nfactors_d1_robot, r = "none")
+print(efa_d1_robot_unrotatedN)
+
+# get loadings for each factor
+efa_d1_robot_unrotatedN_loadings <- getFactorLoadings(efa_d1_robot_unrotatedN)
+```
+
+#### Step 3: Run EFA with varimax rotation
+
+```{r s1 robot varimax rotation, echo = F}
+# run EFA with rotation with N factors
+efa_d1_robot_rotatedN <- factanal(d1_robot, nfactors_d1_robot, r = "none")
+print(efa_d1_robot_rotatedN)
+
+# get loadings for each factor
+efa_d1_robot_rotatedN_loadings <- getFactorLoadings(efa_d1_robot_rotatedN)
+```
+
+##### Factor 1
+
+```{r s1 robot varimax rotation F1, echo = F}
+# examine factor 1
+kable(efa_d1_robot_rotatedN_loadings[[1]], 
+      align = "l", caption = "Study 1, ROBOT condition: Rotated Factor 1")
+```
+
+##### Factor 2
+
+```{r s1 robot varimax rotation F2, echo = F}
+# examine factor 2
+kable(efa_d1_robot_rotatedN_loadings[[2]], 
+      align = "l", caption = "Study 1, ROBOT condition: Rotated Factor 2")
+```
+
+##### Factor 3 (*not applicable*)
+
+```{r s1 robot varimax rotation F3, echo = F}
+# # examine factor 3
+# kable(efa_d1_robot_rotatedN_loadings[[3]], 
+#       align = "l", caption = "Study 1, ROBOT condition: Rotated Factor 3")
+```
 
 ### Exploratory factor analysis: ALL conditions
+
+#### Step 1: Determine how many factors to extract
+
+```{r s1 all how many factors, echo = F}
+howManyFactors(d1_all)
+```
+
+```{r s1 all set nfactors, echo = F}
+# set number of factors to extract
+nfactors_d1_all <- 3
+```
+
+#### Step 2: Run EFA without rotation
+
+```{r s1 all no rotation, echo = F}
+# run EFA without rotation with N factors
+efa_d1_all_unrotatedN <- factanal(d1_all, nfactors_d1_all, r = "none")
+print(efa_d1_all_unrotatedN)
+
+# get loadings for each factor
+efa_d1_all_unrotatedN_loadings <- getFactorLoadings(efa_d1_all_unrotatedN)
+```
+
+#### Step 3: Run EFA with varimax rotation
+
+```{r s1 all varimax rotation, echo = F}
+# run EFA with rotation with N factors
+efa_d1_all_rotatedN <- factanal(d1_all, nfactors_d1_all, r = "none")
+print(efa_d1_all_rotatedN)
+
+# get loadings for each factor
+efa_d1_all_rotatedN_loadings <- getFactorLoadings(efa_d1_all_rotatedN)
+```
+
+##### Factor 1
+
+```{r s1 all varimax rotation F1, echo = F}
+# examine factor 1
+kable(efa_d1_all_rotatedN_loadings[[1]], 
+      align = "l", caption = "Study 1, ALL conditions: Rotated Factor 1")
+```
+
+##### Factor 2
+
+```{r s1 all varimax rotation F2, echo = F}
+# examine factor 2
+kable(efa_d1_all_rotatedN_loadings[[2]], 
+      align = "l", caption = "Study 1, ALL conditions: Rotated Factor 2")
+```
+
+##### Factor 3
+
+```{r s1 all varimax rotation F3, echo = F}
+# examine factor 3
+kable(efa_d1_all_rotatedN_loadings[[3]], 
+      align = "l", caption = "Study 1, ALL conditions: Rotated Factor 3")
+```
 
 
 # Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
