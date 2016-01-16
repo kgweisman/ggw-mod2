@@ -1,29 +1,32 @@
+#################################################### WORKSPACE SETUP ###########
+
 # set up workspace -------------------------------------------------------------
 
 # load libraries
-library(dplyr)
-library(tidyr)
-library(psych)
-library(ggplot2)
 library(devtools)
+library(psych)
 library(stats)
-library(knitr)
 library(nFactors)
+library(ggplot2)
+library(knitr)
+library(tidyr)
+library(dplyr)
 
 # clear workspace
 rm(list = ls(all = T))
 graphics.off()
 
-# choose datasource (manually)
+# choose datasource (manually) -------------------------------------------------
+
 datasource <- "study 1" # 2015-12-15 (between)
 # datasource <- "study 2" # 2016-01-12 (between rep)
 # datasource <- "studies 1 & 2" # combine
 # datasource <- "study 3" # 2016-01-10 (within)
 # datasource <- "study 4" # 2016-01-14 (between, 21 characters)
 
-# prepare datasets -------------------------------------------------------------
+########################################################## DATA PREP ###########
 
-## load in dataset --------------------------------------------------------
+# load dataset -----------------------------------------------------------------
 
 if(datasource == "study 1") {
   d_raw <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (2 conditions between)/GGWmod2_v1_clean.csv")
@@ -66,7 +69,7 @@ if(datasource == "study 4") {
   rm(d_raw)
 }
 
-## clean up dataset -------------------------------------------------------
+# clean up dataset -------------------------------------------------------------
 
 if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
   # enact exclusionary criteria
@@ -352,7 +355,7 @@ if(datasource == "study 4") {
   rm(d_clean_1, d_clean_2)
 }
 
-## prepare datasets for dimension reduction analyses ----------------------
+# prepare datasets for dimension reduction analyses ----------------------------
 
 if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
   # beetle condition
@@ -368,9 +371,9 @@ if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
   d_robot <- data.frame(d_robot[,-1], row.names = d_robot[,1])
   
   # collapse across conditions
-  d_both <- d_clean %>%
+  d_all <- d_clean %>%
     select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3! 
-  d_both <- data.frame(d_both[,-1], row.names = d_both[,1])
+  d_all <- data.frame(d_all[,-1], row.names = d_all[,1])
 }
 
 if(datasource == "study 3") {
@@ -387,10 +390,10 @@ if(datasource == "study 3") {
   d_robot <- data.frame(d_robot[,-1], row.names = d_robot[,1])
   
   # collapse across targets
-  d_both <- d_clean %>%
+  d_all <- d_clean %>%
     mutate(subid = paste(target, subid, sep = "_")) %>%
     select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3! 
-  d_both <- data.frame(d_both[,-1], row.names = d_both[,1])
+  d_all <- data.frame(d_all[,-1], row.names = d_all[,1])
 }
 
 if(datasource == "study 4") {
@@ -399,6 +402,8 @@ if(datasource == "study 4") {
     select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3! 
   d_all <- data.frame(d_all[,-1], row.names = d_all[,1])
 }
+
+####################################################### DEMOGRAPHICS ###########
 
 # examine demographic variables ------------------------------------------------
 
@@ -479,4 +484,213 @@ if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
 
 # STILL NEED TO DEAL WITH EDUCATION FOR STUDY 4
 
-# 
+#################################################### FACTOR ANALYSIS ###########
+
+# make function for determining how many factors to extract
+howManyFactors <- function(data) {
+  # scree plot: look for elbow
+  scree(data)
+  
+  # eigenvalues: count how many > 1
+  eigen_efa <- length(eigen(cor(data))$values[eigen(cor(data))$values > 1])
+  
+  # very simple structure: look at different indices
+  vss_unroted <- nfactors(data, n = 15, rotate = "none",
+                          title = "VSS (no rotation)") # without rotation
+  vss_rotated <- nfactors(data, n = 15, rotate = "varimax",
+                          title = "VSS (varimax rotation)") # with rotation
+  
+  # return
+  return(list("Count of eigenvalues > 1" = eigen_efa,
+              "VSS (no rotation)" = vss_unroted,
+              "VSS (varimax rotation)" = vss_rotated))
+}
+
+# exploratory factor analysis by condition (studies 1-3): BEETLE ---------------
+if(datasource %in% c("study 1", "study 2", "studies 1 & 2", "study 3")) {
+
+  # step 1: determine how many dimensions to extract ---------------------------
+  # howMany_beetle <- howManyFactors(d_beetle)
+  nfactors_beetle <- 3
+  
+  # step 2: run FA without rotation with N factors -----------------------------
+  efa_beetle_unrotatedN <- factanal(d_beetle, nfactors_beetle, r = "none")
+  
+  # examine loadings for each factor
+  efa_beetle_unrotatedN_F1 <- 
+    data.frame(F1 = sort(efa_beetle_unrotatedN$loadings[,1], 
+                         decreasing = TRUE))
+  if(nfactors_beetle > 1) {
+    efa_beetle_unrotatedN_F2 <- 
+      data.frame(F2 = sort(efa_beetle_unrotatedN$loadings[,2], 
+                           decreasing = TRUE))
+    if(nfactors_beetle > 2) {
+      efa_beetle_unrotatedN_F3 <- 
+        data.frame(F3 = sort(efa_beetle_unrotatedN$loadings[,3], 
+                             decreasing = TRUE))
+      if(nfactors_beetle > 3) {
+        efa_beetle_unrotatedN_F4 <- 
+          data.frame(F4 = sort(efa_beetle_unrotatedN$loadings[,4], 
+                               decreasing = TRUE))
+      }
+    }
+  }
+  
+  # step 3: run FA with rotation with N factors --------------------------------
+  efa_beetle_rotatedN <- factanal(d_beetle, nfactors_beetle, r = "varimax")
+  
+  # examine loadings for each factor
+  efa_beetle_rotatedN_F1 <- 
+    data.frame(F1 = sort(efa_beetle_rotatedN$loadings[,1], 
+                         decreasing = TRUE))
+  if(nfactors_beetle > 1) {
+    efa_beetle_rotatedN_F2 <- 
+      data.frame(F2 = sort(efa_beetle_rotatedN$loadings[,2], 
+                           decreasing = TRUE))
+    if(nfactors_beetle > 2) {
+      efa_beetle_rotatedN_F3 <- 
+        data.frame(F3 = sort(efa_beetle_rotatedN$loadings[,3], 
+                             decreasing = TRUE))
+      if(nfactors_beetle > 3) {
+        efa_beetle_rotatedN_F4 <- 
+          data.frame(F4 = sort(efa_beetle_rotatedN$loadings[,4], 
+                               decreasing = TRUE))
+      }
+    }
+  }
+}
+
+# exploratory factor analysis by condition (studies 1-3): ROBOT ----------------
+if(datasource %in% c("study 1", "study 2", "studies 1 & 2", "study 3")) {
+  
+  # step 1: determine how many dimensions to extract ---------------------------
+  # howMany_robot <- howManyFactors(d_robot)
+  nfactors_robot <- 3
+  
+  # step 2: run FA without rotation with N factors -----------------------------
+  efa_robot_unrotatedN <- factanal(d_robot, nfactors_robot, r = "none")
+  
+  # examine loadings for each factor
+  efa_robot_unrotatedN_F1 <- 
+    data.frame(F1 = sort(efa_robot_unrotatedN$loadings[,1], 
+                         decreasing = TRUE))
+  if(nfactors_robot > 1) {
+    efa_robot_unrotatedN_F2 <- 
+      data.frame(F2 = sort(efa_robot_unrotatedN$loadings[,2], 
+                           decreasing = TRUE))
+    if(nfactors_robot > 2) {
+      efa_robot_unrotatedN_F3 <- 
+        data.frame(F3 = sort(efa_robot_unrotatedN$loadings[,3], 
+                             decreasing = TRUE))
+      if(nfactors_robot > 3) {
+        efa_robot_unrotatedN_F4 <- 
+          data.frame(F4 = sort(efa_robot_unrotatedN$loadings[,4], 
+                               decreasing = TRUE))
+      }
+    }
+  }
+  
+  # step 3: run FA with rotation with N factors --------------------------------
+  efa_robot_rotatedN <- factanal(d_robot, nfactors_robot, r = "varimax")
+  
+  # examine loadings for each factor
+  efa_robot_rotatedN_F1 <- 
+    data.frame(F1 = sort(efa_robot_rotatedN$loadings[,1], 
+                         decreasing = TRUE))
+  if(nfactors_robot > 1) {
+    efa_robot_rotatedN_F2 <- 
+      data.frame(F2 = sort(efa_robot_rotatedN$loadings[,2], 
+                           decreasing = TRUE))
+    if(nfactors_robot > 2) {
+      efa_robot_rotatedN_F3 <- 
+        data.frame(F3 = sort(efa_robot_rotatedN$loadings[,3], 
+                             decreasing = TRUE))
+      if(nfactors_robot > 3) {
+        efa_robot_rotatedN_F4 <- 
+          data.frame(F4 = sort(efa_robot_rotatedN$loadings[,4], 
+                               decreasing = TRUE))
+      }
+    }
+  }
+}
+
+# exploratory factor analysis across conditions (studies 1-4) ------------------
+
+# step 1: determine how many dimensions to extract -----------------------------
+# howMany_all <- howManyFactors(d_all)
+nfactors_all <- 3
+
+# step 2: run FA without rotation with N factors -------------------------------
+efa_all_unrotatedN <- factanal(d_all, nfactors_all, r = "none")
+
+# examine loadings for each factor
+efa_all_unrotatedN_F1 <- 
+  data.frame(F1 = sort(efa_all_unrotatedN$loadings[,1], 
+                       decreasing = TRUE))
+if(nfactors_all > 1) {
+  efa_all_unrotatedN_F2 <- 
+    data.frame(F2 = sort(efa_all_unrotatedN$loadings[,2], 
+                         decreasing = TRUE))
+  if(nfactors_all > 2) {
+    efa_all_unrotatedN_F3 <- 
+      data.frame(F3 = sort(efa_all_unrotatedN$loadings[,3], 
+                           decreasing = TRUE))
+    if(nfactors_all > 3) {
+      efa_all_unrotatedN_F4 <- 
+        data.frame(F4 = sort(efa_all_unrotatedN$loadings[,4], 
+                             decreasing = TRUE))
+    }
+  }
+}
+
+# step 3: run FA with rotation with N factors ----------------------------------
+efa_all_rotatedN <- factanal(d_all, nfactors_all, r = "varimax")
+
+# examine loadings for each factor
+efa_all_rotatedN_F1 <- 
+  data.frame(F1 = sort(efa_all_rotatedN$loadings[,1], 
+                       decreasing = TRUE))
+if(nfactors_all > 1) {
+  efa_all_rotatedN_F2 <- 
+    data.frame(F2 = sort(efa_all_rotatedN$loadings[,2], 
+                         decreasing = TRUE))
+  if(nfactors_all > 2) {
+    efa_all_rotatedN_F3 <- 
+      data.frame(F3 = sort(efa_all_rotatedN$loadings[,3], 
+                           decreasing = TRUE))
+    if(nfactors_all > 3) {
+      efa_all_rotatedN_F4 <- 
+        data.frame(F4 = sort(efa_all_rotatedN$loadings[,4], 
+                             decreasing = TRUE))
+    }
+  }
+}
+
+############################################################## PRINT ###########
+
+if(datasource %in% c("study 1", "study 2", "studies 1 & 2", "study 3")) {
+  # BEETLE condition
+  efa_beetle_unrotatedN
+  efa_beetle_rotatedN
+  efa_beetle_rotatedN_F1
+  if(nfactors_beetle > 1) {efa_beetle_rotatedN_F2}
+  if(nfactors_beetle > 2) {efa_beetle_rotatedN_F3}
+  if(nfactors_beetle > 3) {efa_beetle_rotatedN_F4}
+
+  # ROBOT condition
+  efa_robot_unrotatedN
+  efa_robot_rotatedN
+  efa_robot_rotatedN_F1
+  if(nfactors_robot > 1) {efa_robot_rotatedN_F2}
+  if(nfactors_robot > 2) {efa_robot_rotatedN_F3}
+  if(nfactors_robot > 3) {efa_robot_rotatedN_F4}
+}
+
+# ALL conditions
+efa_all_unrotatedN
+efa_all_rotatedN
+efa_all_rotatedN_F1
+if(nfactors_all > 1) {efa_all_rotatedN_F2}
+if(nfactors_all > 2) {efa_all_rotatedN_F3}
+if(nfactors_all > 3) {efa_all_rotatedN_F4}
+
