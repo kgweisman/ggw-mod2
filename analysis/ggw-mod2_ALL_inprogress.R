@@ -301,8 +301,15 @@ if(datasource == "study 4") {
                            labels = c("m", "f", "other"))) %>%
     filter(age_approx >= 18) # exclude Ps who are younger than 18 years
   
+  # recode one character
+  d_clean_2 <- d_clean_1 %>%
+    mutate(condition = factor(ifelse(
+      grepl("vegetative", as.character(condition)), "pvs",
+      ifelse(grepl("blue", as.character(condition)), "bluejay",
+             as.character(condition)))))
+  
   # recode background and demographic variables
-  d_clean <- d_clean_1 %>%
+  d_clean <- d_clean_2 %>%
     mutate( # deal with study number
       study = factor(study)) %>%
     mutate( # deal with study duration
@@ -341,7 +348,7 @@ if(datasource == "study 4") {
     rename(race_cat = race_cat3)
   
   # remove extraneous dfs and variables
-  rm(d_clean_1)
+  rm(d_clean_1, d_clean_2)
 }
 
 ## prepare datasets for dimension reduction analyses ----------------------
@@ -391,3 +398,84 @@ if(datasource == "study 4") {
     select(subid, happy:pride) # NOTE: make sure responses are scored as -3:3! 
   d_all <- data.frame(d_all[,-1], row.names = d_all[,1])
 }
+
+# examine demographic variables ------------------------------------------------
+
+# sample size
+sample_size <- with(d_clean %>% select(condition, subid) %>% unique(), 
+                    table(condition))
+kable(d_clean %>% select(condition, subid) %>% unique() %>% count(condition))
+
+# duration
+duration <- d_clean %>% 
+  group_by(condition) %>%
+  summarise(min_duration = min(duration, na.rm = T),
+            max_duration = max(duration, na.rm = T),
+            median_duration = median(duration, na.rm = T),
+            mean_duration = mean(duration, na.rm = T),
+            sd_duration = sd(duration, na.rm = T))
+
+if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
+  # test for differences in duration across conditions
+  duration_diff <- t.test(duration ~ condition,
+                          data = d_clean %>% 
+                            select(condition, subid, duration) %>%
+                            unique()) 
+}
+
+# approxiate age
+age_approx <- d_clean %>%
+  group_by(condition) %>%
+  summarise(min_age = min(age_approx, na.rm = T),
+            max_age = max(age_approx, na.rm = T),
+            median_age = median(age_approx, na.rm = T),
+            mean_age = mean(age_approx, na.rm = T),
+            sd_age = sd(age_approx, na.rm = T))
+
+if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
+  # test for differences in age across conditions
+  age_diff <- t.test(age_approx ~ condition,
+                     data = d_clean %>%
+                       select(condition, subid, duration) %>%
+                       unique()) 
+}
+
+# gender
+if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
+  gender <- with(d_clean %>% select(subid, condition, gender) %>% unique(), 
+                 table(condition, gender))
+  kable(addmargins(gender))
+  summary(gender) # test for difference in gender distribution across conditions
+} else {
+  gender <- with(d_clean %>% select(subid, gender) %>% unique(),
+                 table(gender))
+  gender_diff <- chisq.test(gender)
+}
+
+# racial/ethnic background
+if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
+  race <- with(d_clean %>% select(subid, condition, race_cat) %>% unique(), 
+                 table(condition, race_cat))
+  kable(addmargins(race))
+  summary(race) # test for difference in race distribution across conditions
+} else {
+  race <- with(d_clean %>% select(subid, race_cat) %>% unique(),
+                 table(race_cat))
+  race_diff <- chisq.test(race)
+}
+
+# racial/ethnic background
+if(datasource %in% c("study 1", "study 2", "studies 1 & 2")) {
+  religion <- with(d_clean %>% select(subid, condition, religion_cat) %>% unique(), 
+               table(condition, religion_cat))
+  kable(addmargins(religion))
+  summary(religion) # test for difference in religion distribution across conditions
+} else if(datasource == "study 3") {
+  religion <- with(d_clean %>% select(subid, religion_cat) %>% unique(),
+               table(religion_cat))
+  religion_diff <- chisq.test(religion)
+}
+
+# STILL NEED TO DEAL WITH EDUCATION FOR STUDY 4
+
+
