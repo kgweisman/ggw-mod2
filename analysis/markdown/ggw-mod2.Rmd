@@ -8,7 +8,7 @@ output:
 
 # Setup
 
-```{r set up workspace, echo = F}
+```{r workspace setup, echo = F}
 # load libraries
 library(devtools)
 library(psych)
@@ -24,7 +24,7 @@ rm(list = ls(all = T))
 graphics.off()
 ```
 
-```{r make functions, echo = F}
+```{r functions, echo = F}
 # make cleanup function
 cleanup <- function(datasource) {
   if(datasource %in% c("study 1", "study 2")) {
@@ -447,7 +447,7 @@ getFactorLoadings <- function(efa) {
 
 # Data preparation
 
-```{r load in data, echo = F}
+```{r data upload, echo = F}
 # study 1 (2015-12-15, 2 conditions, between-subjects)
 d_raw_study1 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (2 conditions between)/GGWmod2_v1_clean.csv") %>%
   mutate(study = "study 1")
@@ -465,7 +465,7 @@ d_raw_study4 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects
   mutate(study = "study 4")
 ```
 
-```{r clean up data, echo = F}
+```{r data cleanup, echo = F}
 # clean up datasets
 d1 <- cleanup("study 1")
 d2 <- cleanup("study 2")
@@ -473,7 +473,7 @@ d3 <- cleanup("study 3")
 d4 <- cleanup("study 4")
 ```
 
-```{r make dataframes for dimension reduction, echo = F}
+```{r dataframes for dimension reduction, echo = F}
 # make dataframes for study 1
 d1_beetle <- makeDRDF("study 1", "beetle")
 d1_robot <- makeDRDF("study 1", "robot")
@@ -681,7 +681,6 @@ kable(efa_d1_all_rotatedN_loadings[[3]],
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 3")
 ```
 
-
 # Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
 
 ## Demographics
@@ -692,6 +691,11 @@ kable(demoSampleSize("study 2"), align = "l", caption = "Study 2: Sample Size")
 ```
 
 ## Analyses
+
+### Set up latent variable structure
+
+```{r s2 latent variable structure}
+```
 
 ### Confirmatory factor analysis: BEETLE condition
 
