@@ -399,8 +399,43 @@ demoSampleSize <- function(datasource) {
   # return dataframe for using kable
   return(sample_size)
 }
-
 # STILL NEED: DURATION, AGE, GENDER, RACE, RELIGION, EDUCATION
+
+# make scree plot to determine how many factors to extract
+howManyFactors <- function (df) {
+  # count eigenvalues > 1.0 (using correlation matrix)
+  countEigen <- function(df) {
+    eigenVals <- eigen(cor(df))$values
+    nLarge <- length(eigenVals[eigenVals > 1])
+    return(nLarge)
+  }
+  
+  # scree plot: look for elbow
+  scree_df <- scree(df, main = "Scree plot: Study 1, BEETLE condition")
+  
+  # eigenvalues: count how many > 1
+  eigen_df <- countEigen(df)
+  text(x = 20, y = 10, 
+       labels = paste(eigen_df, "eigenvalues > 1 (for EFA)"))
+  
+  # very simple structure: look at different indices
+  # vss_unrotated_df <- VSS(df, n = 15, 
+  #                                rotate = "none", plot = FALSE)
+  # vss_rotated_df <- VSS(df, n = 15, 
+  #                              rotate = "varimax", plot = FALSE)
+}
+
+# get factor loadings for some efa
+getFactorLoadings <- function(efa) {
+  factorLoadingsList <- list()
+  for(i in 1:efa$factors) {
+    factorNum <- paste0("F", i)
+    df <- data.frame(X = sort(efa$loadings[,1], decreasing = T))
+    names(df) <- factorNum
+    factorLoadingsList[[i]] <- df
+  }
+  return(factorLoadingsList)
+}
 ```
 
 # Data preparation
@@ -464,9 +499,41 @@ kable(demoSampleSize("study 1"), align = "l", caption = "Study 1: Sample Size")
 
 ### Exploratory factor analysis: BEETLE condition
 
+#### Step 1: Determine how many factors to extract
+
+```{r s1 beetle how many factors, echo = F}
+howManyFactors(d1_beetle)
+```
+
+```{r s1 beetle set nfactors, echo = F}
+# set number of factors to extract
+nfactors_d1_beetle <- 3
+```
+
+#### Step 2: Run EFA without rotation
+
+```{r s1 beetle no rotation, echo = F}
+# run EFA without rotation with N factors
+efa_d1_beetle_unrotatedN <- factanal(d1_beetle, nfactors_d1_beetle, r = "none")
+print(efa_d1_beetle_unrotatedN)
+
+# examine loadings for each factor
+efa_d1_beetle_unrotatedN_loadings <- getFactorLoadings(efa_d1_beetle_unrotatedN)
+print(efa_d1_beetle_unrotatedN_loadings)
+```
+
+#### Step 3: Run EFA with varimax rotation
+
+```{r s1 beetle varimax rotation, echo = F}
+# run EFA with rotation with N factors
+
+```
+
 ### Exploratory factor analysis: ROBOT condition
 
+
 ### Exploratory factor analysis: ALL conditions
+
 
 # Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
 
