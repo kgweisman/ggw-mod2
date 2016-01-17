@@ -13,6 +13,7 @@ output:
 library(devtools)
 library(psych)
 library(stats)
+library(lavaan)
 library(nFactors)
 library(ggplot2)
 library(knitr)
@@ -443,6 +444,62 @@ getFactorLoadings <- function(efa) {
   }
   return(factorLoadingsList)
 }
+
+extractFStructure <- function(efa) {
+  # NOTE: only works for 3 factor solutions!!
+  # examine factor loadings from s1 to structure latent variables for s2
+  d_structure <- data.frame(loadings(efa)[]) %>%
+    add_rownames(var = "mc") %>%
+    mutate(
+      bestFactor =
+        ifelse(abs(Factor1) == abs(Factor2) & abs(Factor1) == abs(Factor3),
+               "all tied",
+               ifelse(abs(Factor1) == abs(Factor2),
+                      "Factor1 and Factor2 tied",
+                      ifelse(abs(Factor1) == abs(Factor3),
+                             "Factor1 and Factor3 tied",
+                             ifelse(abs(Factor2) == abs(Factor3),
+                                    "Factor2 and Factor3 tied",
+                                    ifelse(abs(Factor1) > abs(Factor2),
+                                           ifelse(abs(Factor1) > abs(Factor3),
+                                                  "Factor1",
+                                                  "Factor3"),
+                                           ifelse(abs(Factor2) > abs(Factor3),
+                                                  "Factor2",
+                                                  "Factor3"))))))) %>%
+    mutate(bestFactor = factor(bestFactor))
+  
+  d_structure_Factor1 <- d_structure %>%
+    filter(bestFactor == "Factor1") %>%
+    arrange(desc(Factor1)) %>%
+    select(mc, Factor1) %>%
+    rename(mc_Factor1 = mc,
+           loading_Factor1 = Factor1) %>%
+    add_rownames(var = "order")
+  
+  d_structure_Factor2 <- d_structure %>%
+    filter(bestFactor == "Factor2") %>%
+    arrange(desc(Factor2)) %>%
+    select(mc, Factor2) %>%
+    rename(mc_Factor2 = mc,
+           loading_Factor2 = Factor2) %>%
+    add_rownames(var = "order")
+  
+  d_structure_Factor3 <- d_structure %>%
+    filter(bestFactor == "Factor3") %>%
+    arrange(desc(Factor3)) %>%
+    select(mc, Factor3) %>%
+    rename(mc_Factor3 = mc,
+           loading_Factor3 = Factor3) %>%
+    add_rownames(var = "order")
+  
+  d_structure_allFactors <- d_structure_Factor1 %>%
+    full_join(d_structure_Factor2) %>%
+    full_join(d_structure_Factor3)
+  
+  # return table of factor structure
+  return(d_structure_allFactors)
+}
 ```
 
 # Data preparation
@@ -474,7 +531,7 @@ d4 <- cleanup("study 4")
 ```
 
 ```{r dataframes for dimension reduction, echo = F}
-# make dataframes for study 1
+# make dataframes for s1
 d1_beetle <- makeDRDF("study 1", "beetle")
 d1_robot <- makeDRDF("study 1", "robot")
 d1_all <- makeDRDF("study 1", "all")
@@ -681,6 +738,83 @@ kable(efa_d1_all_rotatedN_loadings[[3]],
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 3")
 ```
 
+## Predict latent variable structure for CFA in follow-up studies
+
+### Extract latent variable structure
+
+```{r s1 variable structure, echo = F}
+# extract factor structure from study 1 efa (all conditions)
+d1_fStructure <- extractFStructure(efa_d1_all_rotatedN)
+kable(d1_fStructure, align = "l", 
+      caption = "Study 1: Factor structure", digits = 2)
+```
+
+### Model 1: One factor (MIND)
+
+```{r s1 cfa model: 1 factor, echo = F}
+# set up model
+model1_Factor1 <- paste0("mind =~ ", paste(names(d1_all), collapse = " + "))
+model1 <- as.character(noquote(model1_Factor1))
+
+# test model on study 1 data (all conditions)
+d1_all_fit1 <- cfa(model1, d1_all)
+print(summary(d1_all_fit1, fit.measures = TRUE))
+
+# remove extraneous variables
+rm(model1_Factor1)
+```
+
+### Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)
+
+```{r s1 cfa model: 2 factors, echo = F}
+# set up model
+model2 <- 'experience =~ hungry + fear + pain + pleasure + angry + desires + personality + conscious + pride + embarrassed + joy + tired + nauseated + safe + happy + depressed + calm + sounds + seeing + temperature + odors + depth + recognizing + love + guilt + disrespected + self_aware
+agency =~ self_restraint + morality + remembering + emo_recog + goal + communicating + thoughts + computations + reasoning + beliefs + free_will + choices + intentions + recognizing + love + guilt + disrespected + self_aware'
+
+# test model on study 1 data (all conditions)
+d1_all_fit2 <- cfa(model2, d1_all)
+print(summary(d1_all_fit2, fit.measures = TRUE))
+```
+
+### Model 3a: Three factors (F1, F2, F3; see Study 1)
+
+```{r s1 cfa model: 3 factors (data-driven), echo = F}
+# set up model
+model3a_Factor1 <- paste0("Factor1 =~ ", paste(d1_fStructure$mc_Factor1[is.na(d1_fStructure$mc_Factor1) == F], collapse = " + "))
+model3a_Factor2 <- paste0("Factor2 =~ ", paste(d1_fStructure$mc_Factor2[is.na(d1_fStructure$mc_Factor2) == F], collapse = " + "))
+model3a_Factor3 <- paste0("Factor3 =~ ", paste(d1_fStructure$mc_Factor3[is.na(d1_fStructure$mc_Factor3) == F], collapse = " + "))
+model3a_allFactors <- paste(model3a_Factor1, "\n", model3a_Factor2, "\n", model3a_Factor3, collapse = "")
+model3a <- as.character(noquote(model3a_allFactors))
+
+# test model on study 1 (all conditions)
+d1_all_fit3a <- cfa(model3a, d1_all)
+summary(d1_all_fit3a, fit.measures = TRUE)
+
+# remove extraneous variables
+rm(model3a_Factor1, model3a_Factor2, model3a_Factor3, model3a_allFactors)
+```
+
+### Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
+
+```{r s1 cfa model: 3 factors (a priori), echo = F}
+# set up model
+model3b <- 'affect =~ happy + depressed + fear + angry + calm + joy
+autonomy =~ free_will + choices + self_restraint + intentions + goal
+perception =~ sounds + seeing + temperature + odors + depth'
+
+# test model on study 1 (all conditions)
+d1_all_fit3b <- cfa(model3b, d1_all)
+summary(d1_all_fit3b, fit.measures = TRUE)
+```
+
+### Compare models
+
+```{r s1 compare model fits, echo = F}
+# compare model fits
+# anova(d1_all_fit1, d1_all_fit2, d1_all_fit3a)
+anova(d1_all_fit1, d1_all_fit2, d1_all_fit3a, d1_all_fit3b)
+```
+
 # Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
 
 ## Demographics
@@ -692,16 +826,47 @@ kable(demoSampleSize("study 2"), align = "l", caption = "Study 2: Sample Size")
 
 ## Analyses
 
-### Set up latent variable structure
+### Confirmatory factor analysis: ALL conditions
 
-```{r s2 latent variable structure}
+### Model 1: One factor (MIND)
+
+```{r s2 cfa model: 1 factor, echo = F}
+# test model on study 1 data (all conditions)
+d2_all_fit1 <- cfa(model1, d2_all)
+print(summary(d2_all_fit1, fit.measures = TRUE))
 ```
 
-### Confirmatory factor analysis: BEETLE condition
+### Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)
 
-### Confirmatory factor analysis: ROBOT condition
+```{r s2 cfa model: 2 factors, echo = F}
+# test model on study 1 data (all conditions)
+d2_all_fit2 <- cfa(model2, d2_all)
+print(summary(d2_all_fit2, fit.measures = TRUE))
+```
 
-### Confirmatory factor analysis: ALL conditions
+### Model 3a: Three factors (F1, F2, F3; see Study 1)
+
+```{r s2 cfa model: 3 factors (data-driven), echo = F}
+# test model on study 1 (all conditions)
+d2_all_fit3a <- cfa(model3a, d2_all)
+summary(d2_all_fit3a, fit.measures = TRUE)
+```
+
+### Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
+
+```{r s2 cfa model: 3 factors (a priori), echo = F}
+# test model on study 1 (all conditions)
+d2_all_fit3b <- cfa(model3b, d2_all)
+summary(d2_all_fit3b, fit.measures = TRUE)
+```
+
+### Compare models
+
+```{r s2 compare model fits, echo = F}
+# compare model fits
+# anova(d2_all_fit1, d2_all_fit2, d2_all_fit3a)
+anova(d2_all_fit1, d2_all_fit2, d2_all_fit3a, d2_all_fit3b)
+```
 
 # Study 3 (2016-01-10, 2 conditions, within-subjects)
 
@@ -714,11 +879,47 @@ kable(demoSampleSize("study 3"), align = "l", caption = "Study 3: Sample Size")
 
 ## Analyses
 
-### Confirmatory factor analysis: BEETLE condition
-
-### Confirmatory factor analysis: ROBOT condition
-
 ### Confirmatory factor analysis: ALL conditions
+
+### Model 1: One factor (MIND)
+
+```{r s3 cfa model: 1 factor, echo = F}
+# test model on study 1 data (all conditions)
+d3_all_fit1 <- cfa(model1, d3_all)
+print(summary(d3_all_fit1, fit.measures = TRUE))
+```
+
+### Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)
+
+```{r s3 cfa model: 2 factors, echo = F}
+# test model on study 1 data (all conditions)
+d3_all_fit2 <- cfa(model2, d3_all)
+print(summary(d3_all_fit2, fit.measures = TRUE))
+```
+
+### Model 3a: Three factors (F1, F2, F3; see Study 1)
+
+```{r s3 cfa model: 3 factors (data-driven), echo = F}
+# test model on study 1 (all conditions)
+d3_all_fit3a <- cfa(model3a, d3_all)
+summary(d3_all_fit3a, fit.measures = TRUE)
+```
+
+### Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
+
+```{r s3 cfa model: 3 factors (a priori), echo = F}
+# test model on study 1 (all conditions)
+d3_all_fit3b <- cfa(model3b, d3_all)
+summary(d3_all_fit3b, fit.measures = TRUE)
+```
+
+### Compare models
+
+```{r s3 compare model fits, echo = F}
+# compare model fits
+# anova(d3_all_fit1, d3_all_fit2, d3_all_fit3a)
+anova(d3_all_fit1, d3_all_fit2, d3_all_fit3a, d3_all_fit3b)
+```
 
 # Study 4 (2016-01-14, 21 conditions, between-subjects)
 
@@ -732,3 +933,79 @@ kable(demoSampleSize("study 4"), align = "l", caption = "Study 4: Sample Size")
 ## Analyses
 
 ### Confirmatory factor analysis: ALL conditions
+
+### Model 1: One factor (MIND)
+
+```{r s4 cfa model: 1 factor, echo = F}
+# test model on study 1 data (all conditions)
+d4_all_fit1 <- cfa(model1, d4_all)
+print(summary(d4_all_fit1, fit.measures = TRUE))
+```
+
+### Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)
+
+```{r s4 cfa model: 2 factors, echo = F}
+# test model on study 1 data (all conditions)
+d4_all_fit2 <- cfa(model2, d4_all)
+print(summary(d4_all_fit2, fit.measures = TRUE))
+```
+
+### Model 3a: Three factors (F1, F2, F3; see Study 1)
+
+```{r s4 cfa model: 3 factors (data-driven), echo = F}
+# test model on study 1 (all conditions)
+d4_all_fit3a <- cfa(model3a, d4_all)
+summary(d4_all_fit3a, fit.measures = TRUE)
+```
+
+### Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
+
+```{r s4 cfa model: 3 factors (a priori), echo = F}
+# test model on study 1 (all conditions)
+d4_all_fit3b <- cfa(model3b, d4_all)
+summary(d4_all_fit3b, fit.measures = TRUE)
+```
+
+### Compare models
+
+```{r s4 compare model fits, echo = F}
+# compare model fits
+# anova(d4_all_fit1, d4_all_fit2, d4_all_fit3a)
+anova(d4_all_fit1, d4_all_fit2, d4_all_fit3a, d4_all_fit3b)
+```
+
+## Plot!
+
+```{r s4 factor scores, echo = F}
+# use best model to get factor scores by participant
+d4_all_fit3b_predict <- predict(d4_all_fit3b)
+
+# use dummy model to get subid into factor scores
+# SHOULD UPDATE THIS SO THAT IT IS AUTOMATICALLY POPULATED FROM MODEL3B
+model3b_dummy <- 'subid ~~ happy + depressed + fear + angry + calm + joy
+subid ~~ free_will + choices + self_restraint + intentions + goal
+subid ~~ sounds + seeing + temperature + odors + depth'
+fit_dummy <- cfa(model3b_dummy, d4 %>%
+                   select(subid, happy:pride))
+
+data_dummy <- fit_dummy@Data@X[[1]]
+d4_all_fit3b_predict <- data.frame(d4_all_fit3b_predict, 
+                                   subid = data_dummy[,1])
+
+d4_subids <- d4 %>% select(subid, condition) %>%
+  mutate(subid_num = as.numeric(subid)) %>%
+  rename(subid_cat = subid,
+         subid = subid_num)
+
+d4_factor_scores <- d4_all_fit3b_predict %>%
+  full_join(d4_subids, by = "subid")
+
+# remove extraneous variables
+rm(d4_all_fit3b_predict, model3b_dummy, fit_dummy, data_dummy, d4_subids)
+```
+
+```{r plot}
+ggplot(aes(x = affect, y = autonomy, colour = condition), 
+       data = d4_factor_scores) +
+  geom_point()
+```

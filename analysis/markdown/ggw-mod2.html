@@ -74,28 +74,46 @@ img {
 <li><a href="#exploratory-factor-analysis-robot-condition">Exploratory factor analysis: ROBOT condition</a></li>
 <li><a href="#exploratory-factor-analysis-all-conditions">Exploratory factor analysis: ALL conditions</a></li>
 </ul></li>
+<li><a href="#predict-latent-variable-structure-for-cfa-in-follow-up-studies">Predict latent variable structure for CFA in follow-up studies</a><ul>
+<li><a href="#extract-latent-variable-structure">Extract latent variable structure</a></li>
+<li><a href="#model-1-one-factor-mind">Model 1: One factor (MIND)</a></li>
+<li><a href="#model-2-two-factors-experience-agency-see-gray-et-al.-2007">Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)</a></li>
+<li><a href="#model-3a-three-factors-f1-f2-f3-see-study-1">Model 3a: Three factors (F1, F2, F3; see Study 1)</a></li>
+<li><a href="#model-3b-three-factors-affect-autonomy-perception-see-weisman-et-al.-2015">Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)</a></li>
+<li><a href="#compare-models">Compare models</a></li>
+</ul></li>
 </ul></li>
 <li><a href="#study-2-2016-01-12-2-conditions-between-subjects---replication">Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)</a><ul>
 <li><a href="#demographics-1">Demographics</a></li>
 <li><a href="#analyses-1">Analyses</a><ul>
-<li><a href="#set-up-latent-variable-structure">Set up latent variable structure</a></li>
-<li><a href="#confirmatory-factor-analysis-beetle-condition">Confirmatory factor analysis: BEETLE condition</a></li>
-<li><a href="#confirmatory-factor-analysis-robot-condition">Confirmatory factor analysis: ROBOT condition</a></li>
 <li><a href="#confirmatory-factor-analysis-all-conditions">Confirmatory factor analysis: ALL conditions</a></li>
+<li><a href="#model-1-one-factor-mind-1">Model 1: One factor (MIND)</a></li>
+<li><a href="#model-2-two-factors-experience-agency-see-gray-et-al.-2007-1">Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)</a></li>
+<li><a href="#model-3a-three-factors-f1-f2-f3-see-study-1-1">Model 3a: Three factors (F1, F2, F3; see Study 1)</a></li>
+<li><a href="#model-3b-three-factors-affect-autonomy-perception-see-weisman-et-al.-2015-1">Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)</a></li>
+<li><a href="#compare-models-1">Compare models</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#study-3-2016-01-10-2-conditions-within-subjects">Study 3 (2016-01-10, 2 conditions, within-subjects)</a><ul>
 <li><a href="#demographics-2">Demographics</a></li>
 <li><a href="#analyses-2">Analyses</a><ul>
-<li><a href="#confirmatory-factor-analysis-beetle-condition-1">Confirmatory factor analysis: BEETLE condition</a></li>
-<li><a href="#confirmatory-factor-analysis-robot-condition-1">Confirmatory factor analysis: ROBOT condition</a></li>
 <li><a href="#confirmatory-factor-analysis-all-conditions-1">Confirmatory factor analysis: ALL conditions</a></li>
+<li><a href="#model-1-one-factor-mind-2">Model 1: One factor (MIND)</a></li>
+<li><a href="#model-2-two-factors-experience-agency-see-gray-et-al.-2007-2">Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)</a></li>
+<li><a href="#model-3a-three-factors-f1-f2-f3-see-study-1-2">Model 3a: Three factors (F1, F2, F3; see Study 1)</a></li>
+<li><a href="#model-3b-three-factors-affect-autonomy-perception-see-weisman-et-al.-2015-2">Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)</a></li>
+<li><a href="#compare-models-2">Compare models</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#study-4-2016-01-14-21-conditions-between-subjects">Study 4 (2016-01-14, 21 conditions, between-subjects)</a><ul>
 <li><a href="#demographics-3">Demographics</a></li>
 <li><a href="#analyses-3">Analyses</a><ul>
 <li><a href="#confirmatory-factor-analysis-all-conditions-2">Confirmatory factor analysis: ALL conditions</a></li>
+<li><a href="#model-1-one-factor-mind-3">Model 1: One factor (MIND)</a></li>
+<li><a href="#model-2-two-factors-experience-agency-see-gray-et-al.-2007-3">Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)</a></li>
+<li><a href="#model-3a-three-factors-f1-f2-f3-see-study-1-3">Model 3a: Three factors (F1, F2, F3; see Study 1)</a></li>
+<li><a href="#model-3b-three-factors-affect-autonomy-perception-see-weisman-et-al.-2015-3">Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)</a></li>
+<li><a href="#compare-models-3">Compare models</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -103,7 +121,9 @@ img {
 
 <div id="setup" class="section level1">
 <h1>Setup</h1>
-<pre><code>## Loading required package: MASS
+<pre><code>## This is lavaan 0.5-20
+## lavaan is BETA software! Please report any bugs.
+## Loading required package: MASS
 ## Loading required package: boot
 ## 
 ## Attaching package: 'boot'
@@ -1899,6 +1919,811 @@ img {
 </div>
 </div>
 </div>
+<div id="predict-latent-variable-structure-for-cfa-in-follow-up-studies" class="section level2">
+<h2>Predict latent variable structure for CFA in follow-up studies</h2>
+<div id="extract-latent-variable-structure" class="section level3">
+<h3>Extract latent variable structure</h3>
+<pre><code>## Joining by: &quot;order&quot;
+## Joining by: &quot;order&quot;</code></pre>
+<table>
+<caption>Study 1: Factor structure</caption>
+<thead>
+<tr class="header">
+<th align="left">order</th>
+<th align="left">mc_Factor1</th>
+<th align="left">loading_Factor1</th>
+<th align="left">mc_Factor2</th>
+<th align="left">loading_Factor2</th>
+<th align="left">mc_Factor3</th>
+<th align="left">loading_Factor3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">pleasure</td>
+<td align="left">0.85</td>
+<td align="left">computations</td>
+<td align="left">0.78</td>
+<td align="left">temperature</td>
+<td align="left">0.65</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">happy</td>
+<td align="left">0.85</td>
+<td align="left">recognizing</td>
+<td align="left">0.67</td>
+<td align="left">seeing</td>
+<td align="left">0.64</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">joy</td>
+<td align="left">0.85</td>
+<td align="left">reasoning</td>
+<td align="left">0.59</td>
+<td align="left">sounds</td>
+<td align="left">0.57</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">nauseated</td>
+<td align="left">0.82</td>
+<td align="left">morality</td>
+<td align="left">0.55</td>
+<td align="left">depth</td>
+<td align="left">0.52</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">angry</td>
+<td align="left">0.82</td>
+<td align="left">remembering</td>
+<td align="left">0.55</td>
+<td align="left">choices</td>
+<td align="left">0.51</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">fear</td>
+<td align="left">0.81</td>
+<td align="left">emo_recog</td>
+<td align="left">0.54</td>
+<td align="left">goal</td>
+<td align="left">0.50</td>
+</tr>
+<tr class="odd">
+<td align="left">7</td>
+<td align="left">love</td>
+<td align="left">0.80</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">communicating</td>
+<td align="left">0.49</td>
+</tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="left">desires</td>
+<td align="left">0.80</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">odors</td>
+<td align="left">0.47</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">tired</td>
+<td align="left">0.79</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left">depressed</td>
+<td align="left">0.79</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">11</td>
+<td align="left">conscious</td>
+<td align="left">0.78</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">12</td>
+<td align="left">calm</td>
+<td align="left">0.78</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">13</td>
+<td align="left">safe</td>
+<td align="left">0.78</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">14</td>
+<td align="left">free_will</td>
+<td align="left">0.77</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">15</td>
+<td align="left">thoughts</td>
+<td align="left">0.77</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">16</td>
+<td align="left">pain</td>
+<td align="left">0.76</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">17</td>
+<td align="left">pride</td>
+<td align="left">0.76</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">18</td>
+<td align="left">self_aware</td>
+<td align="left">0.73</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">19</td>
+<td align="left">guilt</td>
+<td align="left">0.71</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">20</td>
+<td align="left">disrespected</td>
+<td align="left">0.70</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">21</td>
+<td align="left">hungry</td>
+<td align="left">0.69</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">22</td>
+<td align="left">embarrassed</td>
+<td align="left">0.69</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">23</td>
+<td align="left">intentions</td>
+<td align="left">0.67</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">24</td>
+<td align="left">personality</td>
+<td align="left">0.64</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">25</td>
+<td align="left">beliefs</td>
+<td align="left">0.58</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">26</td>
+<td align="left">self_restraint</td>
+<td align="left">0.58</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="model-1-one-factor-mind" class="section level3">
+<h3>Model 1: One factor (MIND)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  39 iterations
+## 
+##   Number of observations                           405
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             6409.262
+##   Degrees of freedom                               740
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            14736.878
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.594
+##   Tucker-Lewis Index (TLI)                       0.572
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -28260.647
+##   Loglikelihood unrestricted model (H1)     -25056.016
+## 
+##   Number of free parameters                         80
+##   Akaike (AIC)                               56681.295
+##   Bayesian (BIC)                             57001.606
+##   Sample-size adjusted Bayesian (BIC)        56747.756
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.138
+##   90 Percent Confidence Interval          0.134  0.141
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.149
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   mind =~                                             
+##     happy             1.000                           
+##     depressed         0.747    0.035   21.398    0.000
+##     fear              1.183    0.061   19.434    0.000
+##     angry             0.988    0.045   21.951    0.000
+##     calm              1.038    0.052   19.869    0.000
+##     sounds            0.134    0.056    2.380    0.017
+##     seeing            0.397    0.065    6.091    0.000
+##     temperature       0.261    0.060    4.313    0.000
+##     odors             0.546    0.070    7.784    0.000
+##     depth             0.375    0.072    5.228    0.000
+##     computations     -0.524    0.090   -5.829    0.000
+##     thoughts          0.972    0.048   20.093    0.000
+##     reasoning         0.525    0.065    8.061    0.000
+##     remembering       0.166    0.073    2.284    0.022
+##     beliefs           0.578    0.041   14.117    0.000
+##     hungry            1.116    0.079   14.041    0.000
+##     tired             1.102    0.059   18.585    0.000
+##     pain              1.144    0.068   16.743    0.000
+##     nauseated         0.882    0.041   21.767    0.000
+##     safe              1.070    0.056   19.205    0.000
+##     love              0.854    0.038   22.303    0.000
+##     recognizing       0.202    0.073    2.759    0.006
+##     communicating     0.310    0.065    4.766    0.000
+##     guilt             0.557    0.031   18.085    0.000
+##     disrespected      0.609    0.035   17.611    0.000
+##     free_will         1.082    0.056   19.169    0.000
+##     choices           0.562    0.066    8.546    0.000
+##     self_restraint    0.702    0.051   13.850    0.000
+##     intentions        0.943    0.060   15.763    0.000
+##     goal              0.426    0.071    5.962    0.000
+##     conscious         1.072    0.055   19.325    0.000
+##     self_aware        0.927    0.050   18.440    0.000
+##     desires           1.083    0.054   20.224    0.000
+##     embarrassed       0.571    0.033   17.236    0.000
+##     emo_recog         0.623    0.048   12.971    0.000
+##     joy               1.003    0.041   24.502    0.000
+##     morality          0.488    0.051    9.566    0.000
+##     personality       0.758    0.048   15.906    0.000
+##     pleasure          1.093    0.049   22.507    0.000
+##     pride             0.725    0.036   20.340    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     happy             0.687    0.052   13.162    0.000
+##     depressed         0.608    0.045   13.556    0.000
+##     fear              2.051    0.149   13.730    0.000
+##     angry             0.976    0.072   13.496    0.000
+##     calm              1.479    0.108   13.696    0.000
+##     sounds            2.568    0.181   14.225    0.000
+##     seeing            3.356    0.236   14.196    0.000
+##     temperature       2.938    0.207   14.213    0.000
+##     odors             3.802    0.268   14.173    0.000
+##     depth             4.101    0.289   14.205    0.000
+##     computations      6.401    0.451   14.199    0.000
+##     thoughts          1.255    0.092   13.677    0.000
+##     reasoning         3.268    0.231   14.168    0.000
+##     remembering       4.272    0.300   14.226    0.000
+##     beliefs           1.135    0.081   14.014    0.000
+##     hungry            4.291    0.306   14.017    0.000
+##     tired             2.025    0.147   13.790    0.000
+##     pain              2.903    0.209   13.899    0.000
+##     nauseated         0.800    0.059   13.516    0.000
+##     safe              1.738    0.126   13.747    0.000
+##     love              0.690    0.051   13.454    0.000
+##     recognizing       4.354    0.306   14.223    0.000
+##     communicating     3.390    0.239   14.209    0.000
+##     guilt             0.558    0.040   13.823    0.000
+##     disrespected      0.719    0.052   13.851    0.000
+##     free_will         1.788    0.130   13.749    0.000
+##     choices           3.314    0.234   14.160    0.000
+##     self_restraint    1.752    0.125   14.024    0.000
+##     intentions        2.301    0.165   13.947    0.000
+##     goal              4.035    0.284   14.197    0.000
+##     conscious         1.712    0.125   13.738    0.000
+##     self_aware        1.466    0.106   13.800    0.000
+##     desires           1.526    0.112   13.666    0.000
+##     embarrassed       0.669    0.048   13.873    0.000
+##     emo_recog         1.613    0.115   14.054    0.000
+##     joy               0.669    0.051   13.126    0.000
+##     morality          1.960    0.139   14.141    0.000
+##     personality       1.453    0.104   13.940    0.000
+##     pleasure          1.095    0.082   13.429    0.000
+##     pride             0.672    0.049   13.656    0.000
+##     mind              2.064    0.188   10.963    0.000
+## 
+## NULL</code></pre>
+</div>
+<div id="model-2-two-factors-experience-agency-see-gray-et-al.-2007" class="section level3">
+<h3>Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  61 iterations
+## 
+##   Number of observations                           405
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             5966.770
+##   Degrees of freedom                               734
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            14736.878
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.625
+##   Tucker-Lewis Index (TLI)                       0.602
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -28039.401
+##   Loglikelihood unrestricted model (H1)     -25056.016
+## 
+##   Number of free parameters                         86
+##   Akaike (AIC)                               56250.802
+##   Bayesian (BIC)                             56595.137
+##   Sample-size adjusted Bayesian (BIC)        56322.248
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.133
+##   90 Percent Confidence Interval          0.130  0.136
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.161
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   experience =~                                       
+##     hungry            1.000                           
+##     fear              1.010    0.067   15.026    0.000
+##     pain              1.004    0.071   14.114    0.000
+##     pleasure          0.912    0.058   15.858    0.000
+##     angry             0.807    0.052   15.377    0.000
+##     desires           0.893    0.060   14.868    0.000
+##     personality       0.569    0.048   11.853    0.000
+##     conscious         0.888    0.061   14.579    0.000
+##     pride             0.561    0.040   14.084    0.000
+##     embarrassed       0.440    0.034   12.763    0.000
+##     joy               0.800    0.051   15.843    0.000
+##     tired             0.942    0.064   14.669    0.000
+##     nauseated         0.732    0.047   15.531    0.000
+##     safe              0.892    0.061   14.612    0.000
+##     happy             0.810    0.051   15.994    0.000
+##     depressed         0.591    0.040   14.759    0.000
+##     calm              0.854    0.058   14.709    0.000
+##     sounds            0.086    0.046    1.870    0.061
+##     seeing            0.314    0.055    5.696    0.000
+##     temperature       0.195    0.050    3.882    0.000
+##     odors             0.450    0.061    7.406    0.000
+##     depth             0.268    0.060    4.471    0.000
+##     recognizing      -0.878    0.096   -9.122    0.000
+##     love              0.443    0.046    9.537    0.000
+##     guilt             0.224    0.037    6.111    0.000
+##     disrespected      0.252    0.042    6.063    0.000
+##     self_aware        0.537    0.064    8.380    0.000
+##   agency =~                                           
+##     self_restraint    1.000                           
+##     morality          0.878    0.069   12.804    0.000
+##     remembering       0.694    0.091    7.630    0.000
+##     emo_recog         0.990    0.068   14.521    0.000
+##     goal              0.819    0.092    8.922    0.000
+##     communicating     0.743    0.083    8.971    0.000
+##     thoughts          1.107    0.079   14.102    0.000
+##     computations      0.237    0.115    2.054    0.040
+##     reasoning         1.068    0.086   12.450    0.000
+##     beliefs           0.830    0.059   14.018    0.000
+##     free_will         0.963    0.090   10.725    0.000
+##     choices           0.894    0.087   10.257    0.000
+##     intentions        1.034    0.089   11.615    0.000
+##     recognizing       1.867    0.158   11.808    0.000
+##     love              0.448    0.065    6.923    0.000
+##     guilt             0.409    0.057    7.212    0.000
+##     disrespected      0.437    0.064    6.831    0.000
+##     self_aware        0.394    0.090    4.400    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   experience ~~                                       
+##     agency            1.572    0.178    8.838    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     hungry            3.733    0.269   13.876    0.000
+##     fear              1.743    0.130   13.456    0.000
+##     pain              2.453    0.179   13.688    0.000
+##     pleasure          0.957    0.073   13.080    0.000
+##     angry             0.952    0.071   13.326    0.000
+##     desires           1.454    0.108   13.506    0.000
+##     personality       1.625    0.116   13.967    0.000
+##     conscious         1.615    0.119   13.585    0.000
+##     pride             0.774    0.057   13.694    0.000
+##     embarrassed       0.737    0.053   13.884    0.000
+##     joy               0.742    0.057   13.089    0.000
+##     tired             1.753    0.129   13.562    0.000
+##     nauseated         0.729    0.055   13.257    0.000
+##     safe              1.610    0.119   13.577    0.000
+##     happy             0.700    0.054   12.991    0.000
+##     depressed         0.667    0.049   13.537    0.000
+##     calm              1.420    0.105   13.551    0.000
+##     sounds            2.582    0.182   14.226    0.000
+##     seeing            3.373    0.238   14.192    0.000
+##     temperature       2.960    0.208   14.213    0.000
+##     odors             3.784    0.267   14.160    0.000
+##     depth             4.165    0.293   14.207    0.000
+##     recognizing       2.323    0.207   11.194    0.000
+##     love              0.675    0.051   13.335    0.000
+##     guilt             0.519    0.038   13.554    0.000
+##     disrespected      0.674    0.049   13.624    0.000
+##     self_aware        1.454    0.105   13.781    0.000
+##     self_restraint    1.375    0.105   13.104    0.000
+##     morality          1.377    0.103   13.365    0.000
+##     remembering       3.657    0.261   14.028    0.000
+##     emo_recog         1.050    0.082   12.782    0.000
+##     goal              3.473    0.249   13.933    0.000
+##     communicating     2.819    0.202   13.929    0.000
+##     thoughts          1.498    0.116   12.962    0.000
+##     computations      6.890    0.485   14.218    0.000
+##     reasoning         2.247    0.167   13.446    0.000
+##     beliefs           0.864    0.066   12.995    0.000
+##     free_will         2.914    0.212   13.740    0.000
+##     choices           2.853    0.207   13.799    0.000
+##     intentions        2.645    0.194   13.607    0.000
+##     experience        3.130    0.409    7.651    0.000
+##     agency            1.393    0.174    8.021    0.000
+## 
+## NULL</code></pre>
+</div>
+<div id="model-3a-three-factors-f1-f2-f3-see-study-1" class="section level3">
+<h3>Model 3a: Three factors (F1, F2, F3; see Study 1)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  61 iterations
+## 
+##   Number of observations                           405
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             5062.827
+##   Degrees of freedom                               737
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            14736.878
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.690
+##   Tucker-Lewis Index (TLI)                       0.672
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -27587.430
+##   Loglikelihood unrestricted model (H1)     -25056.016
+## 
+##   Number of free parameters                         83
+##   Akaike (AIC)                               55340.860
+##   Bayesian (BIC)                             55673.183
+##   Sample-size adjusted Bayesian (BIC)        55409.813
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.120
+##   90 Percent Confidence Interval          0.117  0.124
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.152
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   Factor1 =~                                          
+##     pleasure          1.000                           
+##     happy             0.908    0.039   23.030    0.000
+##     joy               0.908    0.039   23.054    0.000
+##     nauseated         0.806    0.038   21.044    0.000
+##     angry             0.901    0.043   21.139    0.000
+##     fear              1.090    0.057   19.192    0.000
+##     love              0.768    0.037   20.992    0.000
+##     desires           0.988    0.050   19.609    0.000
+##     tired             1.014    0.055   18.364    0.000
+##     depressed         0.675    0.033   20.350    0.000
+##     conscious         0.977    0.052   18.784    0.000
+##     calm              0.944    0.049   19.216    0.000
+##     safe              0.977    0.052   18.721    0.000
+##     free_will         0.989    0.053   18.718    0.000
+##     thoughts          0.873    0.046   19.029    0.000
+##     pain              1.062    0.063   16.836    0.000
+##     pride             0.650    0.034   19.176    0.000
+##     self_aware        0.834    0.047   17.645    0.000
+##     guilt             0.500    0.029   17.246    0.000
+##     disrespected      0.547    0.032   16.859    0.000
+##     hungry            1.045    0.073   14.354    0.000
+##     embarrassed       0.510    0.031   16.413    0.000
+##     intentions        0.848    0.056   15.224    0.000
+##     personality       0.667    0.045   14.919    0.000
+##     beliefs           0.509    0.038   13.348    0.000
+##     self_restraint    0.617    0.047   13.075    0.000
+##   Factor2 =~                                          
+##     computations      1.000                           
+##     recognizing       1.152    0.102   11.266    0.000
+##     reasoning         0.969    0.091   10.691    0.000
+##     morality          0.581    0.066    8.846    0.000
+##     remembering       1.026    0.096   10.672    0.000
+##     emo_recog         0.556    0.065    8.623    0.000
+##   Factor3 =~                                          
+##     temperature       1.000                           
+##     seeing            1.073    0.088   12.136    0.000
+##     sounds            0.791    0.074   10.748    0.000
+##     depth             1.132    0.096   11.763    0.000
+##     choices           1.068    0.091   11.681    0.000
+##     goal              1.118    0.096   11.612    0.000
+##     communicating     1.010    0.087   11.615    0.000
+##     odors             0.933    0.095    9.804    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   Factor1 ~~                                          
+##     Factor2           0.587    0.141    4.168    0.000
+##     Factor3           0.740    0.120    6.163    0.000
+##   Factor2 ~~                                          
+##     Factor3           1.309    0.173    7.570    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     pleasure          1.045    0.078   13.346    0.000
+##     happy             0.676    0.052   13.103    0.000
+##     joy               0.673    0.051   13.097    0.000
+##     nauseated         0.773    0.057   13.454    0.000
+##     angry             0.949    0.071   13.440    0.000
+##     fear              1.952    0.143   13.668    0.000
+##     love              0.709    0.053   13.461    0.000
+##     desires           1.493    0.110   13.627    0.000
+##     tired             1.945    0.142   13.742    0.000
+##     depressed         0.614    0.045   13.544    0.000
+##     conscious         1.682    0.123   13.706    0.000
+##     calm              1.460    0.107   13.666    0.000
+##     safe              1.701    0.124   13.712    0.000
+##     free_will         1.744    0.127   13.712    0.000
+##     thoughts          1.288    0.094   13.684    0.000
+##     pain              2.767    0.200   13.854    0.000
+##     pride             0.696    0.051   13.670    0.000
+##     self_aware        1.488    0.108   13.798    0.000
+##     guilt             0.571    0.041   13.826    0.000
+##     disrespected      0.731    0.053   13.852    0.000
+##     hungry            4.115    0.294   13.985    0.000
+##     embarrassed       0.686    0.049   13.880    0.000
+##     intentions        2.326    0.167   13.945    0.000
+##     personality       1.518    0.109   13.960    0.000
+##     beliefs           1.172    0.084   14.026    0.000
+##     self_restraint    1.811    0.129   14.036    0.000
+##     computations      4.739    0.359   13.190    0.000
+##     recognizing       1.479    0.152    9.729    0.000
+##     reasoning         1.744    0.151   11.527    0.000
+##     morality          1.701    0.128   13.253    0.000
+##     remembering       1.981    0.171   11.564    0.000
+##     emo_recog         1.725    0.129   13.347    0.000
+##     temperature       1.613    0.132   12.256    0.000
+##     seeing            1.993    0.161   12.392    0.000
+##     sounds            1.689    0.129   13.056    0.000
+##     depth             2.512    0.199   12.608    0.000
+##     choices           2.295    0.181   12.651    0.000
+##     goal              2.575    0.203   12.686    0.000
+##     communicating     2.095    0.165   12.684    0.000
+##     odors             3.141    0.235   13.352    0.000
+##     Factor1           2.515    0.241   10.449    0.000
+##     Factor2           2.229    0.383    5.812    0.000
+##     Factor3           1.466    0.196    7.478    0.000</code></pre>
+</div>
+<div id="model-3b-three-factors-affect-autonomy-perception-see-weisman-et-al.-2015" class="section level3">
+<h3>Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  45 iterations
+## 
+##   Number of observations                           405
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic              619.030
+##   Degrees of freedom                               101
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic             3817.954
+##   Degrees of freedom                               120
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.860
+##   Tucker-Lewis Index (TLI)                       0.834
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -11579.778
+##   Loglikelihood unrestricted model (H1)     -11270.263
+## 
+##   Number of free parameters                         35
+##   Akaike (AIC)                               23229.557
+##   Bayesian (BIC)                             23369.693
+##   Sample-size adjusted Bayesian (BIC)        23258.633
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.113
+##   90 Percent Confidence Interval          0.104  0.121
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.094
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   affect =~                                           
+##     happy             1.000                           
+##     depressed         0.712    0.032   22.463    0.000
+##     fear              1.064    0.058   18.257    0.000
+##     angry             0.939    0.041   23.042    0.000
+##     calm              0.957    0.049   19.501    0.000
+##     joy               0.988    0.035   28.454    0.000
+##   autonomy =~                                         
+##     free_will         1.000                           
+##     choices           0.699    0.067   10.466    0.000
+##     self_restraint    0.661    0.055   11.924    0.000
+##     intentions        0.952    0.067   14.196    0.000
+##     goal              0.586    0.071    8.261    0.000
+##   perception =~                                       
+##     sounds            1.000                           
+##     seeing            1.393    0.121   11.506    0.000
+##     temperature       1.304    0.112   11.665    0.000
+##     odors             1.299    0.126   10.275    0.000
+##     depth             1.228    0.125    9.856    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   affect ~~                                           
+##     autonomy          2.026    0.189   10.693    0.000
+##     perception        0.461    0.096    4.820    0.000
+##   autonomy ~~                                         
+##     perception        0.855    0.124    6.880    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     happy             0.475    0.047   10.057    0.000
+##     depressed         0.607    0.048   12.601    0.000
+##     fear              2.362    0.178   13.302    0.000
+##     angry             0.982    0.079   12.472    0.000
+##     calm              1.617    0.123   13.130    0.000
+##     joy               0.523    0.050   10.520    0.000
+##     free_will         1.819    0.159   11.403    0.000
+##     choices           2.802    0.209   13.400    0.000
+##     self_restraint    1.726    0.133   13.007    0.000
+##     intentions        1.970    0.165   11.909    0.000
+##     goal              3.589    0.260   13.780    0.000
+##     sounds            1.557    0.128   12.202    0.000
+##     seeing            1.648    0.158   10.461    0.000
+##     temperature       1.297    0.129   10.041    0.000
+##     odors             2.647    0.217   12.217    0.000
+##     depth             2.810    0.224   12.542    0.000
+##     affect            2.277    0.193   11.775    0.000
+##     autonomy          2.387    0.283    8.433    0.000
+##     perception        1.048    0.161    6.519    0.000</code></pre>
+</div>
+<div id="compare-models" class="section level3">
+<h3>Compare models</h3>
+<pre><code>## Warning in lavTestLRT(object = &lt;S4 object of class structure(&quot;lavaan&quot;,
+## package = &quot;lavaan&quot;)&gt;, : lavaan WARNING: some models are based on a
+## different set of observed variables</code></pre>
+<pre><code>## Chi Square Difference Test
+## 
+##               Df   AIC   BIC   Chisq Chisq diff Df diff Pr(&gt;Chisq)    
+## d1_all_fit3b 101 23230 23370  619.03                                  
+## d1_all_fit2  734 56251 56595 5966.77     5347.7     633     &lt;2e-16 ***
+## d1_all_fit3a 737 55341 55673 5062.83     -903.9       3          1    
+## d1_all_fit1  740 56681 57002 6409.26     1346.4       3     &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
 </div>
 <div id="study-2-2016-01-12-2-conditions-between-subjects---replication" class="section level1">
 <h1>Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)</h1>
@@ -1930,17 +2755,555 @@ img {
 </div>
 <div id="analyses-1" class="section level2">
 <h2>Analyses</h2>
-<div id="set-up-latent-variable-structure" class="section level3">
-<h3>Set up latent variable structure</h3>
-</div>
-<div id="confirmatory-factor-analysis-beetle-condition" class="section level3">
-<h3>Confirmatory factor analysis: BEETLE condition</h3>
-</div>
-<div id="confirmatory-factor-analysis-robot-condition" class="section level3">
-<h3>Confirmatory factor analysis: ROBOT condition</h3>
-</div>
 <div id="confirmatory-factor-analysis-all-conditions" class="section level3">
 <h3>Confirmatory factor analysis: ALL conditions</h3>
+</div>
+<div id="model-1-one-factor-mind-1" class="section level3">
+<h3>Model 1: One factor (MIND)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  38 iterations
+## 
+##   Number of observations                           406
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             6410.817
+##   Degrees of freedom                               740
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            13425.609
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.552
+##   Tucker-Lewis Index (TLI)                       0.527
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -28529.162
+##   Loglikelihood unrestricted model (H1)     -25323.753
+## 
+##   Number of free parameters                         80
+##   Akaike (AIC)                               57218.323
+##   Bayesian (BIC)                             57538.831
+##   Sample-size adjusted Bayesian (BIC)        57284.980
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.137
+##   90 Percent Confidence Interval          0.134  0.140
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.157
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   mind =~                                             
+##     happy             1.000                           
+##     depressed         0.686    0.037   18.676    0.000
+##     fear              1.223    0.063   19.388    0.000
+##     angry             0.919    0.047   19.436    0.000
+##     calm              1.022    0.056   18.399    0.000
+##     sounds            0.219    0.066    3.311    0.001
+##     seeing            0.585    0.072    8.122    0.000
+##     temperature       0.368    0.068    5.411    0.000
+##     odors             0.642    0.071    9.083    0.000
+##     depth             0.289    0.076    3.812    0.000
+##     computations     -0.626    0.092   -6.827    0.000
+##     thoughts          0.954    0.050   19.031    0.000
+##     reasoning         0.388    0.067    5.798    0.000
+##     remembering       0.182    0.079    2.304    0.021
+##     beliefs           0.432    0.040   10.712    0.000
+##     hungry            1.259    0.087   14.522    0.000
+##     tired             1.196    0.065   18.444    0.000
+##     pain              1.243    0.075   16.595    0.000
+##     nauseated         0.810    0.046   17.417    0.000
+##     safe              1.073    0.057   18.798    0.000
+##     love              0.712    0.040   17.970    0.000
+##     recognizing       0.197    0.079    2.500    0.012
+##     communicating     0.398    0.069    5.780    0.000
+##     guilt             0.455    0.032   14.066    0.000
+##     disrespected      0.493    0.035   14.246    0.000
+##     free_will         1.009    0.065   15.637    0.000
+##     choices           0.593    0.070    8.470    0.000
+##     self_restraint    0.534    0.057    9.433    0.000
+##     intentions        0.962    0.065   14.841    0.000
+##     goal              0.533    0.076    6.996    0.000
+##     conscious         1.124    0.063   17.733    0.000
+##     self_aware        0.943    0.056   16.871    0.000
+##     desires           1.036    0.051   20.279    0.000
+##     embarrassed       0.412    0.031   13.264    0.000
+##     emo_recog         0.516    0.046   11.310    0.000
+##     joy               0.915    0.042   21.923    0.000
+##     morality          0.352    0.052    6.792    0.000
+##     personality       0.729    0.054   13.615    0.000
+##     pleasure          1.114    0.051   21.880    0.000
+##     pride             0.552    0.035   15.825    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     happy             0.737    0.056   13.113    0.000
+##     depressed         0.650    0.048   13.643    0.000
+##     fear              1.839    0.136   13.567    0.000
+##     angry             1.029    0.076   13.562    0.000
+##     calm              1.512    0.111   13.670    0.000
+##     sounds            3.199    0.225   14.235    0.000
+##     seeing            3.601    0.254   14.168    0.000
+##     temperature       3.330    0.234   14.214    0.000
+##     odors             3.398    0.240   14.147    0.000
+##     depth             4.208    0.296   14.231    0.000
+##     computations      5.949    0.419   14.193    0.000
+##     thoughts          1.185    0.087   13.606    0.000
+##     reasoning         3.216    0.226   14.209    0.000
+##     remembering       4.606    0.323   14.242    0.000
+##     beliefs           1.069    0.076   14.102    0.000
+##     hungry            4.393    0.315   13.947    0.000
+##     tired             2.053    0.150   13.666    0.000
+##     pain              3.010    0.218   13.819    0.000
+##     nauseated         1.115    0.081   13.756    0.000
+##     safe              1.561    0.114   13.631    0.000
+##     love              0.787    0.057   13.709    0.000
+##     recognizing       4.588    0.322   14.241    0.000
+##     communicating     3.407    0.240   14.209    0.000
+##     guilt             0.623    0.045   13.970    0.000
+##     disrespected      0.708    0.051   13.961    0.000
+##     free_will         2.330    0.168   13.883    0.000
+##     choices           3.381    0.239   14.161    0.000
+##     self_restraint    2.164    0.153   14.138    0.000
+##     intentions        2.429    0.174   13.929    0.000
+##     goal              4.100    0.289   14.190    0.000
+##     conscious         2.038    0.148   13.730    0.000
+##     self_aware        1.654    0.120   13.799    0.000
+##     desires           1.136    0.084   13.458    0.000
+##     embarrassed       0.590    0.042   14.007    0.000
+##     emo_recog         1.346    0.096   14.083    0.000
+##     joy               0.668    0.051   13.200    0.000
+##     morality          1.899    0.134   14.193    0.000
+##     personality       1.731    0.124   13.991    0.000
+##     pleasure          0.999    0.076   13.208    0.000
+##     pride             0.675    0.049   13.871    0.000
+##     mind              1.884    0.178   10.590    0.000
+## 
+## NULL</code></pre>
+</div>
+<div id="model-2-two-factors-experience-agency-see-gray-et-al.-2007-1" class="section level3">
+<h3>Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  59 iterations
+## 
+##   Number of observations                           406
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             5906.848
+##   Degrees of freedom                               734
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            13425.609
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.591
+##   Tucker-Lewis Index (TLI)                       0.565
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -28277.177
+##   Loglikelihood unrestricted model (H1)     -25323.753
+## 
+##   Number of free parameters                         86
+##   Akaike (AIC)                               56726.353
+##   Bayesian (BIC)                             57070.900
+##   Sample-size adjusted Bayesian (BIC)        56798.010
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.132
+##   90 Percent Confidence Interval          0.129  0.135
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.174
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   experience =~                                       
+##     hungry            1.000                           
+##     fear              0.936    0.061   15.281    0.000
+##     pain              0.971    0.069   14.154    0.000
+##     pleasure          0.840    0.052   16.121    0.000
+##     angry             0.688    0.046   15.008    0.000
+##     desires           0.765    0.050   15.185    0.000
+##     personality       0.502    0.046   10.934    0.000
+##     conscious         0.836    0.059   14.114    0.000
+##     pride             0.389    0.031   12.461    0.000
+##     embarrassed       0.289    0.026   10.910    0.000
+##     joy               0.676    0.043   15.853    0.000
+##     tired             0.917    0.062   14.879    0.000
+##     nauseated         0.609    0.043   14.096    0.000
+##     safe              0.805    0.055   14.737    0.000
+##     happy             0.737    0.046   15.987    0.000
+##     depressed         0.497    0.035   14.219    0.000
+##     calm              0.753    0.053   14.313    0.000
+##     sounds            0.124    0.049    2.506    0.012
+##     seeing            0.399    0.056    7.064    0.000
+##     temperature       0.251    0.052    4.855    0.000
+##     odors             0.461    0.056    8.214    0.000
+##     depth             0.168    0.057    2.953    0.003
+##     recognizing      -0.609    0.073   -8.371    0.000
+##     love              0.407    0.040   10.290    0.000
+##     guilt             0.186    0.030    6.183    0.000
+##     disrespected      0.227    0.033    6.902    0.000
+##     self_aware        0.447    0.053    8.470    0.000
+##   agency =~                                           
+##     self_restraint    1.000                           
+##     morality          0.884    0.078   11.291    0.000
+##     remembering       1.006    0.112    8.986    0.000
+##     emo_recog         0.937    0.075   12.563    0.000
+##     goal              1.083    0.113    9.620    0.000
+##     communicating     0.960    0.101    9.554    0.000
+##     thoughts          1.048    0.091   11.457    0.000
+##     computations      0.483    0.128    3.766    0.000
+##     reasoning         1.123    0.100   11.219    0.000
+##     beliefs           0.684    0.063   10.792    0.000
+##     free_will         0.757    0.105    7.225    0.000
+##     choices           1.136    0.107   10.653    0.000
+##     intentions        1.069    0.107    9.969    0.000
+##     recognizing       1.831    0.162   11.333    0.000
+##     love              0.291    0.063    4.653    0.000
+##     guilt             0.369    0.056    6.587    0.000
+##     disrespected      0.337    0.059    5.710    0.000
+##     self_aware        0.602    0.093    6.491    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   experience ~~                                       
+##     agency            1.246    0.158    7.891    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     hungry            3.921    0.284   13.798    0.000
+##     fear              1.633    0.123   13.302    0.000
+##     pain              2.663    0.195   13.624    0.000
+##     pleasure          0.899    0.070   12.863    0.000
+##     angry             0.984    0.073   13.399    0.000
+##     desires           1.134    0.085   13.337    0.000
+##     personality       1.862    0.133   14.010    0.000
+##     conscious         2.002    0.147   13.632    0.000
+##     pride             0.725    0.052   13.880    0.000
+##     embarrassed       0.621    0.044   14.011    0.000
+##     joy               0.664    0.051   13.033    0.000
+##     tired             1.838    0.137   13.440    0.000
+##     nauseated         1.069    0.078   13.636    0.000
+##     safe              1.491    0.111   13.481    0.000
+##     happy             0.741    0.057   12.952    0.000
+##     depressed         0.683    0.050   13.610    0.000
+##     calm              1.519    0.112   13.589    0.000
+##     sounds            3.236    0.227   14.239    0.000
+##     seeing            3.696    0.261   14.172    0.000
+##     temperature       3.368    0.237   14.215    0.000
+##     odors             3.438    0.243   14.139    0.000
+##     depth             4.269    0.300   14.236    0.000
+##     recognizing       2.402    0.208   11.529    0.000
+##     love              0.779    0.057   13.683    0.000
+##     guilt             0.570    0.042   13.732    0.000
+##     disrespected      0.669    0.048   13.821    0.000
+##     self_aware        1.561    0.115   13.624    0.000
+##     self_restraint    1.581    0.120   13.224    0.000
+##     morality          1.258    0.095   13.242    0.000
+##     remembering       3.534    0.256   13.785    0.000
+##     emo_recog         0.865    0.069   12.598    0.000
+##     goal              3.323    0.243   13.678    0.000
+##     communicating     2.673    0.195   13.690    0.000
+##     thoughts          1.667    0.127   13.180    0.000
+##     computations      6.426    0.453   14.189    0.000
+##     reasoning         2.086    0.157   13.268    0.000
+##     beliefs           0.897    0.067   13.404    0.000
+##     free_will         3.605    0.258   13.991    0.000
+##     choices           2.598    0.193   13.444    0.000
+##     intentions        2.892    0.213   13.609    0.000
+##     experience        3.458    0.444    7.781    0.000
+##     agency            1.120    0.160    6.999    0.000
+## 
+## NULL</code></pre>
+</div>
+<div id="model-3a-three-factors-f1-f2-f3-see-study-1-1" class="section level3">
+<h3>Model 3a: Three factors (F1, F2, F3; see Study 1)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  61 iterations
+## 
+##   Number of observations                           406
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             4872.342
+##   Degrees of freedom                               737
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            13425.609
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.673
+##   Tucker-Lewis Index (TLI)                       0.654
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -27759.924
+##   Loglikelihood unrestricted model (H1)     -25323.753
+## 
+##   Number of free parameters                         83
+##   Akaike (AIC)                               55685.847
+##   Bayesian (BIC)                             56018.375
+##   Sample-size adjusted Bayesian (BIC)        55755.004
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.118
+##   90 Percent Confidence Interval          0.114  0.121
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.149
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   Factor1 =~                                          
+##     pleasure          1.000                           
+##     happy             0.892    0.040   22.444    0.000
+##     joy               0.816    0.037   21.966    0.000
+##     nauseated         0.725    0.041   17.565    0.000
+##     angry             0.822    0.042   19.575    0.000
+##     fear              1.098    0.056   19.645    0.000
+##     love              0.634    0.035   17.983    0.000
+##     desires           0.922    0.045   20.275    0.000
+##     tired             1.077    0.057   18.762    0.000
+##     depressed         0.611    0.033   18.701    0.000
+##     conscious         1.003    0.056   17.818    0.000
+##     calm              0.905    0.050   18.240    0.000
+##     safe              0.956    0.051   18.805    0.000
+##     free_will         0.901    0.057   15.719    0.000
+##     thoughts          0.839    0.045   18.692    0.000
+##     pain              1.127    0.066   17.043    0.000
+##     pride             0.487    0.031   15.665    0.000
+##     self_aware        0.825    0.050   16.473    0.000
+##     guilt             0.401    0.029   13.907    0.000
+##     disrespected      0.435    0.031   14.099    0.000
+##     hungry            1.149    0.076   15.025    0.000
+##     embarrassed       0.364    0.028   13.162    0.000
+##     intentions        0.839    0.058   14.439    0.000
+##     personality       0.627    0.048   13.047    0.000
+##     beliefs           0.374    0.036   10.374    0.000
+##     self_restraint    0.448    0.051    8.846    0.000
+##   Factor2 =~                                          
+##     computations      1.000                           
+##     recognizing       1.085    0.094   11.494    0.000
+##     reasoning         0.819    0.078   10.533    0.000
+##     morality          0.549    0.058    9.445    0.000
+##     remembering       1.022    0.092   11.086    0.000
+##     emo_recog         0.491    0.054    9.160    0.000
+##   Factor3 =~                                          
+##     temperature       1.000                           
+##     seeing            1.190    0.097   12.277    0.000
+##     sounds            0.996    0.085   11.780    0.000
+##     depth             0.971    0.095   10.212    0.000
+##     choices           1.160    0.095   12.267    0.000
+##     goal              1.244    0.101   12.282    0.000
+##     communicating     1.144    0.091   12.568    0.000
+##     odors             1.011    0.094   10.789    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   Factor1 ~~                                          
+##     Factor2           0.424    0.137    3.083    0.002
+##     Factor3           0.776    0.121    6.395    0.000
+##   Factor2 ~~                                          
+##     Factor3           1.300    0.174    7.451    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     pleasure          0.950    0.073   13.095    0.000
+##     happy             0.720    0.055   13.036    0.000
+##     joy               0.656    0.050   13.137    0.000
+##     nauseated         1.096    0.080   13.723    0.000
+##     angry             1.007    0.075   13.514    0.000
+##     fear              1.778    0.132   13.505    0.000
+##     love              0.782    0.057   13.685    0.000
+##     desires           1.126    0.084   13.421    0.000
+##     tired             1.980    0.145   13.607    0.000
+##     depressed         0.645    0.047   13.614    0.000
+##     conscious         2.013    0.147   13.700    0.000
+##     calm              1.526    0.112   13.660    0.000
+##     safe              1.549    0.114   13.603    0.000
+##     free_will         2.307    0.166   13.863    0.000
+##     thoughts          1.217    0.089   13.615    0.000
+##     pain              2.887    0.210   13.767    0.000
+##     pride             0.681    0.049   13.866    0.000
+##     self_aware        1.703    0.123   13.811    0.000
+##     guilt             0.628    0.045   13.967    0.000
+##     disrespected      0.713    0.051   13.957    0.000
+##     hungry            4.226    0.304   13.906    0.000
+##     embarrassed       0.593    0.042   14.003    0.000
+##     intentions        2.493    0.179   13.939    0.000
+##     personality       1.793    0.128   14.008    0.000
+##     beliefs           1.087    0.077   14.107    0.000
+##     self_restraint    2.221    0.157   14.149    0.000
+##     computations      4.296    0.334   12.850    0.000
+##     recognizing       1.844    0.178   10.368    0.000
+##     reasoning         1.897    0.157   12.112    0.000
+##     morality          1.410    0.109   12.963    0.000
+##     remembering       2.170    0.192   11.324    0.000
+##     emo_recog         1.270    0.097   13.109    0.000
+##     temperature       2.060    0.160   12.898    0.000
+##     seeing            2.087    0.169   12.358    0.000
+##     sounds            1.776    0.140   12.695    0.000
+##     depth             2.928    0.219   13.355    0.000
+##     choices           1.992    0.161   12.366    0.000
+##     goal              2.276    0.184   12.354    0.000
+##     communicating     1.708    0.141   12.110    0.000
+##     odors             2.614    0.199   13.162    0.000
+##     Factor1           2.389    0.226   10.548    0.000
+##     Factor2           2.392    0.388    6.170    0.000
+##     Factor3           1.526    0.217    7.036    0.000</code></pre>
+</div>
+<div id="model-3b-three-factors-affect-autonomy-perception-see-weisman-et-al.-2015-1" class="section level3">
+<h3>Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  47 iterations
+## 
+##   Number of observations                           406
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic              574.111
+##   Degrees of freedom                               101
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic             3556.652
+##   Degrees of freedom                               120
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.862
+##   Tucker-Lewis Index (TLI)                       0.836
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -11698.470
+##   Loglikelihood unrestricted model (H1)     -11411.415
+## 
+##   Number of free parameters                         35
+##   Akaike (AIC)                               23466.941
+##   Bayesian (BIC)                             23607.163
+##   Sample-size adjusted Bayesian (BIC)        23496.103
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.107
+##   90 Percent Confidence Interval          0.099  0.116
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.091
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   affect =~                                           
+##     happy             1.000                           
+##     depressed         0.656    0.032   20.325    0.000
+##     fear              1.056    0.059   17.752    0.000
+##     angry             0.861    0.042   20.492    0.000
+##     calm              0.956    0.050   19.168    0.000
+##     joy               0.908    0.034   26.657    0.000
+##   autonomy =~                                         
+##     free_will         1.000                           
+##     choices           1.023    0.097   10.532    0.000
+##     self_restraint    0.601    0.075    8.054    0.000
+##     intentions        1.146    0.101   11.308    0.000
+##     goal              1.044    0.103   10.156    0.000
+##   perception =~                                       
+##     sounds            1.000                           
+##     seeing            1.347    0.117   11.537    0.000
+##     temperature       1.194    0.106   11.265    0.000
+##     odors             1.296    0.115   11.310    0.000
+##     depth             1.048    0.111    9.474    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   affect ~~                                           
+##     autonomy          1.312    0.154    8.527    0.000
+##     perception        0.569    0.106    5.380    0.000
+##   autonomy ~~                                         
+##     perception        1.147    0.148    7.737    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     happy             0.477    0.050    9.587    0.000
+##     depressed         0.613    0.048   12.714    0.000
+##     fear              2.270    0.172   13.183    0.000
+##     angry             1.030    0.081   12.677    0.000
+##     calm              1.523    0.118   12.944    0.000
+##     joy               0.475    0.046   10.362    0.000
+##     free_will         2.644    0.206   12.832    0.000
+##     choices           2.367    0.188   12.576    0.000
+##     self_restraint    2.123    0.156   13.629    0.000
+##     intentions        2.069    0.176   11.776    0.000
+##     goal              2.888    0.225   12.834    0.000
+##     sounds            2.009    0.160   12.549    0.000
+##     seeing            1.926    0.175   11.003    0.000
+##     temperature       1.760    0.154   11.461    0.000
+##     odors             2.024    0.178   11.392    0.000
+##     depth             2.959    0.228   12.985    0.000
+##     affect            2.145    0.185   11.617    0.000
+##     autonomy          1.602    0.250    6.414    0.000
+##     perception        1.280    0.198    6.469    0.000</code></pre>
+</div>
+<div id="compare-models-1" class="section level3">
+<h3>Compare models</h3>
+<pre><code>## Warning in lavTestLRT(object = &lt;S4 object of class structure(&quot;lavaan&quot;,
+## package = &quot;lavaan&quot;)&gt;, : lavaan WARNING: some models are based on a
+## different set of observed variables</code></pre>
+<pre><code>## Chi Square Difference Test
+## 
+##               Df   AIC   BIC   Chisq Chisq diff Df diff Pr(&gt;Chisq)    
+## d2_all_fit3b 101 23467 23607  574.11                                  
+## d2_all_fit2  734 56726 57071 5906.85     5332.7     633     &lt;2e-16 ***
+## d2_all_fit3a 737 55686 56018 4872.34    -1034.5       3          1    
+## d2_all_fit1  740 57218 57539 6410.82     1538.5       3     &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 </div>
@@ -1974,14 +3337,555 @@ img {
 </div>
 <div id="analyses-2" class="section level2">
 <h2>Analyses</h2>
-<div id="confirmatory-factor-analysis-beetle-condition-1" class="section level3">
-<h3>Confirmatory factor analysis: BEETLE condition</h3>
-</div>
-<div id="confirmatory-factor-analysis-robot-condition-1" class="section level3">
-<h3>Confirmatory factor analysis: ROBOT condition</h3>
-</div>
 <div id="confirmatory-factor-analysis-all-conditions-1" class="section level3">
 <h3>Confirmatory factor analysis: ALL conditions</h3>
+</div>
+<div id="model-1-one-factor-mind-2" class="section level3">
+<h3>Model 1: One factor (MIND)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  41 iterations
+## 
+##   Number of observations                           400
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             5183.301
+##   Degrees of freedom                               740
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            13689.925
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.656
+##   Tucker-Lewis Index (TLI)                       0.637
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -29370.412
+##   Loglikelihood unrestricted model (H1)     -26778.761
+## 
+##   Number of free parameters                         80
+##   Akaike (AIC)                               58900.824
+##   Bayesian (BIC)                             59220.141
+##   Sample-size adjusted Bayesian (BIC)        58966.296
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.123
+##   90 Percent Confidence Interval          0.119  0.126
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.130
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   mind =~                                             
+##     happy             1.000                           
+##     depressed         0.669    0.036   18.450    0.000
+##     fear              1.212    0.056   21.790    0.000
+##     angry             0.999    0.046   21.889    0.000
+##     calm              1.082    0.051   21.392    0.000
+##     sounds            0.281    0.051    5.523    0.000
+##     seeing            0.425    0.057    7.472    0.000
+##     temperature       0.469    0.059    7.918    0.000
+##     odors             0.692    0.063   10.906    0.000
+##     depth             0.435    0.061    7.132    0.000
+##     computations     -0.742    0.079   -9.423    0.000
+##     thoughts          1.044    0.050   20.949    0.000
+##     reasoning         0.399    0.063    6.368    0.000
+##     remembering       0.221    0.063    3.482    0.000
+##     beliefs           0.458    0.040   11.368    0.000
+##     hungry            1.191    0.071   16.852    0.000
+##     tired             1.207    0.058   20.648    0.000
+##     pain              1.164    0.064   18.163    0.000
+##     nauseated         0.966    0.047   20.696    0.000
+##     safe              1.067    0.055   19.325    0.000
+##     love              0.853    0.042   20.523    0.000
+##     recognizing       0.200    0.066    3.034    0.002
+##     communicating     0.198    0.062    3.206    0.001
+##     guilt             0.505    0.034   14.854    0.000
+##     disrespected      0.531    0.035   15.054    0.000
+##     free_will         1.148    0.055   20.727    0.000
+##     choices           0.611    0.059   10.302    0.000
+##     self_restraint    0.674    0.053   12.755    0.000
+##     intentions        0.961    0.058   16.449    0.000
+##     goal              0.518    0.064    8.063    0.000
+##     conscious         1.208    0.057   21.385    0.000
+##     self_aware        0.951    0.053   17.950    0.000
+##     desires           1.140    0.049   23.377    0.000
+##     embarrassed       0.482    0.035   13.929    0.000
+##     emo_recog         0.577    0.048   12.037    0.000
+##     joy               0.975    0.042   23.095    0.000
+##     morality          0.368    0.053    6.973    0.000
+##     personality       0.778    0.052   14.925    0.000
+##     pleasure          1.139    0.048   23.810    0.000
+##     pride             0.665    0.041   16.246    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     happy             0.920    0.070   13.170    0.000
+##     depressed         0.948    0.069   13.721    0.000
+##     fear              1.848    0.138   13.431    0.000
+##     angry             1.235    0.092   13.420    0.000
+##     calm              1.567    0.116   13.475    0.000
+##     sounds            2.619    0.186   14.115    0.000
+##     seeing            3.190    0.226   14.092    0.000
+##     temperature       3.428    0.243   14.085    0.000
+##     odors             3.731    0.266   14.028    0.000
+##     depth             3.686    0.261   14.096    0.000
+##     computations      5.916    0.421   14.059    0.000
+##     thoughts          1.565    0.116   13.520    0.000
+##     reasoning         3.913    0.277   14.106    0.000
+##     remembering       4.132    0.292   14.132    0.000
+##     beliefs           1.488    0.106   14.016    0.000
+##     hungry            3.866    0.280   13.814    0.000
+##     tired             2.194    0.162   13.549    0.000
+##     pain              3.004    0.219   13.739    0.000
+##     nauseated         1.395    0.103   13.544    0.000
+##     safe              2.105    0.154   13.659    0.000
+##     love              1.116    0.082   13.560    0.000
+##     recognizing       4.447    0.315   14.134    0.000
+##     communicating     3.932    0.278   14.133    0.000
+##     guilt             0.964    0.069   13.905    0.000
+##     disrespected      1.029    0.074   13.897    0.000
+##     free_will         1.958    0.145   13.541    0.000
+##     choices           3.300    0.235   14.041    0.000
+##     self_restraint    2.477    0.177   13.978    0.000
+##     intentions        2.681    0.194   13.835    0.000
+##     goal              4.027    0.286   14.083    0.000
+##     conscious         1.958    0.145   13.476    0.000
+##     self_aware        2.072    0.151   13.752    0.000
+##     desires           1.260    0.095   13.221    0.000
+##     embarrassed       1.026    0.074   13.940    0.000
+##     emo_recog         2.073    0.148   13.999    0.000
+##     joy               0.967    0.073   13.264    0.000
+##     morality          2.764    0.196   14.098    0.000
+##     personality       2.256    0.162   13.903    0.000
+##     pleasure          1.171    0.089   13.151    0.000
+##     pride             1.329    0.096   13.845    0.000
+##     mind              2.653    0.245   10.809    0.000
+## 
+## NULL</code></pre>
+</div>
+<div id="model-2-two-factors-experience-agency-see-gray-et-al.-2007-2" class="section level3">
+<h3>Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  69 iterations
+## 
+##   Number of observations                           400
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             4866.306
+##   Degrees of freedom                               734
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            13689.925
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.680
+##   Tucker-Lewis Index (TLI)                       0.660
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -29211.915
+##   Loglikelihood unrestricted model (H1)     -26778.761
+## 
+##   Number of free parameters                         86
+##   Akaike (AIC)                               58595.829
+##   Bayesian (BIC)                             58939.095
+##   Sample-size adjusted Bayesian (BIC)        58666.211
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.119
+##   90 Percent Confidence Interval          0.115  0.122
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.133
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   experience =~                                       
+##     hungry            1.000                           
+##     fear              0.987    0.055   17.876    0.000
+##     pain              0.967    0.060   16.144    0.000
+##     pleasure          0.919    0.049   18.696    0.000
+##     angry             0.791    0.046   17.377    0.000
+##     desires           0.913    0.050   18.347    0.000
+##     personality       0.582    0.047   12.420    0.000
+##     conscious         0.960    0.056   17.180    0.000
+##     pride             0.511    0.037   13.642    0.000
+##     embarrassed       0.370    0.031   12.072    0.000
+##     joy               0.771    0.043   17.930    0.000
+##     tired             0.993    0.057   17.456    0.000
+##     nauseated         0.782    0.046   17.169    0.000
+##     safe              0.857    0.053   16.245    0.000
+##     happy             0.786    0.043   18.075    0.000
+##     depressed         0.523    0.034   15.281    0.000
+##     calm              0.855    0.050   17.083    0.000
+##     sounds            0.204    0.041    4.934    0.000
+##     seeing            0.328    0.047    7.011    0.000
+##     temperature       0.368    0.049    7.533    0.000
+##     odors             0.552    0.054   10.237    0.000
+##     depth             0.323    0.050    6.449    0.000
+##     recognizing      -0.982    0.117   -8.410    0.000
+##     love              0.368    0.059    6.197    0.000
+##     guilt             0.098    0.052    1.870    0.061
+##     disrespected      0.127    0.054    2.348    0.019
+##     self_aware        0.346    0.079    4.386    0.000
+##   agency =~                                           
+##     self_restraint    1.000                           
+##     morality          0.728    0.076    9.605    0.000
+##     remembering       0.597    0.087    6.889    0.000
+##     emo_recog         0.930    0.076   12.233    0.000
+##     goal              0.839    0.093    9.029    0.000
+##     communicating     0.530    0.084    6.313    0.000
+##     thoughts          1.372    0.096   14.267    0.000
+##     computations     -0.430    0.112   -3.832    0.000
+##     reasoning         0.860    0.089    9.623    0.000
+##     beliefs           0.679    0.062   10.914    0.000
+##     free_will         1.345    0.104   12.911    0.000
+##     choices           0.959    0.090   10.669    0.000
+##     intentions        1.236    0.100   12.326    0.000
+##     recognizing       2.049    0.216    9.500    0.000
+##     love              0.560    0.100    5.594    0.000
+##     guilt             0.547    0.092    5.947    0.000
+##     disrespected      0.533    0.095    5.640    0.000
+##     self_aware        0.736    0.135    5.435    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   experience ~~                                       
+##     agency            2.198    0.238    9.227    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     hungry            3.421    0.250   13.664    0.000
+##     fear              1.649    0.125   13.174    0.000
+##     pain              2.666    0.196   13.568    0.000
+##     pleasure          1.058    0.082   12.833    0.000
+##     angry             1.248    0.094   13.320    0.000
+##     desires           1.195    0.092   12.998    0.000
+##     personality       2.435    0.175   13.915    0.000
+##     conscious         1.952    0.146   13.368    0.000
+##     pride             1.404    0.101   13.837    0.000
+##     embarrassed       1.067    0.077   13.933    0.000
+##     joy               0.987    0.075   13.156    0.000
+##     tired             1.915    0.144   13.299    0.000
+##     nauseated         1.299    0.097   13.371    0.000
+##     safe              2.037    0.150   13.552    0.000
+##     happy             0.975    0.074   13.105    0.000
+##     depressed         0.981    0.072   13.685    0.000
+##     calm              1.595    0.119   13.391    0.000
+##     sounds            2.654    0.188   14.117    0.000
+##     seeing            3.217    0.228   14.087    0.000
+##     temperature       3.441    0.244   14.078    0.000
+##     odors             3.720    0.266   14.008    0.000
+##     depth             3.750    0.266   14.097    0.000
+##     recognizing       2.684    0.249   10.779    0.000
+##     love              1.073    0.080   13.372    0.000
+##     guilt             0.892    0.066   13.509    0.000
+##     disrespected      0.962    0.071   13.570    0.000
+##     self_aware        1.993    0.147   13.532    0.000
+##     self_restraint    2.100    0.157   13.408    0.000
+##     morality          2.283    0.166   13.786    0.000
+##     remembering       3.697    0.264   13.995    0.000
+##     emo_recog         1.587    0.119   13.301    0.000
+##     goal              3.623    0.262   13.845    0.000
+##     communicating     3.591    0.256   14.022    0.000
+##     thoughts          1.473    0.121   12.133    0.000
+##     computations      7.083    0.502   14.102    0.000
+##     reasoning         3.163    0.229   13.784    0.000
+##     beliefs           1.314    0.097   13.603    0.000
+##     free_will         2.585    0.198   13.058    0.000
+##     choices           2.835    0.208   13.644    0.000
+##     intentions        2.711    0.204   13.272    0.000
+##     experience        4.210    0.487    8.651    0.000
+##     agency            1.585    0.220    7.210    0.000
+## 
+## NULL</code></pre>
+</div>
+<div id="model-3a-three-factors-f1-f2-f3-see-study-1-2" class="section level3">
+<h3>Model 3a: Three factors (F1, F2, F3; see Study 1)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  74 iterations
+## 
+##   Number of observations                           400
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             4206.324
+##   Degrees of freedom                               737
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            13689.925
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.731
+##   Tucker-Lewis Index (TLI)                       0.716
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -28881.923
+##   Loglikelihood unrestricted model (H1)     -26778.761
+## 
+##   Number of free parameters                         83
+##   Akaike (AIC)                               57929.847
+##   Bayesian (BIC)                             58261.138
+##   Sample-size adjusted Bayesian (BIC)        57997.774
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.108
+##   90 Percent Confidence Interval          0.105  0.112
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.142
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   Factor1 =~                                          
+##     pleasure          1.000                           
+##     happy             0.873    0.036   24.160    0.000
+##     joy               0.853    0.036   23.672    0.000
+##     nauseated         0.850    0.040   21.307    0.000
+##     angry             0.876    0.039   22.472    0.000
+##     fear              1.064    0.048   22.387    0.000
+##     love              0.744    0.036   20.805    0.000
+##     desires           0.996    0.042   23.881    0.000
+##     tired             1.061    0.050   21.206    0.000
+##     depressed         0.586    0.031   18.786    0.000
+##     conscious         1.051    0.049   21.594    0.000
+##     calm              0.941    0.044   21.622    0.000
+##     safe              0.931    0.048   19.572    0.000
+##     free_will         0.999    0.048   20.957    0.000
+##     thoughts          0.903    0.043   20.916    0.000
+##     pain              1.024    0.055   18.607    0.000
+##     pride             0.580    0.035   16.354    0.000
+##     self_aware        0.824    0.046   17.943    0.000
+##     guilt             0.440    0.029   14.930    0.000
+##     disrespected      0.463    0.031   15.135    0.000
+##     hungry            1.049    0.061   17.261    0.000
+##     embarrassed       0.422    0.030   14.083    0.000
+##     intentions        0.827    0.051   16.282    0.000
+##     personality       0.665    0.045   14.610    0.000
+##     beliefs           0.395    0.035   11.265    0.000
+##     self_restraint    0.580    0.046   12.583    0.000
+##   Factor2 =~                                          
+##     computations      1.000                           
+##     recognizing       1.676    0.263    6.383    0.000
+##     reasoning         1.684    0.262    6.418    0.000
+##     morality          1.116    0.185    6.040    0.000
+##     remembering       1.424    0.230    6.193    0.000
+##     emo_recog         1.083    0.179    6.035    0.000
+##   Factor3 =~                                          
+##     temperature       1.000                           
+##     seeing            0.857    0.075   11.385    0.000
+##     sounds            0.800    0.066   12.051    0.000
+##     depth             0.945    0.081   11.719    0.000
+##     choices           0.946    0.082   11.606    0.000
+##     goal              0.933    0.085   10.929    0.000
+##     communicating     0.738    0.078    9.434    0.000
+##     odors             0.991    0.088   11.282    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   Factor1 ~~                                          
+##     Factor2           0.569    0.133    4.284    0.000
+##     Factor3           1.413    0.181    7.827    0.000
+##   Factor2 ~~                                          
+##     Factor3           0.864    0.161    5.359    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     pleasure          1.123    0.086   13.055    0.000
+##     happy             0.915    0.070   13.126    0.000
+##     joy               0.946    0.072   13.202    0.000
+##     nauseated         1.350    0.100   13.489    0.000
+##     angry             1.203    0.090   13.362    0.000
+##     fear              1.796    0.134   13.373    0.000
+##     love              1.115    0.082   13.537    0.000
+##     desires           1.245    0.095   13.170    0.000
+##     tired             2.135    0.158   13.499    0.000
+##     depressed         0.936    0.068   13.695    0.000
+##     conscious         1.977    0.147   13.460    0.000
+##     calm              1.579    0.117   13.457    0.000
+##     safe              2.101    0.154   13.639    0.000
+##     free_will         1.967    0.145   13.523    0.000
+##     thoughts          1.614    0.119   13.526    0.000
+##     pain              2.939    0.214   13.707    0.000
+##     pride             1.331    0.096   13.834    0.000
+##     self_aware        2.103    0.153   13.749    0.000
+##     guilt             0.965    0.069   13.897    0.000
+##     disrespected      1.031    0.074   13.889    0.000
+##     hungry            3.788    0.275   13.788    0.000
+##     embarrassed       1.021    0.073   13.930    0.000
+##     intentions        2.742    0.198   13.838    0.000
+##     personality       2.319    0.167   13.910    0.000
+##     beliefs           1.500    0.107   14.015    0.000
+##     self_restraint    2.511    0.180   13.979    0.000
+##     computations      6.482    0.471   13.764    0.000
+##     recognizing       2.038    0.191   10.678    0.000
+##     reasoning         1.797    0.177   10.179    0.000
+##     morality          2.009    0.159   12.606    0.000
+##     remembering       2.447    0.203   12.079    0.000
+##     emo_recog         1.907    0.151   12.620    0.000
+##     temperature       2.034    0.170   11.970    0.000
+##     seeing            2.217    0.175   12.682    0.000
+##     sounds            1.563    0.127   12.336    0.000
+##     depth             2.425    0.194   12.520    0.000
+##     choices           2.521    0.200   12.577    0.000
+##     goal              3.018    0.234   12.874    0.000
+##     communicating     2.960    0.222   13.334    0.000
+##     odors             3.060    0.240   12.728    0.000
+##     Factor1           3.491    0.318   10.971    0.000
+##     Factor2           0.895    0.271    3.296    0.001
+##     Factor3           1.977    0.261    7.585    0.000</code></pre>
+</div>
+<div id="model-3b-three-factors-affect-autonomy-perception-see-weisman-et-al.-2015-2" class="section level3">
+<h3>Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  50 iterations
+## 
+##   Number of observations                           400
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic              391.505
+##   Degrees of freedom                               101
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic             3807.455
+##   Degrees of freedom                               120
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.921
+##   Tucker-Lewis Index (TLI)                       0.906
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -11842.660
+##   Loglikelihood unrestricted model (H1)     -11646.907
+## 
+##   Number of free parameters                         35
+##   Akaike (AIC)                               23755.320
+##   Bayesian (BIC)                             23895.021
+##   Sample-size adjusted Bayesian (BIC)        23783.964
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.085
+##   90 Percent Confidence Interval          0.076  0.094
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.069
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   affect =~                                           
+##     happy             1.000                           
+##     depressed         0.652    0.033   19.860    0.000
+##     fear              1.101    0.053   20.924    0.000
+##     angry             0.970    0.040   24.032    0.000
+##     calm              1.017    0.046   21.902    0.000
+##     joy               0.972    0.036   27.273    0.000
+##   autonomy =~                                         
+##     free_will         1.000                           
+##     choices           0.666    0.055   12.057    0.000
+##     self_restraint    0.616    0.051   12.027    0.000
+##     intentions        0.913    0.058   15.710    0.000
+##     goal              0.574    0.059    9.665    0.000
+##   perception =~                                       
+##     sounds            1.000                           
+##     seeing            1.109    0.096   11.575    0.000
+##     temperature       1.295    0.102   12.650    0.000
+##     odors             1.333    0.112   11.865    0.000
+##     depth             1.083    0.101   10.701    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   affect ~~                                           
+##     autonomy          2.727    0.250   10.891    0.000
+##     perception        0.906    0.133    6.832    0.000
+##   autonomy ~~                                         
+##     perception        1.395    0.173    8.058    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     happy             0.647    0.063   10.310    0.000
+##     depressed         0.891    0.069   12.976    0.000
+##     fear              2.203    0.172   12.795    0.000
+##     angry             1.131    0.094   12.094    0.000
+##     calm              1.649    0.131   12.606    0.000
+##     joy               0.723    0.066   10.899    0.000
+##     free_will         1.974    0.185   10.656    0.000
+##     choices           2.747    0.210   13.089    0.000
+##     self_restraint    2.365    0.181   13.097    0.000
+##     intentions        2.228    0.192   11.621    0.000
+##     goal              3.593    0.265   13.550    0.000
+##     sounds            1.477    0.128   11.542    0.000
+##     seeing            2.007    0.170   11.795    0.000
+##     temperature       1.742    0.167   10.433    0.000
+##     odors             2.598    0.226   11.515    0.000
+##     depth             2.604    0.210   12.426    0.000
+##     affect            2.926    0.252   11.603    0.000
+##     autonomy          3.479    0.379    9.167    0.000
+##     perception        1.352    0.186    7.272    0.000</code></pre>
+</div>
+<div id="compare-models-2" class="section level3">
+<h3>Compare models</h3>
+<pre><code>## Warning in lavTestLRT(object = &lt;S4 object of class structure(&quot;lavaan&quot;,
+## package = &quot;lavaan&quot;)&gt;, : lavaan WARNING: some models are based on a
+## different set of observed variables</code></pre>
+<pre><code>## Chi Square Difference Test
+## 
+##               Df   AIC   BIC  Chisq Chisq diff Df diff Pr(&gt;Chisq)    
+## d3_all_fit3b 101 23755 23895  391.5                                  
+## d3_all_fit2  734 58596 58939 4866.3     4474.8     633     &lt;2e-16 ***
+## d3_all_fit3a 737 57930 58261 4206.3     -660.0       3          1    
+## d3_all_fit1  740 58901 59220 5183.3      977.0       3     &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 </div>
@@ -2093,6 +3997,553 @@ img {
 <h2>Analyses</h2>
 <div id="confirmatory-factor-analysis-all-conditions-2" class="section level3">
 <h3>Confirmatory factor analysis: ALL conditions</h3>
+</div>
+<div id="model-1-one-factor-mind-3" class="section level3">
+<h3>Model 1: One factor (MIND)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  48 iterations
+## 
+##   Number of observations                           429
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             7041.600
+##   Degrees of freedom                               740
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            22396.316
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.708
+##   Tucker-Lewis Index (TLI)                       0.693
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -30498.303
+##   Loglikelihood unrestricted model (H1)     -26977.503
+## 
+##   Number of free parameters                         80
+##   Akaike (AIC)                               61156.606
+##   Bayesian (BIC)                             61481.523
+##   Sample-size adjusted Bayesian (BIC)        61227.650
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.141
+##   90 Percent Confidence Interval          0.138  0.144
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.098
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   mind =~                                             
+##     happy             1.000                           
+##     depressed         0.839    0.036   23.016    0.000
+##     fear              0.987    0.036   27.151    0.000
+##     angry             0.971    0.035   27.622    0.000
+##     calm              0.945    0.034   27.962    0.000
+##     sounds            0.665    0.037   17.917    0.000
+##     seeing            0.847    0.039   21.538    0.000
+##     temperature       0.583    0.037   15.756    0.000
+##     odors             0.856    0.038   22.550    0.000
+##     depth             0.693    0.041   17.106    0.000
+##     computations      0.143    0.047    3.053    0.002
+##     thoughts          0.893    0.034   25.933    0.000
+##     reasoning         0.644    0.037   17.428    0.000
+##     remembering       0.720    0.038   18.810    0.000
+##     beliefs           0.532    0.035   15.265    0.000
+##     hungry            0.932    0.040   23.540    0.000
+##     tired             1.005    0.035   28.324    0.000
+##     pain              0.962    0.038   25.298    0.000
+##     nauseated         0.939    0.037   25.314    0.000
+##     safe              0.940    0.034   27.302    0.000
+##     love              0.904    0.034   26.294    0.000
+##     recognizing       0.803    0.037   21.711    0.000
+##     communicating     0.730    0.038   19.175    0.000
+##     guilt             0.636    0.034   18.528    0.000
+##     disrespected      0.637    0.035   18.095    0.000
+##     free_will         0.853    0.035   24.177    0.000
+##     choices           0.789    0.038   20.880    0.000
+##     self_restraint    0.641    0.035   18.555    0.000
+##     intentions        0.834    0.036   22.864    0.000
+##     goal              0.647    0.041   15.680    0.000
+##     conscious         0.914    0.037   24.498    0.000
+##     self_aware        0.731    0.036   20.237    0.000
+##     desires           0.967    0.034   28.523    0.000
+##     embarrassed       0.604    0.035   17.035    0.000
+##     emo_recog         0.661    0.033   20.091    0.000
+##     joy               1.011    0.033   30.314    0.000
+##     morality          0.574    0.035   16.267    0.000
+##     personality       0.963    0.033   29.449    0.000
+##     pleasure          1.038    0.033   31.558    0.000
+##     pride             0.765    0.034   22.306    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     happy             1.130    0.082   13.859    0.000
+##     depressed         1.882    0.131   14.313    0.000
+##     fear              1.561    0.111   14.091    0.000
+##     angry             1.423    0.101   14.057    0.000
+##     calm              1.290    0.092   14.031    0.000
+##     sounds            2.277    0.157   14.473    0.000
+##     seeing            2.304    0.160   14.369    0.000
+##     temperature       2.378    0.164   14.519    0.000
+##     odors             2.078    0.145   14.332    0.000
+##     depth             2.765    0.191   14.491    0.000
+##     computations      4.415    0.302   14.642    0.000
+##     thoughts          1.486    0.105   14.169    0.000
+##     reasoning         2.284    0.158   14.484    0.000
+##     remembering       2.371    0.164   14.451    0.000
+##     beliefs           2.130    0.147   14.528    0.000
+##     hungry            2.179    0.152   14.291    0.000
+##     tired             1.395    0.100   14.002    0.000
+##     pain              1.868    0.131   14.205    0.000
+##     nauseated         1.774    0.125   14.204    0.000
+##     safe              1.389    0.099   14.080    0.000
+##     love              1.457    0.103   14.147    0.000
+##     recognizing       2.028    0.141   14.363    0.000
+##     communicating     2.321    0.161   14.442    0.000
+##     guilt             1.916    0.133   14.458    0.000
+##     disrespected      2.039    0.141   14.469    0.000
+##     free_will         1.687    0.118   14.262    0.000
+##     choices           2.172    0.151   14.391    0.000
+##     self_restraint    1.942    0.134   14.458    0.000
+##     intentions        1.897    0.132   14.320    0.000
+##     goal              2.964    0.204   14.520    0.000
+##     conscious         1.859    0.130   14.247    0.000
+##     self_aware        2.024    0.140   14.411    0.000
+##     desires           1.259    0.090   13.985    0.000
+##     embarrassed       2.121    0.146   14.493    0.000
+##     emo_recog         1.690    0.117   14.416    0.000
+##     joy               1.085    0.079   13.807    0.000
+##     morality          2.141    0.148   14.509    0.000
+##     personality       1.105    0.080   13.900    0.000
+##     pleasure          0.961    0.070   13.648    0.000
+##     pride             1.708    0.119   14.341    0.000
+##     mind              4.762    0.396   12.033    0.000
+## 
+## NULL</code></pre>
+</div>
+<div id="model-2-two-factors-experience-agency-see-gray-et-al.-2007-3" class="section level3">
+<h3>Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  74 iterations
+## 
+##   Number of observations                           429
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             6017.531
+##   Degrees of freedom                               734
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            22396.316
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.756
+##   Tucker-Lewis Index (TLI)                       0.740
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -29986.268
+##   Loglikelihood unrestricted model (H1)     -26977.503
+## 
+##   Number of free parameters                         86
+##   Akaike (AIC)                               60144.537
+##   Bayesian (BIC)                             60493.822
+##   Sample-size adjusted Bayesian (BIC)        60220.909
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.130
+##   90 Percent Confidence Interval          0.127  0.133
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.101
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   experience =~                                       
+##     hungry            1.000                           
+##     fear              1.044    0.040   26.042    0.000
+##     pain              1.030    0.041   25.076    0.000
+##     pleasure          1.080    0.038   28.426    0.000
+##     angry             0.988    0.040   24.513    0.000
+##     desires           0.983    0.039   25.067    0.000
+##     personality       0.966    0.039   25.058    0.000
+##     conscious         0.930    0.042   22.222    0.000
+##     pride             0.733    0.039   18.717    0.000
+##     embarrassed       0.562    0.039   14.373    0.000
+##     joy               1.028    0.039   26.286    0.000
+##     tired             1.068    0.039   27.253    0.000
+##     nauseated         0.971    0.041   23.500    0.000
+##     safe              0.972    0.039   25.024    0.000
+##     happy             1.026    0.039   26.445    0.000
+##     depressed         0.826    0.041   20.016    0.000
+##     calm              0.981    0.038   25.722    0.000
+##     sounds            0.685    0.040   17.233    0.000
+##     seeing            0.877    0.043   20.507    0.000
+##     temperature       0.601    0.039   15.332    0.000
+##     odors             0.881    0.042   21.109    0.000
+##     depth             0.675    0.044   15.320    0.000
+##     recognizing       0.496    0.070    7.127    0.000
+##     love              0.671    0.062   10.905    0.000
+##     guilt            -0.162    0.058   -2.779    0.005
+##     disrespected     -0.190    0.060   -3.182    0.001
+##     self_aware       -0.008    0.062   -0.134    0.894
+##   agency =~                                           
+##     self_restraint    1.000                           
+##     morality          0.941    0.047   19.905    0.000
+##     remembering       1.013    0.055   18.263    0.000
+##     emo_recog         0.984    0.047   21.061    0.000
+##     goal              0.956    0.058   16.564    0.000
+##     communicating     0.959    0.057   16.864    0.000
+##     thoughts          1.144    0.056   20.496    0.000
+##     computations      0.467    0.062    7.572    0.000
+##     reasoning         1.031    0.050   20.593    0.000
+##     beliefs           0.873    0.047   18.703    0.000
+##     free_will         1.094    0.056   19.502    0.000
+##     choices           1.079    0.056   19.170    0.000
+##     intentions        1.124    0.056   20.157    0.000
+##     recognizing       0.464    0.091    5.083    0.000
+##     love              0.364    0.078    4.662    0.000
+##     guilt             1.154    0.085   13.506    0.000
+##     disrespected      1.197    0.088   13.645    0.000
+##     self_aware        1.073    0.089   12.025    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   experience ~~                                       
+##     agency            2.991    0.261   11.482    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     hungry            1.741    0.124   14.070    0.000
+##     fear              1.208    0.088   13.740    0.000
+##     pain              1.414    0.102   13.893    0.000
+##     pleasure          0.757    0.058   13.099    0.000
+##     angry             1.441    0.103   13.966    0.000
+##     desires           1.290    0.093   13.894    0.000
+##     personality       1.248    0.090   13.895    0.000
+##     conscious         1.878    0.132   14.185    0.000
+##     pride             2.032    0.141   14.381    0.000
+##     embarrassed       2.410    0.166   14.514    0.000
+##     joy               1.115    0.081   13.695    0.000
+##     tired             0.982    0.073   13.479    0.000
+##     nauseated         1.657    0.118   14.076    0.000
+##     safe              1.271    0.091   13.900    0.000
+##     happy             1.075    0.079   13.664    0.000
+##     depressed         2.107    0.147   14.321    0.000
+##     calm              1.134    0.082   13.795    0.000
+##     sounds            2.236    0.155   14.436    0.000
+##     seeing            2.196    0.154   14.295    0.000
+##     temperature       2.343    0.162   14.491    0.000
+##     odors             2.016    0.141   14.260    0.000
+##     depth             2.964    0.205   14.492    0.000
+##     recognizing       2.027    0.141   14.370    0.000
+##     love              1.473    0.104   14.201    0.000
+##     guilt             1.299    0.099   13.181    0.000
+##     disrespected      1.357    0.103   13.129    0.000
+##     self_aware        1.555    0.114   13.602    0.000
+##     self_restraint    1.240    0.091   13.604    0.000
+##     morality          1.358    0.098   13.804    0.000
+##     remembering       2.112    0.151   14.019    0.000
+##     emo_recog         1.198    0.088   13.600    0.000
+##     goal              2.531    0.178   14.181    0.000
+##     communicating     2.417    0.171   14.156    0.000
+##     thoughts          1.800    0.131   13.707    0.000
+##     computations      3.932    0.270   14.574    0.000
+##     reasoning         1.434    0.105   13.690    0.000
+##     beliefs           1.451    0.104   13.969    0.000
+##     free_will         1.974    0.142   13.864    0.000
+##     choices           2.039    0.147   13.909    0.000
+##     intentions        1.851    0.134   13.764    0.000
+##     experience        4.578    0.416   11.000    0.000
+##     agency            2.658    0.255   10.441    0.000
+## 
+## NULL</code></pre>
+</div>
+<div id="model-3a-three-factors-f1-f2-f3-see-study-1-3" class="section level3">
+<h3>Model 3a: Three factors (F1, F2, F3; see Study 1)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  65 iterations
+## 
+##   Number of observations                           429
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic             5919.595
+##   Degrees of freedom                               737
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic            22396.316
+##   Degrees of freedom                               780
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.760
+##   Tucker-Lewis Index (TLI)                       0.746
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -29937.300
+##   Loglikelihood unrestricted model (H1)     -26977.503
+## 
+##   Number of free parameters                         83
+##   Akaike (AIC)                               60040.601
+##   Bayesian (BIC)                             60377.702
+##   Sample-size adjusted Bayesian (BIC)        60114.309
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.128
+##   90 Percent Confidence Interval          0.125  0.131
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.096
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   Factor1 =~                                          
+##     pleasure          1.000                           
+##     happy             0.972    0.029   33.848    0.000
+##     joy               0.979    0.029   34.046    0.000
+##     nauseated         0.907    0.033   27.361    0.000
+##     angry             0.932    0.031   29.687    0.000
+##     fear              0.950    0.032   29.305    0.000
+##     love              0.877    0.030   28.896    0.000
+##     desires           0.929    0.030   30.820    0.000
+##     tired             0.970    0.031   30.992    0.000
+##     depressed         0.804    0.033   24.124    0.000
+##     conscious         0.872    0.034   25.617    0.000
+##     calm              0.912    0.030   30.616    0.000
+##     safe              0.904    0.031   29.479    0.000
+##     free_will         0.812    0.032   25.061    0.000
+##     thoughts          0.853    0.031   27.317    0.000
+##     pain              0.929    0.034   27.293    0.000
+##     pride             0.732    0.031   23.266    0.000
+##     self_aware        0.688    0.034   20.331    0.000
+##     guilt             0.607    0.032   18.985    0.000
+##     disrespected      0.605    0.033   18.328    0.000
+##     hungry            0.900    0.036   25.133    0.000
+##     embarrassed       0.579    0.033   17.469    0.000
+##     intentions        0.785    0.034   23.020    0.000
+##     personality       0.923    0.029   31.813    0.000
+##     beliefs           0.505    0.033   15.376    0.000
+##     self_restraint    0.596    0.033   18.175    0.000
+##   Factor2 =~                                          
+##     computations      1.000                           
+##     recognizing       2.241    0.272    8.240    0.000
+##     reasoning         1.940    0.239    8.128    0.000
+##     morality          1.654    0.209    7.922    0.000
+##     remembering       2.195    0.266    8.250    0.000
+##     emo_recog         1.811    0.223    8.110    0.000
+##   Factor3 =~                                          
+##     temperature       1.000                           
+##     seeing            1.299    0.060   21.683    0.000
+##     sounds            1.106    0.053   20.819    0.000
+##     depth             1.090    0.059   18.446    0.000
+##     choices           1.172    0.058   20.176    0.000
+##     goal              0.964    0.061   15.883    0.000
+##     communicating     1.143    0.056   20.244    0.000
+##     odors             1.237    0.060   20.569    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   Factor1 ~~                                          
+##     Factor2           1.626    0.228    7.132    0.000
+##     Factor3           3.041    0.264   11.509    0.000
+##   Factor2 ~~                                          
+##     Factor3           1.182    0.169    6.998    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     pleasure          0.890    0.066   13.426    0.000
+##     happy             0.971    0.071   13.590    0.000
+##     joy               0.964    0.071   13.566    0.000
+##     nauseated         1.685    0.119   14.116    0.000
+##     angry             1.392    0.100   13.970    0.000
+##     fear              1.506    0.108   13.996    0.000
+##     love              1.341    0.096   14.024    0.000
+##     desires           1.227    0.088   13.884    0.000
+##     tired             1.314    0.095   13.870    0.000
+##     depressed         1.868    0.131   14.271    0.000
+##     conscious         1.872    0.132   14.205    0.000
+##     calm              1.210    0.087   13.900    0.000
+##     safe              1.341    0.096   13.984    0.000
+##     free_will         1.722    0.121   14.231    0.000
+##     thoughts          1.495    0.106   14.119    0.000
+##     pain              1.780    0.126   14.120    0.000
+##     pride             1.702    0.119   14.304    0.000
+##     self_aware        2.100    0.146   14.401    0.000
+##     guilt             1.922    0.133   14.438    0.000
+##     disrespected      2.068    0.143   14.454    0.000
+##     hungry            2.100    0.148   14.228    0.000
+##     embarrassed       2.116    0.146   14.474    0.000
+##     intentions        2.007    0.140   14.313    0.000
+##     personality       1.090    0.079   13.799    0.000
+##     beliefs           2.149    0.148   14.517    0.000
+##     self_restraint    2.050    0.142   14.458    0.000
+##     computations      3.808    0.264   14.438    0.000
+##     recognizing       1.558    0.130   12.031    0.000
+##     reasoning         1.605    0.126   12.755    0.000
+##     morality          1.783    0.133   13.418    0.000
+##     remembering       1.445    0.121   11.936    0.000
+##     emo_recog         1.461    0.114   12.838    0.000
+##     temperature       1.412    0.106   13.315    0.000
+##     seeing            1.356    0.110   12.297    0.000
+##     sounds            1.218    0.096   12.753    0.000
+##     depth             1.979    0.146   13.518    0.000
+##     choices           1.585    0.122   13.015    0.000
+##     goal              2.556    0.183   13.964    0.000
+##     communicating     1.484    0.114   12.990    0.000
+##     odors             1.615    0.126   12.861    0.000
+##     Factor1           5.204    0.412   12.617    0.000
+##     Factor2           0.705    0.171    4.118    0.000
+##     Factor3           2.585    0.259    9.976    0.000</code></pre>
+</div>
+<div id="model-3b-three-factors-affect-autonomy-perception-see-weisman-et-al.-2015-3" class="section level3">
+<h3>Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)</h3>
+<pre><code>## lavaan (0.5-20) converged normally after  50 iterations
+## 
+##   Number of observations                           429
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic              704.479
+##   Degrees of freedom                               101
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic             7047.719
+##   Degrees of freedom                               120
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.913
+##   Tucker-Lewis Index (TLI)                       0.897
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)             -12221.735
+##   Loglikelihood unrestricted model (H1)     -11869.496
+## 
+##   Number of free parameters                         35
+##   Akaike (AIC)                               24513.470
+##   Bayesian (BIC)                             24655.621
+##   Sample-size adjusted Bayesian (BIC)        24544.552
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.118
+##   90 Percent Confidence Interval          0.110  0.126
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.057
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   affect =~                                           
+##     happy             1.000                           
+##     depressed         0.807    0.034   23.577    0.000
+##     fear              0.944    0.034   27.888    0.000
+##     angry             0.944    0.032   29.693    0.000
+##     calm              0.917    0.031   29.954    0.000
+##     joy               1.007    0.028   35.903    0.000
+##   autonomy =~                                         
+##     free_will         1.000                           
+##     choices           1.024    0.046   22.089    0.000
+##     self_restraint    0.764    0.044   17.468    0.000
+##     intentions        1.026    0.047   21.914    0.000
+##     goal              0.857    0.049   17.336    0.000
+##   perception =~                                       
+##     sounds            1.000                           
+##     seeing            1.177    0.045   26.292    0.000
+##     temperature       0.904    0.040   22.315    0.000
+##     odors             1.111    0.046   24.072    0.000
+##     depth             0.936    0.048   19.426    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##   affect ~~                                           
+##     autonomy          3.676    0.310   11.869    0.000
+##     perception        3.195    0.278   11.491    0.000
+##   autonomy ~~                                         
+##     perception        2.906    0.255   11.381    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  Z-value  P(&gt;|z|)
+##     happy             0.802    0.073   11.040    0.000
+##     depressed         1.917    0.140   13.680    0.000
+##     fear              1.660    0.127   13.111    0.000
+##     angry             1.373    0.107   12.788    0.000
+##     calm              1.260    0.099   12.735    0.000
+##     joy               0.788    0.072   10.922    0.000
+##     free_will         1.550    0.128   12.122    0.000
+##     choices           1.356    0.117   11.610    0.000
+##     self_restraint    1.796    0.134   13.391    0.000
+##     intentions        1.414    0.121   11.723    0.000
+##     goal              2.314    0.172   13.420    0.000
+##     sounds            1.053    0.091   11.636    0.000
+##     seeing            1.102    0.103   10.653    0.000
+##     temperature       1.280    0.101   12.639    0.000
+##     odors             1.461    0.122   11.973    0.000
+##     depth             2.134    0.160   13.362    0.000
+##     affect            5.091    0.401   12.682    0.000
+##     autonomy          3.604    0.343   10.502    0.000
+##     perception        3.329    0.296   11.262    0.000</code></pre>
+</div>
+<div id="compare-models-3" class="section level3">
+<h3>Compare models</h3>
+<pre><code>## Warning in lavTestLRT(object = &lt;S4 object of class structure(&quot;lavaan&quot;,
+## package = &quot;lavaan&quot;)&gt;, : lavaan WARNING: some models are based on a
+## different set of observed variables</code></pre>
+<pre><code>## Chi Square Difference Test
+## 
+##               Df   AIC   BIC   Chisq Chisq diff Df diff Pr(&gt;Chisq)    
+## d4_all_fit3b 101 24513 24656  704.48                                  
+## d4_all_fit2  734 60145 60494 6017.53     5313.1     633     &lt;2e-16 ***
+## d4_all_fit3a 737 60041 60378 5919.59      -97.9       3          1    
+## d4_all_fit1  740 61157 61482 7041.60     1122.0       3     &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 </div>
