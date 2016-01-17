@@ -1,9 +1,11 @@
 ---
-title: "GGW-mod2: Factor Analysis"
+title: 'GGW-mod2: Factor Analysis'
 output:
   html_document:
-    toc: true
     theme: flatly
+    toc: yes
+  pdf_document:
+    toc: yes
 ---
 
 # Setup
@@ -1026,62 +1028,69 @@ d4_factor_scores_condition <- d4_factor_scores %>%
 #              statistics_functions = c("ci_lower", "mean", "ci_upper"))
 ```
 
-```{r s4 plot: AFFECT vs. AUTONOMY, echo = F, fig.height = 8, fig.width = 8}
+```{r s4 cfa plot: AFFECT vs. AUTONOMY, echo = F, fig.height = 8, fig.width = 8}
 ggplot(aes(x = affect_mean, y = autonomy_mean, colour = condition), 
        data = d4_factor_scores_condition) +
-  geom_point(size = 4) +
   geom_errorbar(aes(ymin = autonomy_mean - autonomy_sd/sqrt(autonomy_n),
                     ymax = autonomy_mean + autonomy_sd/sqrt(autonomy_n)),
-                width = 0.1, alpha = 0.5) +
+                width = 0.1, alpha = 0.4) +
   geom_errorbarh(aes(xmin = affect_mean - affect_sd/sqrt(affect_n),
                      xmax = affect_mean + affect_sd/sqrt(affect_n)),
-                 height = 0.1, alpha = 0.5) +
+                 height = 0.1, alpha = 0.4) +
+  geom_point(size = 4) +
   geom_dl(aes(label = condition), method = "smart.grid") +
   theme_bw() +
   scale_color_discrete() +
   theme(text = element_text(size = 20),
         legend.position = "none") +
+  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   labs(title = "Study 4: AFFECT vs. AUTONOMY\n(Error bars are 95% CIs)\n",
        x = "\nAverage score: AFFECT",
-       y = "Average score: AUTONOMY")
+       y = "Average score: AUTONOMY\n")
 ```
 
-```{r s4 plot: AFFECT vs. PERCEPTION, echo = F, fig.height = 8, fig.width = 8}
+```{r s4 cfa plot: AFFECT vs. PERCEPTION, echo = F, fig.height = 8, fig.width = 8}
 ggplot(aes(x = affect_mean, y = perception_mean, colour = condition), 
        data = d4_factor_scores_condition) +
-  geom_point(size = 4) +
   geom_errorbar(aes(ymin = perception_mean - perception_sd/sqrt(perception_n),
                     ymax = perception_mean + perception_sd/sqrt(perception_n)),
-                width = 0.1, alpha = 0.5) +
+                width = 0.1, alpha = 0.4) +
   geom_errorbarh(aes(xmin = affect_mean - affect_sd/sqrt(affect_n),
                      xmax = affect_mean + affect_sd/sqrt(affect_n)),
-                 height = 0.1, alpha = 0.5) +
+                 height = 0.1, alpha = 0.4) +
+  geom_point(size = 4) +
   geom_dl(aes(label = condition), method = "smart.grid") +
   theme_bw() +
   scale_color_discrete() +
   theme(text = element_text(size = 20),
         legend.position = "none") +
+  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   labs(title = "Study 4: AFFECT vs. PERCEPTION\n(Error bars are 95% CIs)\n",
        x = "\nAverage score: AFFECT",
-       y = "Average score: PERCEPTION")
+       y = "Average score: PERCEPTION\n")
 ```
 
-```{r s4 plot: AUTONOMY vs. PERCEPTION, echo = F, fig.height = 8, fig.width = 8}
+```{r s4 cfa plot: AUTONOMY vs. PERCEPTION, echo = F, fig.height = 8, fig.width = 8}
 ggplot(aes(x = autonomy_mean, y = perception_mean, colour = condition), 
        data = d4_factor_scores_condition) +
-  geom_point(size = 4) +
   geom_errorbar(aes(ymin = perception_mean - perception_sd/sqrt(perception_n),
                     ymax = perception_mean + perception_sd/sqrt(perception_n)),
-                width = 0.1, alpha = 0.5) +
+                width = 0.1, alpha = 0.4) +
   geom_errorbarh(aes(xmin = autonomy_mean - autonomy_sd/sqrt(autonomy_n),
                      xmax = autonomy_mean + autonomy_sd/sqrt(autonomy_n)),
-                 height = 0.1, alpha = 0.5) +
+                 height = 0.1, alpha = 0.4) +
+  geom_point(size = 4) +
   geom_dl(aes(label = condition), method = "smart.grid") +
   theme_bw() +
   scale_color_discrete() +
   theme(text = element_text(size = 20),
         legend.position = "none") +
+  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   labs(title = "Study 4: AUTONOMY vs. PERCEPTION\n(Error bars are 95% CIs)\n",
        x = "\nAverage score: AUTONOMY",
-       y = "Average score: PERCEPTION")
+       y = "Average score: PERCEPTION\n")
 ```
+
