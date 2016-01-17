@@ -15,6 +15,8 @@ library(psych)
 library(stats)
 library(lavaan)
 library(nFactors)
+library(langcog)
+library(directlabels)
 library(ggplot2)
 library(knitr)
 library(tidyr)
@@ -1004,8 +1006,82 @@ d4_factor_scores <- d4_all_fit3b_predict %>%
 rm(d4_all_fit3b_predict, model3b_dummy, fit_dummy, data_dummy, d4_subids)
 ```
 
-```{r plot}
-ggplot(aes(x = affect, y = autonomy, colour = condition), 
-       data = d4_factor_scores) +
-  geom_point()
+```{r s4 average factor scores by condition, echo = F}
+d4_factor_scores_condition <- d4_factor_scores %>%
+  group_by(condition) %>%
+  summarise(affect_mean = mean(affect),
+            affect_sd = sd(affect),
+            affect_n = length(affect),
+            autonomy_mean = mean(autonomy),
+            autonomy_sd = sd(autonomy),
+            autonomy_n = length(autonomy),
+            perception_mean = mean(perception),
+            perception_sd = sd(perception),
+            perception_n = length(perception))
+
+# d4_factor_scores_condition_mb <- d4_factor_scores %>%
+#   gather(factor, score, c(affect, autonomy, perception)) %>%
+#   multi_boot(column = "score",
+#              summary_groups = c("condition", "factor"),
+#              statistics_functions = c("ci_lower", "mean", "ci_upper"))
+```
+
+```{r s4 plot: AFFECT vs. AUTONOMY, echo = F, fig.height = 8, fig.width = 8}
+ggplot(aes(x = affect_mean, y = autonomy_mean, colour = condition), 
+       data = d4_factor_scores_condition) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = autonomy_mean - autonomy_sd/sqrt(autonomy_n),
+                    ymax = autonomy_mean + autonomy_sd/sqrt(autonomy_n)),
+                width = 0.1, alpha = 0.5) +
+  geom_errorbarh(aes(xmin = affect_mean - affect_sd/sqrt(affect_n),
+                     xmax = affect_mean + affect_sd/sqrt(affect_n)),
+                 height = 0.1, alpha = 0.5) +
+  geom_dl(aes(label = condition), method = "smart.grid") +
+  theme_bw() +
+  scale_color_discrete() +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  labs(title = "Study 4: AFFECT vs. AUTONOMY\n(Error bars are 95% CIs)\n",
+       x = "\nAverage score: AFFECT",
+       y = "Average score: AUTONOMY")
+```
+
+```{r s4 plot: AFFECT vs. PERCEPTION, echo = F, fig.height = 8, fig.width = 8}
+ggplot(aes(x = affect_mean, y = perception_mean, colour = condition), 
+       data = d4_factor_scores_condition) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = perception_mean - perception_sd/sqrt(perception_n),
+                    ymax = perception_mean + perception_sd/sqrt(perception_n)),
+                width = 0.1, alpha = 0.5) +
+  geom_errorbarh(aes(xmin = affect_mean - affect_sd/sqrt(affect_n),
+                     xmax = affect_mean + affect_sd/sqrt(affect_n)),
+                 height = 0.1, alpha = 0.5) +
+  geom_dl(aes(label = condition), method = "smart.grid") +
+  theme_bw() +
+  scale_color_discrete() +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  labs(title = "Study 4: AFFECT vs. PERCEPTION\n(Error bars are 95% CIs)\n",
+       x = "\nAverage score: AFFECT",
+       y = "Average score: PERCEPTION")
+```
+
+```{r s4 plot: AUTONOMY vs. PERCEPTION, echo = F, fig.height = 8, fig.width = 8}
+ggplot(aes(x = autonomy_mean, y = perception_mean, colour = condition), 
+       data = d4_factor_scores_condition) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = perception_mean - perception_sd/sqrt(perception_n),
+                    ymax = perception_mean + perception_sd/sqrt(perception_n)),
+                width = 0.1, alpha = 0.5) +
+  geom_errorbarh(aes(xmin = autonomy_mean - autonomy_sd/sqrt(autonomy_n),
+                     xmax = autonomy_mean + autonomy_sd/sqrt(autonomy_n)),
+                 height = 0.1, alpha = 0.5) +
+  geom_dl(aes(label = condition), method = "smart.grid") +
+  theme_bw() +
+  scale_color_discrete() +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  labs(title = "Study 4: AUTONOMY vs. PERCEPTION\n(Error bars are 95% CIs)\n",
+       x = "\nAverage score: AUTONOMY",
+       y = "Average score: PERCEPTION")
 ```
