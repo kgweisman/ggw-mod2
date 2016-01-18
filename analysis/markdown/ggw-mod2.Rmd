@@ -148,7 +148,7 @@ cleanup <- function(datasource) {
         ifelse(as.numeric(as.character(yob)) > 1900 & 
                  as.numeric(as.character(yob)) < 2000, 
                as.numeric(as.character(yob)), NA)), # correct formatting in yob
-        age_approx = 2015 - yob_correct) %>% # calculate approximate age
+        age_approx = 2016 - yob_correct) %>% # calculate approximate age
       mutate(gender = factor(gender, levels = c(1, 2, 0), 
                              labels = c("m", "f", "other"))) %>%
       filter(age_approx >= 18) # exclude Ps who are younger than 18 years
@@ -281,7 +281,7 @@ cleanup <- function(datasource) {
         ifelse(as.numeric(as.character(yob)) > 1900 & 
                  as.numeric(as.character(yob)) < 2000, 
                as.numeric(as.character(yob)), NA)), # correct formatting in yob
-        age_approx = 2015 - yob_correct) %>% # calculate approximate age
+        age_approx = 2016 - yob_correct) %>% # calculate approximate age
       mutate(gender = factor(gender, levels = c(1, 2, 0), 
                              labels = c("m", "f", "other"))) %>%
       filter(age_approx >= 18) # exclude Ps who are younger than 18 years
@@ -341,6 +341,115 @@ cleanup <- function(datasource) {
   
   # return cleaned dataset
   return(d_clean)
+}
+
+# make function for examining exclusion of participants
+excludedCounts <- function(datasource) {
+  
+  # set datasource
+  if(datasource == "study 1"){
+    d <- d1
+    d_raw <- d_raw_study1
+  }
+  if(datasource == "study 2"){
+    d <- d2
+    d_raw <- d_raw_study2
+  }
+  if(datasource == "study 3"){
+    d <- d3
+    d_raw <- d_raw_study3
+  }
+  if(datasource == "study 4"){
+    d <- d4
+    d_raw <- d_raw_study4
+  }
+  
+  # get subids of successful participants
+  d_subids <- levels(factor(as.character(d$subid)))
+  
+  # get subids of excluded participants
+  d_excluded <- d_raw %>%
+    filter(is.element(subid, d_subids) == FALSE) %>%
+    select(condition, subid, finished, starts_with("CATCH"), yob)
+
+  # count excluded participants
+  d_excluded_n <- length(d_excluded$subid)
+  
+  if(datasource %in% c("study 1", "study 2", "study 4")) {
+    # count participants who did not finish
+    d_excluded_unfinished <- d_excluded %>%
+      filter(is.na(CATCH) == T,
+             finished != 1) %>%
+      select(subid) %>%
+      c()
+    
+    # count participants who finished, but failed catch trial
+    d_excluded_CATCH <- d_excluded %>%
+      filter(is.element(subid, d_excluded_unfinished$subid) == FALSE) %>%
+      filter(CATCH != 1) %>%
+      select(subid) %>%
+      c()
+  }
+  
+  if(datasource == "study 3") {
+    # count participants who did not finish
+    d_excluded_unfinished <- d_excluded %>%
+      filter(is.na(CATCH..characterL) == T,
+             is.na(CATCH..characterR) == T,
+             finished != 1) %>%
+      select(subid) %>%
+      c()
+    
+    # count participants who finished, but failed catch trial
+    d_excluded_CATCH <- d_excluded %>%
+      filter(is.element(subid, d_excluded_unfinished$subid) == FALSE) %>%
+      filter(CATCH..characterL != 5 | CATCH..characterR != 5) %>%
+      select(subid) %>%
+      c()
+  }
+  
+  # count participants who finished and passed catch trial, 
+  # but did not provide year of birth
+  d_excluded_no_yob <- d_excluded %>%
+    filter(is.element(subid, d_excluded_unfinished$subid) == FALSE,
+           is.element(subid, d_excluded_CATCH$subid) == FALSE) %>%
+    mutate(yob = as.numeric(as.character(yob))) %>%
+    filter(is.na(yob) | yob < 1899 | nchar(as.character(yob)) != 4) %>%
+    select(subid) %>%
+    c()
+  
+  # count participants who finished and passed catch trial, 
+  # but did not provide year of birth
+  d_excluded_young <- d_excluded %>%
+    filter(is.element(subid, d_excluded_unfinished$subid) == FALSE,
+           is.element(subid, d_excluded_CATCH$subid) == FALSE,
+           is.element(subid, d_excluded_no_yob$subid) == FALSE) %>%
+    mutate(yob = as.numeric(as.character(yob))) %>%
+    filter(is.na(yob) | 2016 - yob < 18) %>%
+    select(subid) %>%
+    c()
+  
+  # sum up excluded participants by category
+  total <- sum(length(d_excluded_unfinished$subid),
+               length(d_excluded_CATCH$subid),
+               length(d_excluded_no_yob$subid),
+               length(d_excluded_young$subid))
+  
+  # calculate counts
+  excluded_counts <- 
+    data.frame("did_not_finish" = length(d_excluded_unfinished$subid),
+               "failed_catch_trial" = length(d_excluded_CATCH$subid),
+               "did_not_provide_yob" = length(d_excluded_no_yob$subid),
+               "too_young" = length(d_excluded_young$subid),
+               "TOTAL_excluded" = total,
+               "TOTAL_participated" = length(d$subid),
+               "OVERALL_TOTAL" = sum(total, length(d$subid)))
+  
+  if(total != d_excluded_n) {
+    stop("Error: 4 sources of exclusion do not add up to total.")
+    } else {
+      return(excluded_counts)
+    }
 }
 
 # make function for stripping dataframes for dimension reducation
@@ -839,6 +948,10 @@ ggplot(allData) +
 ## Demographics
 
 ```{r s1 demographics, echo = F}
+# examine exclusion
+kable(excludedCounts("study 1"), align = "l",
+      caption = "Study 1: Exclusion")
+
 # make demographics tables
 kable(demoSampleSize("study 1"), align = "l", digits = 2,
       caption = "Study 1: Sample size")
@@ -1099,6 +1212,10 @@ summary(d1_all_fitGGW, fit.measures = TRUE)
 ## Demographics
 
 ```{r s2 demographics, echo = F}
+# examine exclusion
+kable(excludedCounts("study 1"), align = "l",
+      caption = "Study 1: Exclusion")
+
 # make demographics tables
 kable(demoSampleSize("study 2"), align = "l", digits = 2, 
       caption = "Study 2: Sample size")
@@ -1332,6 +1449,10 @@ summary(d2_all_fitGGW, fit.measures = TRUE)
 ## Demographics
 
 ```{r s3 demographics, echo = F}
+# examine exclusion
+kable(excludedCounts("study 1"), align = "l",
+      caption = "Study 1: Exclusion")
+
 # make demographics tables
 kable(demoSampleSize("study 3"), align = "l", digits = 2, 
       caption = "Study 3: Sample size")
@@ -1443,6 +1564,10 @@ summary(d3_all_fitGGW, fit.measures = TRUE)
 ## Demographics
 
 ```{r s4 demographics, echo = F}
+# examine exclusion
+kable(excludedCounts("study 1"), align = "l",
+      caption = "Study 1: Exclusion")
+
 # make demographics tables
 kable(demoSampleSize("study 4"), align = "l", digits = 2, 
       caption = "Study 4: Sample size")
