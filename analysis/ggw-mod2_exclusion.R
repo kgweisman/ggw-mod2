@@ -69,17 +69,30 @@ excludedCounts <- function(datasource) {
   
   # count participants who finished and passed catch trial, 
   # but did not provide year of birth
-  d_excluded_yob <- d_excluded %>%
+  d_excluded_no_yob <- d_excluded %>%
     filter(is.element(subid, d_excluded_unfinished$subid) == FALSE,
            is.element(subid, d_excluded_CATCH$subid) == FALSE) %>%
-    filter(nchar(as.character(yob)) != 4) %>%
+    mutate(yob = as.numeric(as.character(yob))) %>%
+    filter(is.na(yob) | yob < 1899 | nchar(as.character(yob)) != 4) %>%
+    select(subid) %>%
+    c()
+  
+  # count participants who finished and passed catch trial, 
+  # but did not provide year of birth
+  d_excluded_young <- d_excluded %>%
+    filter(is.element(subid, d_excluded_unfinished$subid) == FALSE,
+           is.element(subid, d_excluded_CATCH$subid) == FALSE,
+           is.element(subid, d_excluded_no_yob$subid) == FALSE) %>%
+    mutate(yob = as.numeric(as.character(yob))) %>%
+    filter(is.na(yob) | 2016 - yob < 18) %>%
     select(subid) %>%
     c()
   
   # sum up excluded participants by category
   total <- sum(length(d_excluded_unfinished$subid),
                length(d_excluded_CATCH$subid),
-               length(d_excluded_yob$subid))
+               length(d_excluded_no_yob$subid),
+               length(d_excluded_young$subid))
   
   if(total != d_excluded_n) {
     stop("Error: 3 sources of exclusion do not add up to total.")
@@ -89,10 +102,13 @@ excludedCounts <- function(datasource) {
     excluded_counts <- 
       data.frame("did_not_finish" = length(d_excluded_unfinished$subid),
                  "failed_catch_trial" = length(d_excluded_CATCH$subid),
-                 "did_not_provide_yob" = length(d_excluded_yob$subid),
+                 "did_not_provide_yob" = length(d_excluded_no_yob$subid),
+                 "too_young" = length(d_excluded_young$subid),
                  "TOTAL" = total)
     return(excluded_counts)
   }
 }
 
 excludedCounts("study 4")
+
+# rm(datasource, d_subids, d_excluded, d_excluded_n, d_excluded_unfinished, d_excluded_CATCH, d_excluded_no_yob, d_excluded_young, total, excluded_counts)

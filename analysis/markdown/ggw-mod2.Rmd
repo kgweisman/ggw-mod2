@@ -49,7 +49,7 @@ cleanup <- function(datasource) {
         ifelse(as.numeric(as.character(yob)) > 1900 & 
                  as.numeric(as.character(yob)) < 2000, 
                as.numeric(as.character(yob)), NA)), # correct formatting in yob
-        age_approx = 2015 - yob_correct) %>% # calculate approximate age
+        age_approx = 2016 - yob_correct) %>% # calculate approximate age
       mutate(gender = factor(gender, levels = c(1, 2, 0), 
                              labels = c("m", "f", "other"))) %>%
       filter(age_approx >= 18) # exclude Ps who are younger than 18 years
