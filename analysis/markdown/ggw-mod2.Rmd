@@ -775,7 +775,7 @@ howManyFactors <- function (df) {
   # vss_unrotated_df <- VSS(df, n = 15, 
   #                                rotate = "none", plot = FALSE)
   # vss_rotated_df <- VSS(df, n = 15, 
-  #                              rotate = "oblimin", cor = "poly", plot = FALSE)
+  #                              rotate = "oblimin", cor = "cor", plot = FALSE)
 }
 
 # get factor loadings for some efa
@@ -933,6 +933,12 @@ tol21rainbow = c("#771155", "#AA4488", "#CC99BB", "#114477", "#4477AA", "#77AADD
 ```
 
 ```{r modeling decisions, echo = F}
+# for current purposes always choose minimal residual (fm = "minres") instead of ML because of non-normality
+
+# for EFAs, what kind of correlation?
+chosenCorType <- "cor" # pearson correlation, less appropriate for ordinal data but 7-point likert scale might be ok
+# chosenCorType <- "poly" # polychoric correlation, appropriate for ordinal data but seems to throw errors
+
 # for CFAs, treat variables as continuous or ordinal?
 chosenVarCoding <- "continuous" # less true (bc of skewed data) but faster and able to compare non-nested models using vuongtest
 # chosenVarCoding <- "ordinal" # truer but slower and impossible to compare non-nested models
@@ -940,6 +946,10 @@ chosenVarCoding <- "continuous" # less true (bc of skewed data) but faster and a
 # for CFAs, what estimator to use?
 chosenEstimator <- "ML" # maximum likelihood, probably less true (bc of skewed data) but able to compare non-nested models using vuongtest
 # chosenEstimator <- "default"
+
+kable(data.frame("EFA_correlation" = chosenCorType,
+                 "CFA_coding" = chosenVarCoding,
+                 "CFA_estimator" = chosenEstimator))
 ```
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
@@ -1084,7 +1094,7 @@ nfactors_d1_beetle <- 2
 ```{r s1 beetle no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d1_beetle_unrotatedN <- fa(d1_beetle, nfactors_d1_beetle, 
-                               rotate = "none", cor = "poly", fm = "minres")
+                               rotate = "none", cor = "cor", fm = "minres")
 print(efa_d1_beetle_unrotatedN)
 
 # get loadings for each factor
@@ -1096,7 +1106,7 @@ efa_d1_beetle_unrotatedN_loadings <- getFactorLoadings(efa_d1_beetle_unrotatedN)
 ```{r s1 beetle oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d1_beetle_rotatedN <- fa(d1_beetle, nfactors_d1_beetle, 
-                             rotate = "oblimin", cor = "poly", fm = "minres")
+                             rotate = "oblimin", cor = "cor", fm = "minres")
 print(efa_d1_beetle_rotatedN)
 
 # get loadings for each factor
@@ -1149,7 +1159,7 @@ nfactors_d1_robot <- 2
 ```{r s1 robot no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d1_robot_unrotatedN <- fa(d1_robot, nfactors_d1_robot, 
-                              rotate = "none", cor = "poly", fm = "minres")
+                              rotate = "none", cor = "cor", fm = "minres")
 print(efa_d1_robot_unrotatedN)
 
 # get loadings for each factor
@@ -1161,7 +1171,7 @@ efa_d1_robot_unrotatedN_loadings <- getFactorLoadings(efa_d1_robot_unrotatedN)
 ```{r s1 robot oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d1_robot_rotatedN <- fa(d1_robot, nfactors_d1_robot, 
-                            rotate = "oblimin", cor = "poly", fm = "minres")
+                            rotate = "oblimin", cor = "cor", fm = "minres")
 print(efa_d1_robot_rotatedN)
 
 # get loadings for each factor
@@ -1214,7 +1224,7 @@ nfactors_d1_all <- 3
 ```{r s1 all no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d1_all_unrotatedN <- fa(d1_all, nfactors_d1_all, 
-                            rotate = "none", cor = "poly", fm = "minres")
+                            rotate = "none", cor = "cor", fm = "minres")
 print(efa_d1_all_unrotatedN)
 
 # get loadings for each factor
@@ -1226,7 +1236,7 @@ efa_d1_all_unrotatedN_loadings <- getFactorLoadings(efa_d1_all_unrotatedN)
 ```{r s1 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d1_all_rotatedN <- fa(d1_all, nfactors_d1_all, 
-                          rotate = "oblimin", cor = "poly", fm = "minres")
+                          rotate = "oblimin", cor = "cor", fm = "minres")
 print(efa_d1_all_rotatedN)
 
 # get loadings for each factor
@@ -1371,7 +1381,7 @@ nfactors_d2_beetle <- 2
 ```{r s2 beetle no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d2_beetle_unrotatedN <- fa(d2_beetle, nfactors_d2_beetle, 
-                               rotate = "none", cor = "poly", fm = "minres")
+                               rotate = "none", cor = "cor", fm = "minres")
 print(efa_d2_beetle_unrotatedN)
 
 # get loadings for each factor
@@ -1383,7 +1393,7 @@ efa_d2_beetle_unrotatedN_loadings <- getFactorLoadings(efa_d2_beetle_unrotatedN)
 ```{r s2 beetle oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d2_beetle_rotatedN <- fa(d2_beetle, nfactors_d2_beetle, 
-                             rotate = "oblimin", cor = "poly", fm = "minres")
+                             rotate = "oblimin", cor = "cor", fm = "minres")
 print(efa_d2_beetle_rotatedN)
 
 # get loadings for each factor
@@ -1436,7 +1446,7 @@ nfactors_d2_robot <- 2
 ```{r s2 robot no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d2_robot_unrotatedN <- fa(d2_robot, nfactors_d2_robot, 
-                              rotate = "none", cor = "poly", fm = "minres")
+                              rotate = "none", cor = "cor", fm = "minres")
 print(efa_d2_robot_unrotatedN)
 
 # get loadings for each factor
@@ -1448,7 +1458,7 @@ efa_d2_robot_unrotatedN_loadings <- getFactorLoadings(efa_d2_robot_unrotatedN)
 ```{r s2 robot oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d2_robot_rotatedN <- fa(d2_robot, nfactors_d2_robot, 
-                            rotate = "oblimin", cor = "poly", fm = "minres")
+                            rotate = "oblimin", cor = "cor", fm = "minres")
 print(efa_d2_robot_rotatedN)
 
 # get loadings for each factor
@@ -1501,7 +1511,7 @@ nfactors_d2_all <- 3
 ```{r s2 all no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d2_all_unrotatedN <- fa(d2_all, nfactors_d2_all, 
-                            rotate = "none", cor = "poly", fm = "minres")
+                            rotate = "none", cor = "cor", fm = "minres")
 print(efa_d2_all_unrotatedN)
 
 # get loadings for each factor
@@ -1513,7 +1523,7 @@ efa_d2_all_unrotatedN_loadings <- getFactorLoadings(efa_d2_all_unrotatedN)
 ```{r s2 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d2_all_rotatedN <- fa(d2_all, nfactors_d2_all, 
-                          rotate = "oblimin", cor = "poly", fm = "minres")
+                          rotate = "oblimin", cor = "cor", fm = "minres")
 print(efa_d2_all_rotatedN)
 
 # get loadings for each factor
@@ -1631,7 +1641,7 @@ nfactors_d3_all <- 3
 ```{r s3 all no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d3_all_unrotatedN <- fa(d3_all, nfactors_d3_all, 
-                            rotate = "none", cor = "poly", fm = "minres")
+                            rotate = "none", cor = "cor", fm = "minres")
 print(efa_d3_all_unrotatedN)
 
 # get loadings for each factor
@@ -1643,7 +1653,7 @@ efa_d3_all_unrotatedN_loadings <- getFactorLoadings(efa_d3_all_unrotatedN)
 ```{r s3 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d3_all_rotatedN <- fa(d3_all, nfactors_d3_all, 
-                          rotate = "oblimin", cor = "poly", fm = "minres")
+                          rotate = "oblimin", cor = "cor", fm = "minres")
 print(efa_d3_all_rotatedN)
 
 # get loadings for each factor
@@ -1761,7 +1771,7 @@ nfactors_d4_all <- 3
 ```{r s4 all no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d4_all_unrotatedN <- fa(d4_all, nfactors_d4_all, 
-                            rotate = "none", cor = "poly", fm = "minres")
+                            rotate = "none", cor = "cor", fm = "minres")
 print(efa_d4_all_unrotatedN)
 
 # get loadings for each factor
@@ -1773,7 +1783,7 @@ efa_d4_all_unrotatedN_loadings <- getFactorLoadings(efa_d4_all_unrotatedN)
 ```{r s4 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d4_all_rotatedN <- fa(d4_all, nfactors_d4_all, 
-                          rotate = "oblimin", cor = "poly", fm = "minres")
+                          rotate = "oblimin", cor = "cor", fm = "minres")
 print(efa_d4_all_rotatedN)
 
 # get loadings for each factor
