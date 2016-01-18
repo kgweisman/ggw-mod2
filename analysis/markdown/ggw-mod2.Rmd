@@ -16,6 +16,7 @@ library(devtools)
 library(psych)
 library(stats)
 library(lavaan)
+library(nonnest2)
 library(nFactors)
 library(langcog)
 library(directlabels)
@@ -774,7 +775,7 @@ howManyFactors <- function (df) {
   # vss_unrotated_df <- VSS(df, n = 15, 
   #                                rotate = "none", plot = FALSE)
   # vss_rotated_df <- VSS(df, n = 15, 
-  #                              rotate = "oblimin", plot = FALSE)
+  #                              rotate = "oblimin", cor = "poly", plot = FALSE)
 }
 
 # get factor loadings for some efa
@@ -849,8 +850,28 @@ extractFStructure <- function(efa) {
   return(d_structure_allFactors)
 }
 
+# run customized CFA
+customCFA <- function(d, model) {
+  if(chosenVarCoding == "continuous") {
+    cfa <- cfa(model, d, estimator = chosenEstimator) 
+  } else if(chosenVarCoding == "ordinal") {
+    cfa <- cfa(model, d, ordered = names(d), estimator = chosenEstimator)
+  }
+  return(cfa)
+}
+
 # set 21-color palette (thank to Paul Tol: https://personal.sron.nl/~pault/colourschemes.pdf)
 tol21rainbow = c("#771155", "#AA4488", "#CC99BB", "#114477", "#4477AA", "#77AADD", "#117777", "#44AAAA", "#77CCCC", "#117744", "#44AA77", "#88CCAA", "#777711", "#AAAA44", "#DDDD77", "#774411", "#AA7744", "#DDAA77", "#771122", "#AA4455", "#DD7788")
+```
+
+```{r modeling decisions, echo = F}
+# for CFAs, treat variables as continuous or ordinal?
+chosenVarCoding <- "continuous" # less true (bc of skewed data) but faster and able to compare non-nested models using vuongtest
+# chosenVarCoding <- "ordinal" # truer but slower and impossible to compare non-nested models
+
+# for CFAs, what estimator to use?
+chosenEstimator <- "ML" # maximum likelihood, probably less true (bc of skewed data) but able to compare non-nested models using vuongtest
+# chosenEstimator <- "default"
 ```
 
 # Data preparation
@@ -904,22 +925,22 @@ d4_all <- makeDRDF("study 4", "all")
 # Data examination
 
 ```{r distributions, message = F, echo = F, fig.width = 15, fig.height = 3}
-# verify that data is too skewed to assume normality
-allData <- d1 %>%
-  select(study, subid, condition, happy:pride) %>%
-  full_join(d2 %>% select(study, subid, happy:pride)) %>%
-  full_join(d3 %>% select(study, subid, happy:pride)) %>%
-  full_join(d4 %>% select(study, subid, happy:pride)) %>%
-  gather(mc, response, happy:pride) %>%
-  mutate(log_response = log(response + 4),
-         recip_response = 1/(response + 4),
-         sqrt_response = sqrt(response + 4),
-         logsqrt_response = log(sqrt(response + 4)))
-
-ggplot(allData) +
-  geom_histogram(aes(x = response)) + 
-  facet_grid(study ~ mc) +
-  theme_bw()
+# # verify that data is too skewed to assume normality
+# allData <- d1 %>%
+#   select(study, subid, condition, happy:pride) %>%
+#   full_join(d2 %>% select(study, subid, happy:pride)) %>%
+#   full_join(d3 %>% select(study, subid, happy:pride)) %>%
+#   full_join(d4 %>% select(study, subid, happy:pride)) %>%
+#   gather(mc, response, happy:pride) %>%
+#   mutate(log_response = log(response + 4),
+#          recip_response = 1/(response + 4),
+#          sqrt_response = sqrt(response + 4),
+#          logsqrt_response = log(sqrt(response + 4)))
+# 
+# ggplot(allData) +
+#   geom_histogram(aes(x = response)) + 
+#   facet_grid(study ~ mc) +
+#   theme_bw()
 ```
 
 ```{r sphericity, message = F, echo = F}
@@ -999,7 +1020,7 @@ efa_d1_beetle_unrotatedN_loadings <- getFactorLoadings(efa_d1_beetle_unrotatedN)
 ```{r s1 beetle oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d1_beetle_rotatedN <- fa(d1_beetle, nfactors_d1_beetle, 
-                             rotate = "oblimin", fm = "minres")
+                             rotate = "oblimin", cor = "poly", fm = "minres")
 print(efa_d1_beetle_rotatedN)
 
 # get loadings for each factor
@@ -1060,7 +1081,7 @@ efa_d1_robot_unrotatedN_loadings <- getFactorLoadings(efa_d1_robot_unrotatedN)
 ```{r s1 robot oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d1_robot_rotatedN <- fa(d1_robot, nfactors_d1_robot, 
-                            rotate = "oblimin", fm = "minres")
+                            rotate = "oblimin", cor = "poly", fm = "minres")
 print(efa_d1_robot_rotatedN)
 
 # get loadings for each factor
@@ -1121,7 +1142,7 @@ efa_d1_all_unrotatedN_loadings <- getFactorLoadings(efa_d1_all_unrotatedN)
 ```{r s1 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d1_all_rotatedN <- fa(d1_all, nfactors_d1_all, 
-                          rotate = "oblimin", fm = "minres")
+                          rotate = "oblimin", cor = "poly", fm = "minres")
 print(efa_d1_all_rotatedN)
 
 # get loadings for each factor
@@ -1174,8 +1195,8 @@ modelDD_MR3 <- paste0("MR3 =~ ", paste(d1_fStructure$mc_MR3[is.na(d1_fStructure$
 modelDD_allFactors <- paste(modelDD_MR1, "\n", modelDD_MR2, "\n", modelDD_MR3, collapse = "")
 modelDD <- as.character(noquote(modelDD_allFactors))
 
-# test model on study 1 (all conditions)
-d1_all_fitDD <- cfa(modelDD, d1_all, ordered = TRUE)
+# test model
+d1_all_fitDD <- customCFA(d1_all, modelDD)
 summary(d1_all_fitDD, fit.measures = TRUE)
 
 # remove extraneous variables
@@ -1190,8 +1211,8 @@ modelWDM <- 'affect =~ happy + depressed + fear + angry + calm + joy
 perception =~ sounds + seeing + temperature + odors + depth
 autonomy =~ free_will + choices + self_restraint + intentions + goal'
 
-# test model on study 1 (all conditions)
-d1_all_fitWDM <- cfa(modelWDM, d1_all, ordered = TRUE)
+# test model
+d1_all_fitWDM <- customCFA(d1_all, modelWDM)
 summary(d1_all_fitWDM, fit.measures = TRUE)
 ```
 
@@ -1203,8 +1224,20 @@ modelGGW <- ggw_model <- 'experience =~ hungry + fear + pain + pleasure + angry 
 agency =~ self_restraint + morality + remembering + emo_recog + goal + communicating + thoughts'
 
 # test model
-d1_all_fitGGW <- cfa(modelGGW, d1_all, ordered = TRUE)
+d1_all_fitGGW <- customCFA(d1_all, modelGGW)
 summary(d1_all_fitGGW, fit.measures = TRUE)
+```
+
+#### Compare models (if possible)
+
+```{r s1 cfa model comparison}
+# NOTE: currently only possible if models were fitted to continuous data using maximum likelihood estimator
+if(chosenVarCoding == "continuous" & chosenEstimator == "ML") {
+  # all set up so that model 2 predicted to be better than model 1
+  vuongtest(d1_all_fitDD, d1_all_fitWDM) # compare DD to WDM
+  vuongtest(d1_all_fitDD, d1_all_fitGGW) # compare DD to GGW
+  vuongtest(d1_all_fitGGW, d1_all_fitWDM) # compare GGW to WDM
+}
 ```
 
 # Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
@@ -1263,7 +1296,7 @@ efa_d2_beetle_unrotatedN_loadings <- getFactorLoadings(efa_d2_beetle_unrotatedN)
 ```{r s2 beetle oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d2_beetle_rotatedN <- fa(d2_beetle, nfactors_d2_beetle, 
-                             rotate = "oblimin", fm = "minres")
+                             rotate = "oblimin", cor = "poly", fm = "minres")
 print(efa_d2_beetle_rotatedN)
 
 # get loadings for each factor
@@ -1324,7 +1357,7 @@ efa_d2_robot_unrotatedN_loadings <- getFactorLoadings(efa_d2_robot_unrotatedN)
 ```{r s2 robot oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d2_robot_rotatedN <- fa(d2_robot, nfactors_d2_robot, 
-                            rotate = "oblimin", fm = "minres")
+                            rotate = "oblimin", cor = "poly", fm = "minres")
 print(efa_d2_robot_rotatedN)
 
 # get loadings for each factor
@@ -1385,7 +1418,7 @@ efa_d2_all_unrotatedN_loadings <- getFactorLoadings(efa_d2_all_unrotatedN)
 ```{r s2 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d2_all_rotatedN <- fa(d2_all, nfactors_d2_all, 
-                          rotate = "oblimin", fm = "minres")
+                          rotate = "oblimin", cor = "poly", fm = "minres")
 print(efa_d2_all_rotatedN)
 
 # get loadings for each factor
@@ -1424,7 +1457,7 @@ kable(efa_d2_all_rotatedN_loadings[[3]],
 
 ```{r s2 cfa modelDD: 3 factors (data-driven), echo = F}
 # test model
-d2_all_fitDD <- cfa(modelDD, d2_all, ordered = TRUE)
+d2_all_fitDD <- customCFA(d2_all, modelDD)
 summary(d2_all_fitDD, fit.measures = TRUE)
 ```
 
@@ -1432,7 +1465,7 @@ summary(d2_all_fitDD, fit.measures = TRUE)
 
 ```{r s2 cfa modelWDM: 3 factors (theory-based), echo = F}
 # test model
-d2_all_fitWDM <- cfa(modelWDM, d2_all, ordered = TRUE)
+d2_all_fitWDM <- customCFA(d2_all, modelWDM)
 summary(d2_all_fitWDM, fit.measures = TRUE)
 ```
 
@@ -1440,8 +1473,20 @@ summary(d2_all_fitWDM, fit.measures = TRUE)
 
 ```{r s2 cfa modelGGW: 2 factors (theory-based), echo = F}
 # test model
-d2_all_fitGGW <- cfa(modelGGW, d2_all, ordered = TRUE)
+d2_all_fitGGW <- customCFA(d2_all, modelGGW)
 summary(d2_all_fitGGW, fit.measures = TRUE)
+```
+
+#### Compare models (if possible)
+
+```{r s2 cfa model comparison}
+# NOTE: currently only possible if models were fitted to continuous data using maximum likelihood estimator
+if(chosenVarCoding == "continuous" & chosenEstimator == "ML") {
+  # all set up so that model 2 predicted to be better than model 1
+  vuongtest(d2_all_fitDD, d2_all_fitWDM) # compare DD to WDM
+  vuongtest(d2_all_fitDD, d2_all_fitGGW) # compare DD to GGW
+  vuongtest(d2_all_fitGGW, d2_all_fitWDM) # compare GGW to WDM
+}
 ```
 
 # Study 3 (2016-01-10, 2 conditions, within-subjects)
@@ -1500,7 +1545,7 @@ efa_d3_all_unrotatedN_loadings <- getFactorLoadings(efa_d3_all_unrotatedN)
 ```{r s3 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d3_all_rotatedN <- fa(d3_all, nfactors_d3_all, 
-                          rotate = "oblimin", fm = "minres")
+                          rotate = "oblimin", cor = "poly", fm = "minres")
 print(efa_d3_all_rotatedN)
 
 # get loadings for each factor
@@ -1539,7 +1584,7 @@ kable(efa_d3_all_rotatedN_loadings[[3]],
 
 ```{r s3 cfa modelDD: 3 factors (data-driven), echo = F}
 # test model
-d3_all_fitDD <- cfa(modelDD, d3_all, ordered = TRUE)
+d3_all_fitDD <- customCFA(d3_all, modelDD)
 summary(d3_all_fitDD, fit.measures = TRUE)
 ```
 
@@ -1547,7 +1592,7 @@ summary(d3_all_fitDD, fit.measures = TRUE)
 
 ```{r s3 cfa modelWDM: 3 factors (theory-based), echo = F}
 # test model
-d3_all_fitWDM <- cfa(modelWDM, d3_all, ordered = TRUE)
+d3_all_fitWDM <- customCFA(d3_all, modelWDM)
 summary(d3_all_fitWDM, fit.measures = TRUE)
 ```
 
@@ -1555,8 +1600,20 @@ summary(d3_all_fitWDM, fit.measures = TRUE)
 
 ```{r s3 cfa modelGGW: 2 factors (theory-based), echo = F}
 # test model
-d3_all_fitGGW <- cfa(modelGGW, d3_all, ordered = TRUE)
+d3_all_fitGGW <- customCFA(d3_all, modelGGW)
 summary(d3_all_fitGGW, fit.measures = TRUE)
+```
+
+#### Compare models (if possible)
+
+```{r s3 cfa model comparison}
+# NOTE: currently only possible if models were fitted to continuous data using maximum likelihood estimator
+if(chosenVarCoding == "continuous" & chosenEstimator == "ML") {
+  # all set up so that model 2 predicted to be better than model 1
+  vuongtest(d3_all_fitDD, d3_all_fitWDM) # compare DD to WDM
+  vuongtest(d3_all_fitDD, d3_all_fitGGW) # compare DD to GGW
+  vuongtest(d3_all_fitGGW, d3_all_fitWDM) # compare GGW to WDM
+}
 ```
 
 # Study 4 (2016-01-14, 21 conditions, between-subjects)
@@ -1615,7 +1672,7 @@ efa_d4_all_unrotatedN_loadings <- getFactorLoadings(efa_d4_all_unrotatedN)
 ```{r s4 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d4_all_rotatedN <- fa(d4_all, nfactors_d4_all, 
-                          rotate = "oblimin", fm = "minres")
+                          rotate = "oblimin", cor = "poly", fm = "minres")
 print(efa_d4_all_rotatedN)
 
 # get loadings for each factor
@@ -1654,7 +1711,7 @@ kable(efa_d4_all_rotatedN_loadings[[3]],
 
 ```{r s4 cfa modelDD: 3 factors (data-driven), echo = F}
 # test model
-d4_all_fitDD <- cfa(modelDD, d4_all, ordered = TRUE)
+d4_all_fitDD <- customCFA(d4_all, modelDD)
 summary(d4_all_fitDD, fit.measures = TRUE)
 ```
 
@@ -1668,7 +1725,7 @@ modelDD_dummy <- gsub("MR1", "subid", modelDD_dummy)
 modelDD_dummy <- gsub("MR2", "subid", modelDD_dummy)
 modelDD_dummy <- gsub("MR3", "subid", modelDD_dummy)
 dummy_fitDD <- cfa(modelDD_dummy, d4 %>%
-                   select(subid, happy:pride), ordered = TRUE)
+                   select(subid, happy:pride), ordered = FALSE, estimator = chosenEstimator)
 
 dummy_dataDD <- dummy_fitDD@Data@X[[1]]
 d4_all_fitDD_predict <- data.frame(d4_all_fitDD_predict,
@@ -1776,7 +1833,7 @@ ggplot(aes(x = MR2_mean, y = MR3_mean, colour = condition),
 
 ```{r s4 cfa modelWDM: 3 factors (theory-driven), echo = F}
 # test model
-d4_all_fitWDM <- cfa(modelWDM, d4_all, ordered = TRUE)
+d4_all_fitWDM <- customCFA(d4_all, modelWDM)
 summary(d4_all_fitWDM, fit.measures = TRUE)
 ```
 
@@ -1790,7 +1847,7 @@ modelWDM_dummy <- gsub("affect", "subid", modelWDM_dummy)
 modelWDM_dummy <- gsub("autonomy", "subid", modelWDM_dummy)
 modelWDM_dummy <- gsub("perception", "subid", modelWDM_dummy)
 dummy_fitWDM <- cfa(modelWDM_dummy, d4 %>%
-                   select(subid, happy:pride), ordered = TRUE)
+                   select(subid, happy:pride), ordered = FALSE, estimator = chosenEstimator)
 
 dummy_dataWDM <- dummy_fitWDM@Data@X[[1]]
 d4_all_fitWDM_predict <- data.frame(d4_all_fitWDM_predict,
@@ -1898,7 +1955,7 @@ ggplot(aes(x = autonomy_mean, y = perception_mean, colour = condition),
 
 ```{r s4 cfa modelGGW: 2 factors (theory-based), echo = F}
 # test model
-d4_all_fitGGW <- cfa(modelGGW, d4_all, ordered = TRUE)
+d4_all_fitGGW <- customCFA(d4_all, modelGGW)
 summary(d4_all_fitGGW, fit.measures = TRUE)
 ```
 
@@ -1911,7 +1968,7 @@ modelGGW_dummy <- gsub("=~", "~~", modelGGW)
 modelGGW_dummy <- gsub("experience", "subid", modelGGW_dummy)
 modelGGW_dummy <- gsub("agency", "subid", modelGGW_dummy)
 dummy_fitGGW <- cfa(modelGGW_dummy, d4 %>%
-                   select(subid, happy:pride), ordered = TRUE)
+                   select(subid, happy:pride), ordered = FALSE, estimator = chosenEstimator)
 
 dummy_dataGGW <- dummy_fitGGW@Data@X[[1]]
 d4_all_fitGGW_predict <- data.frame(d4_all_fitGGW_predict,
@@ -1966,5 +2023,17 @@ ggplot(aes(x = experience_mean, y = agency_mean, colour = condition),
   labs(title = "Study 4: Theoretical model (GGW2007), EXPERIENCE vs. AGENCY\n(Error bars are 95% CIs)\n",
        x = "\nAverage score: EXPERIENCE",
        y = "Average score: AGENCY\n")
+```
+
+#### Compare models (if possible)
+
+```{r s4 cfa model comparison}
+# NOTE: currently only possible if models were fitted to continuous data using maximum likelihood estimator
+if(chosenVarCoding == "continuous" & chosenEstimator == "ML") {
+  # all set up so that model 2 predicted to be better than model 1
+  vuongtest(d4_all_fitDD, d4_all_fitWDM) # compare DD to WDM
+  vuongtest(d4_all_fitDD, d4_all_fitGGW) # compare DD to GGW
+  vuongtest(d4_all_fitGGW, d4_all_fitWDM) # compare GGW to WDM
+}
 ```
 
