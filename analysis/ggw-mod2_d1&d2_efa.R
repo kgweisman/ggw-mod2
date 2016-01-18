@@ -1,4 +1,6 @@
-temp <- full_join(d1_all, d2_all)
+temp <- bind_rows(d1_all, d2_all) 
+temp <- bind_rows(temp, d3_all)
+temp <- bind_rows(temp, d4_all)
 
 howManyFactors(temp)
 nfactors_temp <- 3
@@ -21,12 +23,12 @@ efa_temp_rotatedN_loadings <- getFactorLoadings(efa_temp_rotatedN)
 
 # examine factor 1
 kable(efa_temp_rotatedN_loadings[[1]], 
-      align = "l", caption = "Study 1, BEETLE condition: Rotated Factor 1")
+      align = "l", caption = "All studies and conditions: Rotated Factor 1")
 
 # examine factor 2
 kable(efa_temp_rotatedN_loadings[[2]], 
-      align = "l", caption = "Study 1, BEETLE condition: Rotated Factor 2")
+      align = "l", caption = "All studies and conditions: Rotated Factor 2")
 
 # examine factor 3
 kable(efa_temp_rotatedN_loadings[[3]], 
-      align = "l", caption = "Study 1, BEETLE condition: Rotated Factor 3")
+      align = "l", caption = "All studies and conditions: Rotated Factor 3")
