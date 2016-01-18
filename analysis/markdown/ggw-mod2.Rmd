@@ -1,4 +1,3 @@
-# TOC
 ---
 title: 'GGW-mod2: Factor Analysis'
 output:
@@ -943,7 +942,7 @@ chosenEstimator <- "ML" # maximum likelihood, probably less true (bc of skewed d
 # chosenEstimator <- "default"
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 # Data preparation
 
@@ -993,7 +992,7 @@ d3_all <- makeDRDF("study 3", "all")
 d4_all <- makeDRDF("study 4", "all")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 # Data examination
 
@@ -1037,9 +1036,7 @@ d4_all <- makeDRDF("study 4", "all")
 # cortest.bartlett(cor(d4_all), n = nrow(d4_all))
 ```
 
-<a href="#TOC">back to top</a>
-
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 # Study 1 (2015-12-15, 2 conditions, between-subjects)
 
@@ -1065,7 +1062,7 @@ kable(demoReligion("study 1"), align = "l", digits = 2,
       caption = "Study 1: Participant religion")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ## Exploratory factor analysis
 
@@ -1106,7 +1103,7 @@ print(efa_d1_beetle_rotatedN)
 efa_d1_beetle_rotatedN_loadings <- getFactorLoadings(efa_d1_beetle_rotatedN)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ##### Factor 1
 
@@ -1132,7 +1129,7 @@ kable(efa_d1_beetle_rotatedN_loadings[[2]],
 #       align = "l", caption = "Study 1, BEETLE condition: Rotated Factor 3")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ### EFA: ROBOT condition
 
@@ -1171,7 +1168,7 @@ print(efa_d1_robot_rotatedN)
 efa_d1_robot_rotatedN_loadings <- getFactorLoadings(efa_d1_robot_rotatedN)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ##### Factor 1
 
@@ -1197,7 +1194,7 @@ kable(efa_d1_robot_rotatedN_loadings[[2]],
 #       align = "l", caption = "Study 1, ROBOT condition: Rotated Factor 3")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ### EFA: ALL conditions
 
@@ -1236,7 +1233,7 @@ print(efa_d1_all_rotatedN)
 efa_d1_all_rotatedN_loadings <- getFactorLoadings(efa_d1_all_rotatedN)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ##### Factor 1
 
@@ -1262,7 +1259,7 @@ kable(efa_d1_all_rotatedN_loadings[[3]],
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 3")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ## Predict latent variable structure for CFA in follow-up studies
 
@@ -1326,7 +1323,7 @@ summary(d1_all_fitGGW, fit.measures = TRUE)
 customVuong(d1_all_fitDD, d1_all_fitWDM, d1_all_fitGGW)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 # Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
 
@@ -1352,7 +1349,7 @@ kable(demoReligion("study 2"), align = "l", digits = 2,
       caption = "Study 2: Participant religion")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ## Exploratory factor analysis
 
@@ -1393,7 +1390,7 @@ print(efa_d2_beetle_rotatedN)
 efa_d2_beetle_rotatedN_loadings <- getFactorLoadings(efa_d2_beetle_rotatedN)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ##### Factor 1
 
@@ -1419,7 +1416,7 @@ kable(efa_d2_beetle_rotatedN_loadings[[2]],
 #       align = "l", caption = "Study 2, BEETLE condition: Rotated Factor 3")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ### EFA: ROBOT condition
 
@@ -1458,7 +1455,7 @@ print(efa_d2_robot_rotatedN)
 efa_d2_robot_rotatedN_loadings <- getFactorLoadings(efa_d2_robot_rotatedN)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ##### Factor 1
 
@@ -1484,7 +1481,7 @@ kable(efa_d2_robot_rotatedN_loadings[[2]],
 #       align = "l", caption = "Study 2, ROBOT condition: Rotated Factor 3")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ### EFA: ALL conditions
 
@@ -1523,7 +1520,7 @@ print(efa_d2_all_rotatedN)
 efa_d2_all_rotatedN_loadings <- getFactorLoadings(efa_d2_all_rotatedN)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ##### Factor 1
 
@@ -1549,7 +1546,7 @@ kable(efa_d2_all_rotatedN_loadings[[3]],
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 3")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ## Confirmatory factor analysis
 
@@ -1586,7 +1583,7 @@ summary(d2_all_fitGGW, fit.measures = TRUE)
 customVuong(d2_all_fitDD, d2_all_fitWDM, d2_all_fitGGW)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 # Study 3 (2016-01-10, 2 conditions, within-subjects)
 
@@ -1612,7 +1609,7 @@ kable(demoReligion("study 3"), align = "l", digits = 2,
       caption = "Study 3: Participant religion")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ## Exploratory factor analysis
 
@@ -1653,7 +1650,7 @@ print(efa_d3_all_rotatedN)
 efa_d3_all_rotatedN_loadings <- getFactorLoadings(efa_d3_all_rotatedN)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ##### Factor 1
 
@@ -1679,7 +1676,7 @@ kable(efa_d3_all_rotatedN_loadings[[3]],
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 3")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ## Confirmatory factor analysis
 
@@ -1716,7 +1713,7 @@ summary(d3_all_fitGGW, fit.measures = TRUE)
 customVuong(d3_all_fitDD, d3_all_fitWDM, d3_all_fitGGW)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 # Study 4 (2016-01-14, 21 conditions, between-subjects)
 
@@ -1742,7 +1739,7 @@ kable(demoEducation("study 4"), align = "l", digits = 2,
       caption = "Study 4: Participant education")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ## Exploratory factor analysis
 
@@ -1783,7 +1780,7 @@ print(efa_d4_all_rotatedN)
 efa_d4_all_rotatedN_loadings <- getFactorLoadings(efa_d4_all_rotatedN)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ##### Factor 1
 
@@ -1809,7 +1806,7 @@ kable(efa_d4_all_rotatedN_loadings[[3]],
       align = "l", caption = "Study 4, ALL conditions: Rotated Factor 3")
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
 
 ## Confirmatory factor analysis
 
@@ -2140,4 +2137,4 @@ ggplot(aes(x = experience_mean, y = agency_mean, colour = condition),
 customVuong(d4_all_fitDD, d4_all_fitWDM, d4_all_fitGGW)
 ```
 
-<p style="text-align:right"><a href="#header">back to top</a></p>
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
