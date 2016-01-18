@@ -860,6 +860,74 @@ customCFA <- function(d, model) {
   return(cfa)
 }
 
+# compare non-nested models if possible
+# NOTE: currently only possible if models were fitted to continuous data using maximum likelihood estimator
+customVuong <- function(chosenDD, chosenWDM, chosenGGW) {
+  # check if conditions are met before running tests
+  if(chosenVarCoding != "continuous" | chosenEstimator != "ML") {
+    stop("Variables must be considered continuous (ordered = NULL), and models must be estimated using maximum likelihood (estimator = 'ML').")
+  }
+
+  # find winner of comparison 1
+  C1 <- vuongtest(chosenDD, chosenWDM)
+  if(C1$p_LRT[1] < 0.05) {
+    betterModelC1 <- "DD>WDM"
+  } else if(C1$p_LRT[2] < 0.05) {
+    betterModelC1 <- "WDM>DD"
+  } else {
+    betterModelC1 <- "DD=WDM=DD"
+  }
+  
+  # find winner of comparison 2
+  C2 <- vuongtest(chosenDD, chosenGGW)
+  if(C2$p_LRT[1] < 0.05) {
+    betterModelC2 <- "DD>GGW"
+  } else if(C2$p_LRT[2] < 0.05) {
+    betterModelC2 <- "GGW>DD"
+  } else {
+    betterModelC2 <- "DD=GGW=DD"
+  }
+  
+  # find winner of comparison 3
+  C3 <- vuongtest(chosenGGW, chosenWDM)
+  if(C3$p_LRT[1] < 0.05) {
+    betterModelC3 <- "GGW>WDM"
+  } else if(C3$p_LRT[2] < 0.05) {
+    betterModelC3 <- "WDM>GGW"
+  } else {
+    betterModelC3 <- "GGW=WDM=GGW"
+  }
+  
+  # gather winners
+  wins <- c(betterModelC1, betterModelC2, betterModelC3)
+  
+  # tally up wins
+  winCounts <- c(DD = length(grep("DD>", wins)),
+                 WDM = length(grep("WDM>", wins)),
+                 GGW = length(grep("GGW>", wins)))
+  
+  # look for ties, otherwise declare winner
+  if(winCounts["DD"] == winCounts["WDM"] & 
+     winCounts["DD"] == winCounts["GGW"]) {
+    winner <- c("DD", "WDM", "GGW")
+  } else if(winCounts["DD"] == winCounts["WDM"]) {
+    winner <- c("DD", "WDM")
+  } else if(winCounts["DD"] == winCounts["GGW"]) {
+    winner <- c("DD", "GGW")
+  } else if(winCounts["GGW"] == winCounts["WDM"]) {
+    winner <- c("GGW", "WDM")
+  } else {
+    winner <- names(which.max(winCounts))
+  }
+  
+  # NOTE: all set up so that model 2 predicted to be better than model 1
+  results <- list("mod1_v_mod2" = vuongtest(chosenDD, chosenWDM), 
+                  "mod1_v_mod3" = vuongtest(chosenDD, chosenGGW), 
+                  "mod3_v_mod2" = vuongtest(chosenGGW, chosenWDM),
+                  "winner" = names(which.max(winCounts)))
+  return(results)
+}
+
 # set 21-color palette (thank to Paul Tol: https://personal.sron.nl/~pault/colourschemes.pdf)
 tol21rainbow = c("#771155", "#AA4488", "#CC99BB", "#114477", "#4477AA", "#77AADD", "#117777", "#44AAAA", "#77CCCC", "#117744", "#44AA77", "#88CCAA", "#777711", "#AAAA44", "#DDDD77", "#774411", "#AA7744", "#DDAA77", "#771122", "#AA4455", "#DD7788")
 ```
@@ -1231,13 +1299,8 @@ summary(d1_all_fitGGW, fit.measures = TRUE)
 #### Compare models (if possible)
 
 ```{r s1 cfa model comparison}
-# NOTE: currently only possible if models were fitted to continuous data using maximum likelihood estimator
-if(chosenVarCoding == "continuous" & chosenEstimator == "ML") {
-  # all set up so that model 2 predicted to be better than model 1
-  vuongtest(d1_all_fitDD, d1_all_fitWDM) # compare DD to WDM
-  vuongtest(d1_all_fitDD, d1_all_fitGGW) # compare DD to GGW
-  vuongtest(d1_all_fitGGW, d1_all_fitWDM) # compare GGW to WDM
-}
+# compare models (iff continuous and ML)
+customVuong(d1_all_fitDD, d1_all_fitWDM, d1_all_fitGGW)
 ```
 
 # Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
@@ -1480,13 +1543,8 @@ summary(d2_all_fitGGW, fit.measures = TRUE)
 #### Compare models (if possible)
 
 ```{r s2 cfa model comparison}
-# NOTE: currently only possible if models were fitted to continuous data using maximum likelihood estimator
-if(chosenVarCoding == "continuous" & chosenEstimator == "ML") {
-  # all set up so that model 2 predicted to be better than model 1
-  vuongtest(d2_all_fitDD, d2_all_fitWDM) # compare DD to WDM
-  vuongtest(d2_all_fitDD, d2_all_fitGGW) # compare DD to GGW
-  vuongtest(d2_all_fitGGW, d2_all_fitWDM) # compare GGW to WDM
-}
+# compare models (iff continuous and ML)
+customVuong(d2_all_fitDD, d2_all_fitWDM, d2_all_fitGGW)
 ```
 
 # Study 3 (2016-01-10, 2 conditions, within-subjects)
@@ -1607,13 +1665,8 @@ summary(d3_all_fitGGW, fit.measures = TRUE)
 #### Compare models (if possible)
 
 ```{r s3 cfa model comparison}
-# NOTE: currently only possible if models were fitted to continuous data using maximum likelihood estimator
-if(chosenVarCoding == "continuous" & chosenEstimator == "ML") {
-  # all set up so that model 2 predicted to be better than model 1
-  vuongtest(d3_all_fitDD, d3_all_fitWDM) # compare DD to WDM
-  vuongtest(d3_all_fitDD, d3_all_fitGGW) # compare DD to GGW
-  vuongtest(d3_all_fitGGW, d3_all_fitWDM) # compare GGW to WDM
-}
+# compare models (iff continuous and ML)
+customVuong(d3_all_fitDD, d3_all_fitWDM, d3_all_fitGGW)
 ```
 
 # Study 4 (2016-01-14, 21 conditions, between-subjects)
@@ -2028,12 +2081,7 @@ ggplot(aes(x = experience_mean, y = agency_mean, colour = condition),
 #### Compare models (if possible)
 
 ```{r s4 cfa model comparison}
-# NOTE: currently only possible if models were fitted to continuous data using maximum likelihood estimator
-if(chosenVarCoding == "continuous" & chosenEstimator == "ML") {
-  # all set up so that model 2 predicted to be better than model 1
-  vuongtest(d4_all_fitDD, d4_all_fitWDM) # compare DD to WDM
-  vuongtest(d4_all_fitDD, d4_all_fitGGW) # compare DD to GGW
-  vuongtest(d4_all_fitGGW, d4_all_fitWDM) # compare GGW to WDM
-}
+# compare models (iff continuous and ML)
+customVuong(d4_all_fitDD, d4_all_fitWDM, d4_all_fitGGW)
 ```
 
