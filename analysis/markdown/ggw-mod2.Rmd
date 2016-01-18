@@ -10,7 +10,7 @@ output:
 
 # Setup
 
-```{r workspace setup, echo = F}
+```{r workspace setup, message = F, echo = F}
 # load libraries
 library(devtools)
 library(psych)
@@ -29,7 +29,7 @@ rm(list = ls(all = T))
 graphics.off()
 ```
 
-```{r functions, echo = F}
+```{r functions, message = F, echo = F}
 # make cleanup function
 cleanup <- function(datasource) {
   if(datasource %in% c("study 1", "study 2")) {
@@ -336,6 +336,8 @@ cleanup <- function(datasource) {
     # remove extraneous dfs and variables
     rm(d, d_clean_1, d_clean_2)
   }
+  
+  # do transformation to reduce skewness
   
   # return cleaned dataset
   return(d_clean)
@@ -663,7 +665,7 @@ howManyFactors <- function (df) {
   # vss_unrotated_df <- VSS(df, n = 15, 
   #                                rotate = "none", plot = FALSE)
   # vss_rotated_df <- VSS(df, n = 15, 
-  #                              rotate = "varimax", plot = FALSE)
+  #                              rotate = "oblimin", plot = FALSE)
 }
 
 # get factor loadings for some efa
@@ -686,50 +688,53 @@ extractFStructure <- function(efa) {
     add_rownames(var = "mc") %>%
     mutate(
       bestFactor =
-        ifelse(abs(Factor1) == abs(Factor2) & abs(Factor1) == abs(Factor3),
+        # NOTE: ONLY TAKES POSITIVE LOADINGS: NEED TO IMPLEMENT 
+        # TRANSLATION INTO MODEL IN ORDER TO INCLUDE ABSOLUTE VALUES 
+        # (wrap all "MR*" with abs)
+        ifelse(MR1 == MR2 & MR1 == MR3,
                "all tied",
-               ifelse(abs(Factor1) == abs(Factor2),
-                      "Factor1 and Factor2 tied",
-                      ifelse(abs(Factor1) == abs(Factor3),
-                             "Factor1 and Factor3 tied",
-                             ifelse(abs(Factor2) == abs(Factor3),
-                                    "Factor2 and Factor3 tied",
-                                    ifelse(abs(Factor1) > abs(Factor2),
-                                           ifelse(abs(Factor1) > abs(Factor3),
-                                                  "Factor1",
-                                                  "Factor3"),
-                                           ifelse(abs(Factor2) > abs(Factor3),
-                                                  "Factor2",
-                                                  "Factor3"))))))) %>%
+               ifelse(MR1 == MR2,
+                      "MR1 and MR2 tied",
+                      ifelse(MR1 == MR3,
+                             "MR1 and MR3 tied",
+                             ifelse(MR2 == MR3,
+                                    "MR2 and MR3 tied",
+                                    ifelse(MR1 > MR2,
+                                           ifelse(MR1 > MR3,
+                                                  "MR1",
+                                                  "MR3"),
+                                           ifelse(MR2 > MR3,
+                                                  "MR2",
+                                                  "MR3"))))))) %>%
     mutate(bestFactor = factor(bestFactor))
   
-  d_structure_Factor1 <- d_structure %>%
-    filter(bestFactor == "Factor1") %>%
-    arrange(desc(Factor1)) %>%
-    select(mc, Factor1) %>%
-    rename(mc_Factor1 = mc,
-           loading_Factor1 = Factor1) %>%
+  d_structure_MR1 <- d_structure %>%
+    filter(bestFactor == "MR1") %>%
+    arrange(desc(MR1)) %>%
+    select(mc, MR1) %>%
+    rename(mc_MR1 = mc,
+           loading_MR1 = MR1) %>%
     add_rownames(var = "order")
   
-  d_structure_Factor2 <- d_structure %>%
-    filter(bestFactor == "Factor2") %>%
-    arrange(desc(Factor2)) %>%
-    select(mc, Factor2) %>%
-    rename(mc_Factor2 = mc,
-           loading_Factor2 = Factor2) %>%
+  d_structure_MR2 <- d_structure %>%
+    filter(bestFactor == "MR2") %>%
+    arrange(desc(MR2)) %>%
+    select(mc, MR2) %>%
+    rename(mc_MR2 = mc,
+           loading_MR2 = MR2) %>%
     add_rownames(var = "order")
   
-  d_structure_Factor3 <- d_structure %>%
-    filter(bestFactor == "Factor3") %>%
-    arrange(desc(Factor3)) %>%
-    select(mc, Factor3) %>%
-    rename(mc_Factor3 = mc,
-           loading_Factor3 = Factor3) %>%
+  d_structure_MR3 <- d_structure %>%
+    filter(bestFactor == "MR3") %>%
+    arrange(desc(MR3)) %>%
+    select(mc, MR3) %>%
+    rename(mc_MR3 = mc,
+           loading_MR3 = MR3) %>%
     add_rownames(var = "order")
   
-  d_structure_allFactors <- d_structure_Factor1 %>%
-    full_join(d_structure_Factor2) %>%
-    full_join(d_structure_Factor3)
+  d_structure_allFactors <- d_structure_MR1 %>%
+    full_join(d_structure_MR2) %>%
+    full_join(d_structure_MR3)
   
   # return table of factor structure
   return(d_structure_allFactors)
@@ -741,7 +746,7 @@ tol21rainbow = c("#771155", "#AA4488", "#CC99BB", "#114477", "#4477AA", "#77AADD
 
 # Data preparation
 
-```{r data upload, echo = F}
+```{r data upload, message = F, echo = F}
 # study 1 (2015-12-15, 2 conditions, between-subjects)
 d_raw_study1 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (2 conditions between)/GGWmod2_v1_clean.csv") %>%
   mutate(study = "study 1")
@@ -759,7 +764,7 @@ d_raw_study4 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects
   mutate(study = "study 4")
 ```
 
-```{r data cleanup, echo = F}
+```{r data cleanup, message = F, echo = F}
 # clean up datasets
 d1 <- cleanup("study 1")
 d2 <- cleanup("study 2")
@@ -767,7 +772,7 @@ d3 <- cleanup("study 3")
 d4 <- cleanup("study 4")
 ```
 
-```{r dataframes for dimension reducation, echo = F}
+```{r dataframes for dimension reducation, message = F, echo = F}
 # make dataframes for s1
 d1_beetle <- makeDRDF("study 1", "beetle")
 d1_robot <- makeDRDF("study 1", "robot")
@@ -785,6 +790,48 @@ d3_all <- makeDRDF("study 3", "all")
 
 # make dataframes for study 4
 d4_all <- makeDRDF("study 4", "all")
+```
+
+# Data examination
+
+```{r distributions, message = F, echo = F, fig.width = 15, fig.height = 3}
+# verify that data is too skewed to assume normality
+allData <- d1 %>%
+  select(study, subid, condition, happy:pride) %>%
+  full_join(d2 %>% select(study, subid, happy:pride)) %>%
+  full_join(d3 %>% select(study, subid, happy:pride)) %>%
+  full_join(d4 %>% select(study, subid, happy:pride)) %>%
+  gather(mc, response, happy:pride) %>%
+  mutate(log_response = log(response + 4),
+         recip_response = 1/(response + 4),
+         sqrt_response = sqrt(response + 4),
+         logsqrt_response = log(sqrt(response + 4)))
+
+ggplot(allData) +
+  geom_histogram(aes(x = response)) + 
+  facet_grid(study ~ mc) +
+  theme_bw()
+```
+
+```{r sphericity, message = F, echo = F}
+# conduct bartlett's test of sphericity for all correlation matrices
+# # study 1
+# cortest.bartlett(cor(d1_beetle), n = nrow(d1_beetle))
+# cortest.bartlett(cor(d1_robot), n = nrow(d1_robot))
+# cortest.bartlett(cor(d1_all), n = nrow(d1_all))
+# 
+# # study 2
+# cortest.bartlett(cor(d2_beetle), n = nrow(d2_beetle))
+# cortest.bartlett(cor(d2_robot), n = nrow(d2_robot))
+# cortest.bartlett(cor(d2_all), n = nrow(d2_all))
+# 
+# # study 3
+# cortest.bartlett(cor(d3_beetle), n = nrow(d3_beetle))
+# cortest.bartlett(cor(d3_robot), n = nrow(d3_robot))
+# cortest.bartlett(cor(d3_all), n = nrow(d3_all))
+# 
+# # study 4
+# cortest.bartlett(cor(d4_all), n = nrow(d4_all))
 ```
 
 # Study 1 (2015-12-15, 2 conditions, between-subjects)
@@ -826,18 +873,20 @@ nfactors_d1_beetle <- 2
 
 ```{r s1 beetle no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d1_beetle_unrotatedN <- factanal(d1_beetle, nfactors_d1_beetle, r = "none")
+efa_d1_beetle_unrotatedN <- fa(d1_beetle, nfactors_d1_beetle, 
+                               rotate = "none", cor = "poly", fm = "minres")
 print(efa_d1_beetle_unrotatedN)
 
 # get loadings for each factor
 efa_d1_beetle_unrotatedN_loadings <- getFactorLoadings(efa_d1_beetle_unrotatedN)
 ```
 
-#### Step 3: Run EFA with varimax rotation
+#### Step 3: Run EFA with oblimin rotation
 
-```{r s1 beetle varimax rotation, echo = F}
+```{r s1 beetle oblimin rotation, echo = F}
 # run EFA with rotation with N factors
-efa_d1_beetle_rotatedN <- factanal(d1_beetle, nfactors_d1_beetle, r = "none")
+efa_d1_beetle_rotatedN <- fa(d1_beetle, nfactors_d1_beetle, 
+                             rotate = "oblimin", fm = "minres")
 print(efa_d1_beetle_rotatedN)
 
 # get loadings for each factor
@@ -846,7 +895,7 @@ efa_d1_beetle_rotatedN_loadings <- getFactorLoadings(efa_d1_beetle_rotatedN)
 
 ##### Factor 1
 
-```{r s1 beetle varimax rotation F1, echo = F}
+```{r s1 beetle oblimin rotation F1, echo = F}
 # examine factor 1
 kable(efa_d1_beetle_rotatedN_loadings[[1]], 
       align = "l", caption = "Study 1, BEETLE condition: Rotated Factor 1")
@@ -854,7 +903,7 @@ kable(efa_d1_beetle_rotatedN_loadings[[1]],
 
 ##### Factor 2
 
-```{r s1 beetle varimax rotation F2, echo = F}
+```{r s1 beetle oblimin rotation F2, echo = F}
 # examine factor 2
 kable(efa_d1_beetle_rotatedN_loadings[[2]], 
       align = "l", caption = "Study 1, BEETLE condition: Rotated Factor 2")
@@ -862,7 +911,7 @@ kable(efa_d1_beetle_rotatedN_loadings[[2]],
 
 ##### Factor 3 (*not applicable*)
 
-```{r s1 beetle varimax rotation F3, echo = F}
+```{r s1 beetle oblimin rotation F3, echo = F}
 # # examine factor 3
 # kable(efa_d1_beetle_rotatedN_loadings[[3]], 
 #       align = "l", caption = "Study 1, BEETLE condition: Rotated Factor 3")
@@ -885,18 +934,20 @@ nfactors_d1_robot <- 2
 
 ```{r s1 robot no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d1_robot_unrotatedN <- factanal(d1_robot, nfactors_d1_robot, r = "none")
+efa_d1_robot_unrotatedN <- fa(d1_robot, nfactors_d1_robot, 
+                              rotate = "none", cor = "poly", fm = "minres")
 print(efa_d1_robot_unrotatedN)
 
 # get loadings for each factor
 efa_d1_robot_unrotatedN_loadings <- getFactorLoadings(efa_d1_robot_unrotatedN)
 ```
 
-#### Step 3: Run EFA with varimax rotation
+#### Step 3: Run EFA with oblimin rotation
 
-```{r s1 robot varimax rotation, echo = F}
+```{r s1 robot oblimin rotation, echo = F}
 # run EFA with rotation with N factors
-efa_d1_robot_rotatedN <- factanal(d1_robot, nfactors_d1_robot, r = "none")
+efa_d1_robot_rotatedN <- fa(d1_robot, nfactors_d1_robot, 
+                            rotate = "oblimin", fm = "minres")
 print(efa_d1_robot_rotatedN)
 
 # get loadings for each factor
@@ -905,7 +956,7 @@ efa_d1_robot_rotatedN_loadings <- getFactorLoadings(efa_d1_robot_rotatedN)
 
 ##### Factor 1
 
-```{r s1 robot varimax rotation F1, echo = F}
+```{r s1 robot oblimin rotation F1, echo = F}
 # examine factor 1
 kable(efa_d1_robot_rotatedN_loadings[[1]], 
       align = "l", caption = "Study 1, ROBOT condition: Rotated Factor 1")
@@ -913,7 +964,7 @@ kable(efa_d1_robot_rotatedN_loadings[[1]],
 
 ##### Factor 2
 
-```{r s1 robot varimax rotation F2, echo = F}
+```{r s1 robot oblimin rotation F2, echo = F}
 # examine factor 2
 kable(efa_d1_robot_rotatedN_loadings[[2]], 
       align = "l", caption = "Study 1, ROBOT condition: Rotated Factor 2")
@@ -921,7 +972,7 @@ kable(efa_d1_robot_rotatedN_loadings[[2]],
 
 ##### Factor 3 (*not applicable*)
 
-```{r s1 robot varimax rotation F3, echo = F}
+```{r s1 robot oblimin rotation F3, echo = F}
 # # examine factor 3
 # kable(efa_d1_robot_rotatedN_loadings[[3]], 
 #       align = "l", caption = "Study 1, ROBOT condition: Rotated Factor 3")
@@ -944,18 +995,20 @@ nfactors_d1_all <- 3
 
 ```{r s1 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d1_all_unrotatedN <- factanal(d1_all, nfactors_d1_all, r = "none")
+efa_d1_all_unrotatedN <- fa(d1_all, nfactors_d1_all, 
+                            rotate = "none", cor = "poly", fm = "minres")
 print(efa_d1_all_unrotatedN)
 
 # get loadings for each factor
 efa_d1_all_unrotatedN_loadings <- getFactorLoadings(efa_d1_all_unrotatedN)
 ```
 
-#### Step 3: Run EFA with varimax rotation
+#### Step 3: Run EFA with oblimin rotation
 
-```{r s1 all varimax rotation, echo = F}
+```{r s1 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
-efa_d1_all_rotatedN <- factanal(d1_all, nfactors_d1_all, r = "none")
+efa_d1_all_rotatedN <- fa(d1_all, nfactors_d1_all, 
+                          rotate = "oblimin", fm = "minres")
 print(efa_d1_all_rotatedN)
 
 # get loadings for each factor
@@ -964,7 +1017,7 @@ efa_d1_all_rotatedN_loadings <- getFactorLoadings(efa_d1_all_rotatedN)
 
 ##### Factor 1
 
-```{r s1 all varimax rotation F1, echo = F}
+```{r s1 all oblimin rotation F1, echo = F}
 # examine factor 1
 kable(efa_d1_all_rotatedN_loadings[[1]], 
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 1")
@@ -972,7 +1025,7 @@ kable(efa_d1_all_rotatedN_loadings[[1]],
 
 ##### Factor 2
 
-```{r s1 all varimax rotation F2, echo = F}
+```{r s1 all oblimin rotation F2, echo = F}
 # examine factor 2
 kable(efa_d1_all_rotatedN_loadings[[2]], 
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 2")
@@ -980,7 +1033,7 @@ kable(efa_d1_all_rotatedN_loadings[[2]],
 
 ##### Factor 3
 
-```{r s1 all varimax rotation F3, echo = F}
+```{r s1 all oblimin rotation F3, echo = F}
 # examine factor 3
 kable(efa_d1_all_rotatedN_loadings[[3]], 
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 3")
@@ -997,70 +1050,48 @@ kable(d1_fStructure, align = "l",
       caption = "Study 1: Factor structure", digits = 2)
 ```
 
-### Model 1: One factor (MIND)
+### ModelDD: Data-driven, three factors (MR1, MR2, MR3; see Study 1)
 
-```{r s1 cfa model: 1 factor, echo = F}
-# set up model
-model1_Factor1 <- paste0("mind =~ ", paste(names(d1_all), collapse = " + "))
-model1 <- as.character(noquote(model1_Factor1))
-
-# test model on study 1 data (all conditions)
-d1_all_fit1 <- cfa(model1, d1_all)
-print(summary(d1_all_fit1, fit.measures = TRUE))
-
-# remove extraneous variables
-rm(model1_Factor1)
-```
-
-### Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)
-
-```{r s1 cfa model: 2 factors, echo = F}
-# set up model
-model2 <- 'experience =~ hungry + fear + pain + pleasure + angry + desires + personality + conscious + pride + embarrassed + joy + tired + nauseated + safe + happy + depressed + calm + sounds + seeing + temperature + odors + depth + recognizing + love + guilt + disrespected + self_aware
-agency =~ self_restraint + morality + remembering + emo_recog + goal + communicating + thoughts + computations + reasoning + beliefs + free_will + choices + intentions + recognizing + love + guilt + disrespected + self_aware'
-
-# test model on study 1 data (all conditions)
-d1_all_fit2 <- cfa(model2, d1_all)
-print(summary(d1_all_fit2, fit.measures = TRUE))
-```
-
-### Model 3a: Three factors (F1, F2, F3; see Study 1)
-
-```{r s1 cfa model: 3 factors (data-driven), echo = F}
-# set up model
-model3a_Factor1 <- paste0("Factor1 =~ ", paste(d1_fStructure$mc_Factor1[is.na(d1_fStructure$mc_Factor1) == F], collapse = " + "))
-model3a_Factor2 <- paste0("Factor2 =~ ", paste(d1_fStructure$mc_Factor2[is.na(d1_fStructure$mc_Factor2) == F], collapse = " + "))
-model3a_Factor3 <- paste0("Factor3 =~ ", paste(d1_fStructure$mc_Factor3[is.na(d1_fStructure$mc_Factor3) == F], collapse = " + "))
-model3a_allFactors <- paste(model3a_Factor1, "\n", model3a_Factor2, "\n", model3a_Factor3, collapse = "")
-model3a <- as.character(noquote(model3a_allFactors))
+```{r s1 cfa modelDD: 3 factors (data-driven), echo = F}
+# set up model based on EFA
+# NOTE: ONLY WORKS FOR POSITIVE LOADINGS!!
+modelDD_MR1 <- paste0("MR1 =~ ", paste(d1_fStructure$mc_MR1[is.na(d1_fStructure$mc_MR1) == F], collapse = " + "))
+modelDD_MR2 <- paste0("MR2 =~ ", paste(d1_fStructure$mc_MR2[is.na(d1_fStructure$mc_MR2) == F], collapse = " + "))
+modelDD_MR3 <- paste0("MR3 =~ ", paste(d1_fStructure$mc_MR3[is.na(d1_fStructure$mc_MR3) == F], collapse = " + "))
+modelDD_allFactors <- paste(modelDD_MR1, "\n", modelDD_MR2, "\n", modelDD_MR3, collapse = "")
+modelDD <- as.character(noquote(modelDD_allFactors))
 
 # test model on study 1 (all conditions)
-d1_all_fit3a <- cfa(model3a, d1_all)
-summary(d1_all_fit3a, fit.measures = TRUE)
+d1_all_fitDD <- cfa(modelDD, d1_all, ordered = TRUE)
+summary(d1_all_fitDD, fit.measures = TRUE)
 
 # remove extraneous variables
-rm(model3a_Factor1, model3a_Factor2, model3a_Factor3, model3a_allFactors)
+rm(modelDD_MR1, modelDD_MR2, modelDD_MR3, modelDD_allFactors)
 ```
 
-### Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
+### ModelWDM: Theoretical, three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
 
-```{r s1 cfa model: 3 factors (a priori), echo = F}
-# set up model
-model3b <- 'affect =~ happy + depressed + fear + angry + calm + joy
-autonomy =~ free_will + choices + self_restraint + intentions + goal
-perception =~ sounds + seeing + temperature + odors + depth'
+```{r s1 cfa modelWDM: 3 factors (theory-based), echo = F}
+# set up model based on Weisman et al (2015)
+modelWDM <- 'affect =~ happy + depressed + fear + angry + calm + joy
+perception =~ sounds + seeing + temperature + odors + depth
+autonomy =~ free_will + choices + self_restraint + intentions + goal'
 
 # test model on study 1 (all conditions)
-d1_all_fit3b <- cfa(model3b, d1_all)
-summary(d1_all_fit3b, fit.measures = TRUE)
+d1_all_fitWDM <- cfa(modelWDM, d1_all, ordered = TRUE)
+summary(d1_all_fitWDM, fit.measures = TRUE)
 ```
 
-### Compare models
+#### ModelGGW: Theoretical, two factors (AGENCY, EXPERIENCE; see Gray et al., 2007)
 
-```{r s1 compare model fits, echo = F}
-# compare model fits
-# anova(d1_all_fit1, d1_all_fit2, d1_all_fit3a)
-anova(d1_all_fit1, d1_all_fit2, d1_all_fit3a, d1_all_fit3b)
+```{r s1 cfa modelGGW: 2 factors (theory-based), echo = F}
+# set up model based on Weisman et al (2015)
+modelGGW <- ggw_model <- 'experience =~ hungry + fear + pain + pleasure + angry + desires + personality + conscious + pride + embarrassed + joy
+agency =~ self_restraint + morality + remembering + emo_recog + goal + communicating + thoughts'
+
+# test model
+d1_all_fitGGW <- cfa(modelGGW, d1_all, ordered = TRUE)
+summary(d1_all_fitGGW, fit.measures = TRUE)
 ```
 
 # Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
@@ -1102,18 +1133,20 @@ nfactors_d2_beetle <- 2
 
 ```{r s2 beetle no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d2_beetle_unrotatedN <- factanal(d2_beetle, nfactors_d2_beetle, r = "none")
+efa_d2_beetle_unrotatedN <- fa(d2_beetle, nfactors_d2_beetle, 
+                               rotate = "none", cor = "poly", fm = "minres")
 print(efa_d2_beetle_unrotatedN)
 
 # get loadings for each factor
 efa_d2_beetle_unrotatedN_loadings <- getFactorLoadings(efa_d2_beetle_unrotatedN)
 ```
 
-#### Step 3: Run EFA with varimax rotation
+#### Step 3: Run EFA with oblimin rotation
 
-```{r s2 beetle varimax rotation, echo = F}
+```{r s2 beetle oblimin rotation, echo = F}
 # run EFA with rotation with N factors
-efa_d2_beetle_rotatedN <- factanal(d2_beetle, nfactors_d2_beetle, r = "none")
+efa_d2_beetle_rotatedN <- fa(d2_beetle, nfactors_d2_beetle, 
+                             rotate = "oblimin", fm = "minres")
 print(efa_d2_beetle_rotatedN)
 
 # get loadings for each factor
@@ -1122,7 +1155,7 @@ efa_d2_beetle_rotatedN_loadings <- getFactorLoadings(efa_d2_beetle_rotatedN)
 
 ##### Factor 1
 
-```{r s2 beetle varimax rotation F1, echo = F}
+```{r s2 beetle oblimin rotation F1, echo = F}
 # examine factor 1
 kable(efa_d2_beetle_rotatedN_loadings[[1]], 
       align = "l", caption = "Study 2, BEETLE condition: Rotated Factor 1")
@@ -1130,7 +1163,7 @@ kable(efa_d2_beetle_rotatedN_loadings[[1]],
 
 ##### Factor 2
 
-```{r s2 beetle varimax rotation F2, echo = F}
+```{r s2 beetle oblimin rotation F2, echo = F}
 # examine factor 2
 kable(efa_d2_beetle_rotatedN_loadings[[2]], 
       align = "l", caption = "Study 2, BEETLE condition: Rotated Factor 2")
@@ -1138,7 +1171,7 @@ kable(efa_d2_beetle_rotatedN_loadings[[2]],
 
 ##### Factor 3 (*not applicable*)
 
-```{r s2 beetle varimax rotation F3, echo = F}
+```{r s2 beetle oblimin rotation F3, echo = F}
 # # examine factor 3
 # kable(efa_d2_beetle_rotatedN_loadings[[3]], 
 #       align = "l", caption = "Study 2, BEETLE condition: Rotated Factor 3")
@@ -1161,18 +1194,20 @@ nfactors_d2_robot <- 2
 
 ```{r s2 robot no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d2_robot_unrotatedN <- factanal(d2_robot, nfactors_d2_robot, r = "none")
+efa_d2_robot_unrotatedN <- fa(d2_robot, nfactors_d2_robot, 
+                              rotate = "none", cor = "poly", fm = "minres")
 print(efa_d2_robot_unrotatedN)
 
 # get loadings for each factor
 efa_d2_robot_unrotatedN_loadings <- getFactorLoadings(efa_d2_robot_unrotatedN)
 ```
 
-#### Step 3: Run EFA with varimax rotation
+#### Step 3: Run EFA with oblimin rotation
 
-```{r s2 robot varimax rotation, echo = F}
+```{r s2 robot oblimin rotation, echo = F}
 # run EFA with rotation with N factors
-efa_d2_robot_rotatedN <- factanal(d2_robot, nfactors_d2_robot, r = "none")
+efa_d2_robot_rotatedN <- fa(d2_robot, nfactors_d2_robot, 
+                            rotate = "oblimin", fm = "minres")
 print(efa_d2_robot_rotatedN)
 
 # get loadings for each factor
@@ -1181,7 +1216,7 @@ efa_d2_robot_rotatedN_loadings <- getFactorLoadings(efa_d2_robot_rotatedN)
 
 ##### Factor 1
 
-```{r s2 robot varimax rotation F1, echo = F}
+```{r s2 robot oblimin rotation F1, echo = F}
 # examine factor 1
 kable(efa_d2_robot_rotatedN_loadings[[1]], 
       align = "l", caption = "Study 2, ROBOT condition: Rotated Factor 1")
@@ -1189,7 +1224,7 @@ kable(efa_d2_robot_rotatedN_loadings[[1]],
 
 ##### Factor 2
 
-```{r s2 robot varimax rotation F2, echo = F}
+```{r s2 robot oblimin rotation F2, echo = F}
 # examine factor 2
 kable(efa_d2_robot_rotatedN_loadings[[2]], 
       align = "l", caption = "Study 2, ROBOT condition: Rotated Factor 2")
@@ -1197,7 +1232,7 @@ kable(efa_d2_robot_rotatedN_loadings[[2]],
 
 ##### Factor 3 (*not applicable*)
 
-```{r s2 robot varimax rotation F3, echo = F}
+```{r s2 robot oblimin rotation F3, echo = F}
 # # examine factor 3
 # kable(efa_d2_robot_rotatedN_loadings[[3]], 
 #       align = "l", caption = "Study 2, ROBOT condition: Rotated Factor 3")
@@ -1220,18 +1255,20 @@ nfactors_d2_all <- 3
 
 ```{r s2 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d2_all_unrotatedN <- factanal(d2_all, nfactors_d2_all, r = "none")
+efa_d2_all_unrotatedN <- fa(d2_all, nfactors_d2_all, 
+                            rotate = "none", cor = "poly", fm = "minres")
 print(efa_d2_all_unrotatedN)
 
 # get loadings for each factor
 efa_d2_all_unrotatedN_loadings <- getFactorLoadings(efa_d2_all_unrotatedN)
 ```
 
-#### Step 3: Run EFA with varimax rotation
+#### Step 3: Run EFA with oblimin rotation
 
-```{r s2 all varimax rotation, echo = F}
+```{r s2 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
-efa_d2_all_rotatedN <- factanal(d2_all, nfactors_d2_all, r = "none")
+efa_d2_all_rotatedN <- fa(d2_all, nfactors_d2_all, 
+                          rotate = "oblimin", fm = "minres")
 print(efa_d2_all_rotatedN)
 
 # get loadings for each factor
@@ -1240,7 +1277,7 @@ efa_d2_all_rotatedN_loadings <- getFactorLoadings(efa_d2_all_rotatedN)
 
 ##### Factor 1
 
-```{r s2 all varimax rotation F1, echo = F}
+```{r s2 all oblimin rotation F1, echo = F}
 # examine factor 1
 kable(efa_d2_all_rotatedN_loadings[[1]], 
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 1")
@@ -1248,7 +1285,7 @@ kable(efa_d2_all_rotatedN_loadings[[1]],
 
 ##### Factor 2
 
-```{r s2 all varimax rotation F2, echo = F}
+```{r s2 all oblimin rotation F2, echo = F}
 # examine factor 2
 kable(efa_d2_all_rotatedN_loadings[[2]], 
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 2")
@@ -1256,7 +1293,7 @@ kable(efa_d2_all_rotatedN_loadings[[2]],
 
 ##### Factor 3
 
-```{r s2 all varimax rotation F3, echo = F}
+```{r s2 all oblimin rotation F3, echo = F}
 # examine factor 3
 kable(efa_d2_all_rotatedN_loadings[[3]], 
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 3")
@@ -1264,46 +1301,30 @@ kable(efa_d2_all_rotatedN_loadings[[3]],
 
 ## Confirmatory factor analysis
 
-### CFA: ALL conditions
+### CFA: All conditions
 
-### Model 1: One factor (MIND)
+#### ModelDD: Data-driven, three factors (experience, MR2, MR3; see Study 1)
 
-```{r s2 cfa model: 1 factor, echo = F}
-# test model on study 1 data (all conditions)
-d2_all_fit1 <- cfa(model1, d2_all)
-print(summary(d2_all_fit1, fit.measures = TRUE))
+```{r s2 cfa modelDD: 3 factors (data-driven), echo = F}
+# test model
+d2_all_fitDD <- cfa(modelDD, d2_all, ordered = TRUE)
+summary(d2_all_fitDD, fit.measures = TRUE)
 ```
 
-### Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)
+#### ModelWDM: Theoretical, three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
 
-```{r s2 cfa model: 2 factors, echo = F}
-# test model on study 1 data (all conditions)
-d2_all_fit2 <- cfa(model2, d2_all)
-print(summary(d2_all_fit2, fit.measures = TRUE))
+```{r s2 cfa modelWDM: 3 factors (theory-based), echo = F}
+# test model
+d2_all_fitWDM <- cfa(modelWDM, d2_all, ordered = TRUE)
+summary(d2_all_fitWDM, fit.measures = TRUE)
 ```
 
-### Model 3a: Three factors (F1, F2, F3; see Study 1)
+#### ModelGGW: Theoretical, two factors (AGENCY, EXPERIENCE; see Gray et al., 2007)
 
-```{r s2 cfa model: 3 factors (data-driven), echo = F}
-# test model on study 1 (all conditions)
-d2_all_fit3a <- cfa(model3a, d2_all)
-summary(d2_all_fit3a, fit.measures = TRUE)
-```
-
-### Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
-
-```{r s2 cfa model: 3 factors (a priori), echo = F}
-# test model on study 1 (all conditions)
-d2_all_fit3b <- cfa(model3b, d2_all)
-summary(d2_all_fit3b, fit.measures = TRUE)
-```
-
-### Compare models
-
-```{r s2 compare model fits, echo = F}
-# compare model fits
-# anova(d2_all_fit1, d2_all_fit2, d2_all_fit3a)
-anova(d2_all_fit1, d2_all_fit2, d2_all_fit3a, d2_all_fit3b)
+```{r s2 cfa modelGGW: 2 factors (theory-based), echo = F}
+# test model
+d2_all_fitGGW <- cfa(modelGGW, d2_all, ordered = TRUE)
+summary(d2_all_fitGGW, fit.measures = TRUE)
 ```
 
 # Study 3 (2016-01-10, 2 conditions, within-subjects)
@@ -1345,18 +1366,20 @@ nfactors_d3_all <- 3
 
 ```{r s3 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d3_all_unrotatedN <- factanal(d3_all, nfactors_d3_all, r = "none")
+efa_d3_all_unrotatedN <- fa(d3_all, nfactors_d3_all, 
+                            rotate = "none", cor = "poly", fm = "minres")
 print(efa_d3_all_unrotatedN)
 
 # get loadings for each factor
 efa_d3_all_unrotatedN_loadings <- getFactorLoadings(efa_d3_all_unrotatedN)
 ```
 
-#### Step 3: Run EFA with varimax rotation
+#### Step 3: Run EFA with oblimin rotation
 
-```{r s3 all varimax rotation, echo = F}
+```{r s3 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
-efa_d3_all_rotatedN <- factanal(d3_all, nfactors_d3_all, r = "none")
+efa_d3_all_rotatedN <- fa(d3_all, nfactors_d3_all, 
+                          rotate = "oblimin", fm = "minres")
 print(efa_d3_all_rotatedN)
 
 # get loadings for each factor
@@ -1365,7 +1388,7 @@ efa_d3_all_rotatedN_loadings <- getFactorLoadings(efa_d3_all_rotatedN)
 
 ##### Factor 1
 
-```{r s3 all varimax rotation F1, echo = F}
+```{r s3 all oblimin rotation F1, echo = F}
 # examine factor 1
 kable(efa_d3_all_rotatedN_loadings[[1]], 
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 1")
@@ -1373,7 +1396,7 @@ kable(efa_d3_all_rotatedN_loadings[[1]],
 
 ##### Factor 2
 
-```{r s3 all varimax rotation F2, echo = F}
+```{r s3 all oblimin rotation F2, echo = F}
 # examine factor 2
 kable(efa_d3_all_rotatedN_loadings[[2]], 
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 2")
@@ -1381,7 +1404,7 @@ kable(efa_d3_all_rotatedN_loadings[[2]],
 
 ##### Factor 3
 
-```{r s3 all varimax rotation F3, echo = F}
+```{r s3 all oblimin rotation F3, echo = F}
 # examine factor 3
 kable(efa_d3_all_rotatedN_loadings[[3]], 
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 3")
@@ -1389,46 +1412,30 @@ kable(efa_d3_all_rotatedN_loadings[[3]],
 
 ## Confirmatory factor analysis
 
-### CFA: ALL conditions
+### CFA: All conditions
 
-### Model 1: One factor (MIND)
+#### ModelDD: Data-driven, three factors (MR1, MR2, MR3; see Study 1)
 
-```{r s3 cfa model: 1 factor, echo = F}
-# test model on study 1 data (all conditions)
-d3_all_fit1 <- cfa(model1, d3_all)
-print(summary(d3_all_fit1, fit.measures = TRUE))
+```{r s3 cfa modelDD: 3 factors (data-driven), echo = F}
+# test model
+d3_all_fitDD <- cfa(modelDD, d3_all, ordered = TRUE)
+summary(d3_all_fitDD, fit.measures = TRUE)
 ```
 
-### Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)
+#### ModelWDM: Theoretical, three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
 
-```{r s3 cfa model: 2 factors, echo = F}
-# test model on study 1 data (all conditions)
-d3_all_fit2 <- cfa(model2, d3_all)
-print(summary(d3_all_fit2, fit.measures = TRUE))
+```{r s3 cfa modelWDM: 3 factors (theory-based), echo = F}
+# test model
+d3_all_fitWDM <- cfa(modelWDM, d3_all, ordered = TRUE)
+summary(d3_all_fitWDM, fit.measures = TRUE)
 ```
 
-### Model 3a: Three factors (F1, F2, F3; see Study 1)
+#### ModelGGW: Theoretical, two factors (AGENCY, EXPERIENCE; see Gray et al., 2007)
 
-```{r s3 cfa model: 3 factors (data-driven), echo = F}
-# test model on study 1 (all conditions)
-d3_all_fit3a <- cfa(model3a, d3_all)
-summary(d3_all_fit3a, fit.measures = TRUE)
-```
-
-### Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
-
-```{r s3 cfa model: 3 factors (a priori), echo = F}
-# test model on study 1 (all conditions)
-d3_all_fit3b <- cfa(model3b, d3_all)
-summary(d3_all_fit3b, fit.measures = TRUE)
-```
-
-### Compare models
-
-```{r s3 compare model fits, echo = F}
-# compare model fits
-# anova(d3_all_fit1, d3_all_fit2, d3_all_fit3a)
-anova(d3_all_fit1, d3_all_fit2, d3_all_fit3a, d3_all_fit3b)
+```{r s3 cfa modelGGW: 2 factors (theory-based), echo = F}
+# test model
+d3_all_fitGGW <- cfa(modelGGW, d3_all, ordered = TRUE)
+summary(d3_all_fitGGW, fit.measures = TRUE)
 ```
 
 # Study 4 (2016-01-14, 21 conditions, between-subjects)
@@ -1470,18 +1477,20 @@ nfactors_d4_all <- 3
 
 ```{r s4 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d4_all_unrotatedN <- factanal(d4_all, nfactors_d4_all, r = "none")
+efa_d4_all_unrotatedN <- fa(d4_all, nfactors_d4_all, 
+                            rotate = "none", cor = "poly", fm = "minres")
 print(efa_d4_all_unrotatedN)
 
 # get loadings for each factor
 efa_d4_all_unrotatedN_loadings <- getFactorLoadings(efa_d4_all_unrotatedN)
 ```
 
-#### Step 3: Run EFA with varimax rotation
+#### Step 3: Run EFA with oblimin rotation
 
-```{r s4 all varimax rotation, echo = F}
+```{r s4 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
-efa_d4_all_rotatedN <- factanal(d4_all, nfactors_d4_all, r = "none")
+efa_d4_all_rotatedN <- fa(d4_all, nfactors_d4_all, 
+                          rotate = "oblimin", fm = "minres")
 print(efa_d4_all_rotatedN)
 
 # get loadings for each factor
@@ -1490,7 +1499,7 @@ efa_d4_all_rotatedN_loadings <- getFactorLoadings(efa_d4_all_rotatedN)
 
 ##### Factor 1
 
-```{r s4 all varimax rotation F1, echo = F}
+```{r s4 all oblimin rotation F1, echo = F}
 # examine factor 1
 kable(efa_d4_all_rotatedN_loadings[[1]], 
       align = "l", caption = "Study 4, ALL conditions: Rotated Factor 1")
@@ -1498,7 +1507,7 @@ kable(efa_d4_all_rotatedN_loadings[[1]],
 
 ##### Factor 2
 
-```{r s4 all varimax rotation F2, echo = F}
+```{r s4 all oblimin rotation F2, echo = F}
 # examine factor 2
 kable(efa_d4_all_rotatedN_loadings[[2]], 
       align = "l", caption = "Study 4, ALL conditions: Rotated Factor 2")
@@ -1506,7 +1515,7 @@ kable(efa_d4_all_rotatedN_loadings[[2]],
 
 ##### Factor 3
 
-```{r s4 all varimax rotation F3, echo = F}
+```{r s4 all oblimin rotation F3, echo = F}
 # examine factor 3
 kable(efa_d4_all_rotatedN_loadings[[3]], 
       align = "l", caption = "Study 4, ALL conditions: Rotated Factor 3")
@@ -1516,78 +1525,166 @@ kable(efa_d4_all_rotatedN_loadings[[3]],
 
 ### CFA: ALL conditions
 
-### Model 1: One factor (MIND)
+#### ModelDD: Data-driven, three factors (MR1, MR2, MR3; see Study 1)
 
-```{r s4 cfa model: 1 factor, echo = F}
-# test model on study 1 data (all conditions)
-d4_all_fit1 <- cfa(model1, d4_all)
-print(summary(d4_all_fit1, fit.measures = TRUE))
+```{r s4 cfa modelDD: 3 factors (data-driven), echo = F}
+# test model
+d4_all_fitDD <- cfa(modelDD, d4_all, ordered = TRUE)
+summary(d4_all_fitDD, fit.measures = TRUE)
 ```
 
-### Model 2: Two factors (EXPERIENCE, AGENCY; see Gray et al., 2007)
-
-```{r s4 cfa model: 2 factors, echo = F}
-# test model on study 1 data (all conditions)
-d4_all_fit2 <- cfa(model2, d4_all)
-print(summary(d4_all_fit2, fit.measures = TRUE))
-```
-
-### Model 3a: Three factors (F1, F2, F3; see Study 1)
-
-```{r s4 cfa model: 3 factors (data-driven), echo = F}
-# test model on study 1 (all conditions)
-d4_all_fit3a <- cfa(model3a, d4_all)
-summary(d4_all_fit3a, fit.measures = TRUE)
-```
-
-### Model 3b: Three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
-
-```{r s4 cfa model: 3 factors (a priori), echo = F}
-# test model on study 1 (all conditions)
-d4_all_fit3b <- cfa(model3b, d4_all)
-summary(d4_all_fit3b, fit.measures = TRUE)
-```
-
-### Compare models
-
-```{r s4 compare model fits, echo = F}
-# compare model fits
-# anova(d4_all_fit1, d4_all_fit2, d4_all_fit3a)
-anova(d4_all_fit1, d4_all_fit2, d4_all_fit3a, d4_all_fit3b)
-```
-
-## Plots!
-
-```{r s4 factor scores, echo = F}
+```{r s4 cfa modelDD factor scores, echo = F}
 # use best model to get factor scores by participant
-d4_all_fit3b_predict <- predict(d4_all_fit3b)
+d4_all_fitDD_predict <- predict(d4_all_fitDD)
 
 # use dummy model to get subid into factor scores
-# SHOULD UPDATE THIS SO THAT IT IS AUTOMATICALLY POPULATED FROM MODEL3B
-model3b_dummy <- 'subid ~~ happy + depressed + fear + angry + calm + joy
-subid ~~ free_will + choices + self_restraint + intentions + goal
-subid ~~ sounds + seeing + temperature + odors + depth'
-fit_dummy <- cfa(model3b_dummy, d4 %>%
-                   select(subid, happy:pride))
+modelDD_dummy <- gsub("=~", "~~", modelDD)
+modelDD_dummy <- gsub("MR1", "subid", modelDD_dummy)
+modelDD_dummy <- gsub("MR2", "subid", modelDD_dummy)
+modelDD_dummy <- gsub("MR3", "subid", modelDD_dummy)
+dummy_fitDD <- cfa(modelDD_dummy, d4 %>%
+                   select(subid, happy:pride), ordered = TRUE)
 
-data_dummy <- fit_dummy@Data@X[[1]]
-d4_all_fit3b_predict <- data.frame(d4_all_fit3b_predict, 
-                                   subid = data_dummy[,1])
+dummy_dataDD <- dummy_fitDD@Data@X[[1]]
+d4_all_fitDD_predict <- data.frame(d4_all_fitDD_predict,
+                                   subid = dummy_dataDD[,1])
 
 d4_subids <- d4 %>% select(subid, condition) %>%
   mutate(subid_num = as.numeric(subid)) %>%
   rename(subid_cat = subid,
          subid = subid_num)
 
-d4_factor_scores <- d4_all_fit3b_predict %>%
+d4_factor_scoresDD <- d4_all_fitDD_predict %>%
   full_join(d4_subids, by = "subid")
 
 # remove extraneous variables
-rm(d4_all_fit3b_predict, model3b_dummy, fit_dummy, data_dummy, d4_subids)
+rm(d4_all_fitDD_predict, modelDD_dummy, dummy_fitDD, dummy_dataDD, d4_subids)
 ```
 
-```{r s4 average factor scores by condition, echo = F}
-d4_factor_scores_condition <- d4_factor_scores %>%
+```{r s4 cfa modelDD average factor scores by condition, echo = F}
+d4_factor_scoresDD_condition <- d4_factor_scoresDD %>%
+  group_by(condition) %>%
+  summarise(MR1_mean = mean(MR1),
+            MR1_sd = sd(MR1),
+            MR1_n = length(MR1),
+            MR2_mean = mean(MR2),
+            MR2_sd = sd(MR2),
+            MR2_n = length(MR2),
+            MR3_mean = mean(MR3),
+            MR3_sd = sd(MR3),
+            MR3_n = length(MR3))
+
+# d4_factor_scoresDD_condition_mb <- d4_factor_scoresDD %>%
+#   gather(factor, score, c(MR1, MR2, MR3)) %>%
+#   multi_boot(column = "score",
+#              summary_groups = c("condition", "factor"),
+#              statistics_functions = c("ci_lower", "mean", "ci_upper"))
+```
+
+```{r s4 cfa modelDD plot: MR1 vs. MR2, echo = F, fig.height = 8, fig.width = 8}
+ggplot(aes(x = MR1_mean, y = MR2_mean, colour = condition), 
+       data = d4_factor_scoresDD_condition) +
+  geom_errorbar(aes(ymin = MR2_mean - MR2_sd/sqrt(MR2_n),
+                    ymax = MR2_mean + MR2_sd/sqrt(MR2_n)),
+                width = 0.1, alpha = 0.4) +
+  geom_errorbarh(aes(xmin = MR1_mean - MR1_sd/sqrt(MR1_n),
+                     xmax = MR1_mean + MR1_sd/sqrt(MR1_n)),
+                 height = 0.1, alpha = 0.4) +
+  geom_point(size = 4) +
+  geom_dl(aes(label = condition), method = "smart.grid") +
+  theme_bw() +
+  scale_color_manual(values = tol21rainbow) +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  labs(title = "Study 4: Data-driven model, MR1 vs. MR2\n(Error bars are 95% CIs)\n",
+       x = "\nAverage score: MR1",
+       y = "Average score: MR2\n")
+```
+
+```{r s4 cfa modelDD plot: MR1 vs. MR3, echo = F, fig.height = 8, fig.width = 8}
+ggplot(aes(x = MR1_mean, y = MR3_mean, colour = condition), 
+       data = d4_factor_scoresDD_condition) +
+  geom_errorbar(aes(ymin = MR3_mean - MR3_sd/sqrt(MR3_n),
+                    ymax = MR3_mean + MR3_sd/sqrt(MR3_n)),
+                width = 0.1, alpha = 0.4) +
+  geom_errorbarh(aes(xmin = MR1_mean - MR1_sd/sqrt(MR1_n),
+                     xmax = MR1_mean + MR1_sd/sqrt(MR1_n)),
+                 height = 0.1, alpha = 0.4) +
+  geom_point(size = 4) +
+  geom_dl(aes(label = condition), method = "smart.grid") +
+  theme_bw() +
+  scale_color_manual(values = tol21rainbow) +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  labs(title = "Study 4: Data-driven model, MR1 vs. MR3\n(Error bars are 95% CIs)\n",
+       x = "\nAverage score: MR1",
+       y = "Average score: MR3\n")
+```
+
+```{r s4 cfa modelDD plot: MR2 vs. MR3, echo = F, fig.height = 8, fig.width = 8}
+ggplot(aes(x = MR2_mean, y = MR3_mean, colour = condition), 
+       data = d4_factor_scoresDD_condition) +
+  geom_errorbar(aes(ymin = MR3_mean - MR3_sd/sqrt(MR3_n),
+                    ymax = MR3_mean + MR3_sd/sqrt(MR3_n)),
+                width = 0.1, alpha = 0.4) +
+  geom_errorbarh(aes(xmin = MR2_mean - MR2_sd/sqrt(MR2_n),
+                     xmax = MR2_mean + MR2_sd/sqrt(MR2_n)),
+                 height = 0.1, alpha = 0.4) +
+  geom_point(size = 4) +
+  geom_dl(aes(label = condition), method = "smart.grid") +
+  theme_bw() +
+  scale_color_manual(values = tol21rainbow) +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  labs(title = "Study 4: Data-driven model, MR2 vs. MR3\n(Error bars are 95% CIs)\n",
+       x = "\nAverage score: MR2",
+       y = "Average score: MR3\n")
+```
+
+#### ModelWDM: Theoretical, three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
+
+```{r s4 cfa modelWDM: 3 factors (theory-driven), echo = F}
+# test model
+d4_all_fitWDM <- cfa(modelWDM, d4_all, ordered = TRUE)
+summary(d4_all_fitWDM, fit.measures = TRUE)
+```
+
+```{r s4 cfa modelWDM factor scores, echo = F}
+# use best model to get factor scores by participant
+d4_all_fitWDM_predict <- predict(d4_all_fitWDM)
+
+# use dummy model to get subid into factor scores
+modelWDM_dummy <- gsub("=~", "~~", modelWDM)
+modelWDM_dummy <- gsub("affect", "subid", modelWDM_dummy)
+modelWDM_dummy <- gsub("autonomy", "subid", modelWDM_dummy)
+modelWDM_dummy <- gsub("perception", "subid", modelWDM_dummy)
+dummy_fitWDM <- cfa(modelWDM_dummy, d4 %>%
+                   select(subid, happy:pride), ordered = TRUE)
+
+dummy_dataWDM <- dummy_fitWDM@Data@X[[1]]
+d4_all_fitWDM_predict <- data.frame(d4_all_fitWDM_predict,
+                                   subid = dummy_dataWDM[,1])
+
+d4_subids <- d4 %>% select(subid, condition) %>%
+  mutate(subid_num = as.numeric(subid)) %>%
+  rename(subid_cat = subid,
+         subid = subid_num)
+
+d4_factor_scoresWDM <- d4_all_fitWDM_predict %>%
+  full_join(d4_subids, by = "subid")
+
+# remove extraneous variables
+rm(d4_all_fitWDM_predict, modelWDM_dummy, dummy_fitWDM, dummy_dataWDM, d4_subids)
+```
+
+```{r s4 cfa modelWDM average factor scores by condition, echo = F}
+d4_factor_scoresWDM_condition <- d4_factor_scoresWDM %>%
   group_by(condition) %>%
   summarise(affect_mean = mean(affect),
             affect_sd = sd(affect),
@@ -1599,16 +1696,16 @@ d4_factor_scores_condition <- d4_factor_scores %>%
             perception_sd = sd(perception),
             perception_n = length(perception))
 
-# d4_factor_scores_condition_mb <- d4_factor_scores %>%
+# d4_factor_scoresWDM_condition_mb <- d4_factor_scoresWDM %>%
 #   gather(factor, score, c(affect, autonomy, perception)) %>%
 #   multi_boot(column = "score",
 #              summary_groups = c("condition", "factor"),
 #              statistics_functions = c("ci_lower", "mean", "ci_upper"))
 ```
 
-```{r s4 cfa plot: AFFECT vs. AUTONOMY, echo = F, fig.height = 8, fig.width = 8}
+```{r s4 cfa modelWDM plot: affect vs. autonomy, echo = F, fig.height = 8, fig.width = 8}
 ggplot(aes(x = affect_mean, y = autonomy_mean, colour = condition), 
-       data = d4_factor_scores_condition) +
+       data = d4_factor_scoresWDM_condition) +
   geom_errorbar(aes(ymin = autonomy_mean - autonomy_sd/sqrt(autonomy_n),
                     ymax = autonomy_mean + autonomy_sd/sqrt(autonomy_n)),
                 width = 0.1, alpha = 0.4) +
@@ -1623,14 +1720,14 @@ ggplot(aes(x = affect_mean, y = autonomy_mean, colour = condition),
         legend.position = "none") +
   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: AFFECT vs. AUTONOMY\n(Error bars are 95% CIs)\n",
+  labs(title = "Study 4: Data-driven model, AFFECT vs. AUTONOMY\n(Error bars are 95% CIs)\n",
        x = "\nAverage score: AFFECT",
        y = "Average score: AUTONOMY\n")
 ```
 
-```{r s4 cfa plot: AFFECT vs. PERCEPTION, echo = F, fig.height = 8, fig.width = 8}
+```{r s4 cfa modelWDM plot: affect vs. perception, echo = F, fig.height = 8, fig.width = 8}
 ggplot(aes(x = affect_mean, y = perception_mean, colour = condition), 
-       data = d4_factor_scores_condition) +
+       data = d4_factor_scoresWDM_condition) +
   geom_errorbar(aes(ymin = perception_mean - perception_sd/sqrt(perception_n),
                     ymax = perception_mean + perception_sd/sqrt(perception_n)),
                 width = 0.1, alpha = 0.4) +
@@ -1645,14 +1742,14 @@ ggplot(aes(x = affect_mean, y = perception_mean, colour = condition),
         legend.position = "none") +
   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: AFFECT vs. PERCEPTION\n(Error bars are 95% CIs)\n",
+  labs(title = "Study 4: Data-driven model, AFFECT vs. PERCEPTION\n(Error bars are 95% CIs)\n",
        x = "\nAverage score: AFFECT",
        y = "Average score: PERCEPTION\n")
 ```
 
-```{r s4 cfa plot: AUTONOMY vs. PERCEPTION, echo = F, fig.height = 8, fig.width = 8}
+```{r s4 cfa modelWDM plot: autonomy vs. perception, echo = F, fig.height = 8, fig.width = 8}
 ggplot(aes(x = autonomy_mean, y = perception_mean, colour = condition), 
-       data = d4_factor_scores_condition) +
+       data = d4_factor_scoresWDM_condition) +
   geom_errorbar(aes(ymin = perception_mean - perception_sd/sqrt(perception_n),
                     ymax = perception_mean + perception_sd/sqrt(perception_n)),
                 width = 0.1, alpha = 0.4) +
@@ -1667,8 +1764,82 @@ ggplot(aes(x = autonomy_mean, y = perception_mean, colour = condition),
         legend.position = "none") +
   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: AUTONOMY vs. PERCEPTION\n(Error bars are 95% CIs)\n",
+  labs(title = "Study 4: Data-driven model, AUTONOMY vs. PERCEPTION\n(Error bars are 95% CIs)\n",
        x = "\nAverage score: AUTONOMY",
        y = "Average score: PERCEPTION\n")
+```
+
+#### ModelGGW: Theoretical, two factors (AGENCY, EXPERIENCE; see Gray et al., 2007)
+
+```{r s4 cfa modelGGW: 2 factors (theory-based), echo = F}
+# test model
+d4_all_fitGGW <- cfa(modelGGW, d4_all, ordered = TRUE)
+summary(d4_all_fitGGW, fit.measures = TRUE)
+```
+
+```{r s4 cfa modelGGW factor scores, echo = F}
+# use best model to get factor scores by participant
+d4_all_fitGGW_predict <- predict(d4_all_fitGGW)
+
+# use dummy model to get subid into factor scores
+modelGGW_dummy <- gsub("=~", "~~", modelGGW)
+modelGGW_dummy <- gsub("experience", "subid", modelGGW_dummy)
+modelGGW_dummy <- gsub("agency", "subid", modelGGW_dummy)
+dummy_fitGGW <- cfa(modelGGW_dummy, d4 %>%
+                   select(subid, happy:pride), ordered = TRUE)
+
+dummy_dataGGW <- dummy_fitGGW@Data@X[[1]]
+d4_all_fitGGW_predict <- data.frame(d4_all_fitGGW_predict,
+                                   subid = dummy_dataGGW[,1])
+
+d4_subids <- d4 %>% select(subid, condition) %>%
+  mutate(subid_num = as.numeric(subid)) %>%
+  rename(subid_cat = subid,
+         subid = subid_num)
+
+d4_factor_scoresGGW <- d4_all_fitGGW_predict %>%
+  full_join(d4_subids, by = "subid")
+
+# remove extraneous variables
+rm(d4_all_fitGGW_predict, modelGGW_dummy, dummy_fitGGW, dummy_dataGGW, d4_subids)
+```
+
+```{r s4 cfa modelGGW average factor scores by condition, echo = F}
+d4_factor_scoresGGW_condition <- d4_factor_scoresGGW %>%
+  group_by(condition) %>%
+  summarise(experience_mean = mean(experience),
+            experience_sd = sd(experience),
+            experience_n = length(experience),
+            agency_mean = mean(agency),
+            agency_sd = sd(agency),
+            agency_n = length(agency))
+
+# d4_factor_scoresGGW_condition_mb <- d4_factor_scoresGGW %>%
+#   gather(factor, score, c(MR1, MR2)) %>%
+#   multi_boot(column = "score",
+#              summary_groups = c("condition", "factor"),
+#              statistics_functions = c("ci_lower", "mean", "ci_upper"))
+```
+
+```{r s4 cfa modelGGW plot: experience vs. agency, echo = F, fig.height = 8, fig.width = 8}
+ggplot(aes(x = experience_mean, y = agency_mean, colour = condition), 
+       data = d4_factor_scoresGGW_condition) +
+  geom_errorbar(aes(ymin = agency_mean - agency_sd/sqrt(agency_n),
+                    ymax = agency_mean + agency_sd/sqrt(agency_n)),
+                width = 0.1, alpha = 0.4) +
+  geom_errorbarh(aes(xmin = experience_mean - experience_sd/sqrt(experience_n),
+                     xmax = experience_mean + experience_sd/sqrt(experience_n)),
+                 height = 0.1, alpha = 0.4) +
+  geom_point(size = 4) +
+  geom_dl(aes(label = condition), method = "smart.grid") +
+  theme_bw() +
+  scale_color_manual(values = tol21rainbow) +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  labs(title = "Study 4: Theoretical model (GGW2007), EXPERIENCE vs. AGENCY\n(Error bars are 95% CIs)\n",
+       x = "\nAverage score: EXPERIENCE",
+       y = "Average score: AGENCY\n")
 ```
 
