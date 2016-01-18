@@ -1213,8 +1213,8 @@ summary(d1_all_fitGGW, fit.measures = TRUE)
 
 ```{r s2 demographics, echo = F}
 # examine exclusion
-kable(excludedCounts("study 1"), align = "l",
-      caption = "Study 1: Exclusion")
+kable(excludedCounts("study 2"), align = "l",
+      caption = "Study 2: Exclusion")
 
 # make demographics tables
 kable(demoSampleSize("study 2"), align = "l", digits = 2, 
@@ -1450,8 +1450,8 @@ summary(d2_all_fitGGW, fit.measures = TRUE)
 
 ```{r s3 demographics, echo = F}
 # examine exclusion
-kable(excludedCounts("study 1"), align = "l",
-      caption = "Study 1: Exclusion")
+kable(excludedCounts("study 3"), align = "l",
+      caption = "Study 3: Exclusion")
 
 # make demographics tables
 kable(demoSampleSize("study 3"), align = "l", digits = 2, 
@@ -1565,8 +1565,8 @@ summary(d3_all_fitGGW, fit.measures = TRUE)
 
 ```{r s4 demographics, echo = F}
 # examine exclusion
-kable(excludedCounts("study 1"), align = "l",
-      caption = "Study 1: Exclusion")
+kable(excludedCounts("study 4"), align = "l",
+      caption = "Study 4: Exclusion")
 
 # make demographics tables
 kable(demoSampleSize("study 4"), align = "l", digits = 2, 
