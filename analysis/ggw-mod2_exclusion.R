@@ -81,7 +81,7 @@ excludedCounts <- function(datasource) {
                length(d_excluded_CATCH$subid),
                length(d_excluded_yob$subid))
   
-  if(total == d_excluded_n) {
+  if(total != d_excluded_n) {
     stop("Error: 3 sources of exclusion do not add up to total.")
   } else {
     
@@ -93,7 +93,6 @@ excludedCounts <- function(datasource) {
                  "TOTAL" = total)
     return(excluded_counts)
   }
-
 }
 
-excludedCounts("study 1")
+excludedCounts("study 4")
