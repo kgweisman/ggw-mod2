@@ -1093,7 +1093,7 @@ nfactors_d1_beetle <- 2
 
 ```{r s1 beetle no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d1_beetle_unrotated <- fa(d1_beetle, 20, rotate = "none",
+efa_d1_beetle_unrotated <- fa(d1_beetle, 39, rotate = "none",
                               cor = "cor", fm = "minres")
 print(efa_d1_beetle_unrotated)
 
@@ -1158,7 +1158,7 @@ nfactors_d1_robot <- 2
 
 ```{r s1 robot no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d2_robot_unrotated <- fa(d2_robot, 20, rotate = "none",
+efa_d2_robot_unrotated <- fa(d2_robot, 39, rotate = "none",
                              cor = "cor", fm = "minres")
 print(efa_d2_robot_unrotated)
 
@@ -1223,7 +1223,7 @@ nfactors_d1_all <- 3
 
 ```{r s1 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d1_all_unrotated <- fa(d1_all, 20, rotate = "none", 
+efa_d1_all_unrotated <- fa(d1_all, 39, rotate = "none", 
                            cor = "cor", fm = "minres")
 print(efa_d1_all_unrotated)
 
@@ -1389,7 +1389,7 @@ nfactors_d2_beetle <- 2
 
 ```{r s2 beetle no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d2_beetle_unrotated <- fa(d2_beetle, 20, rotate = "none",
+efa_d2_beetle_unrotated <- fa(d2_beetle, 39, rotate = "none",
                               cor = "cor", fm = "minres")
 print(efa_d2_beetle_unrotated)
 
@@ -1454,7 +1454,7 @@ nfactors_d2_robot <- 2
 
 ```{r s2 robot no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d2_robot_unrotated <- fa(d2_robot, 20, rotate = "none",
+efa_d2_robot_unrotated <- fa(d2_robot, 39, rotate = "none",
                              cor = "cor", fm = "minres")
 print(efa_d2_robot_unrotated)
 
@@ -1519,7 +1519,7 @@ nfactors_d2_all <- 3
 
 ```{r s2 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d2_all_unrotated <- fa(d2_all, 20, rotate = "none", 
+efa_d2_all_unrotated <- fa(d2_all, 39, rotate = "none", 
                            cor = "cor", fm = "minres")
 print(efa_d2_all_unrotated)
 
@@ -1652,7 +1652,7 @@ nfactors_d3_all <- 3
 
 ```{r s3 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d3_all_unrotated <- fa(d3_all, 20, rotate = "none", 
+efa_d3_all_unrotated <- fa(d3_all, 39, rotate = "none", 
                            cor = "cor", fm = "minres")
 print(efa_d3_all_unrotated)
 
@@ -1785,7 +1785,7 @@ nfactors_d4_all <- 3
 
 ```{r s4 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d4_all_unrotated <- fa(d4_all, 20, rotate = "none", 
+efa_d4_all_unrotated <- fa(d4_all, 39, rotate = "none", 
                            cor = "cor", fm = "minres")
 print(efa_d4_all_unrotated)
 
