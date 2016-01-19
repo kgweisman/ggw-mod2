@@ -798,22 +798,19 @@ extractFStructure <- function(efa) {
     add_rownames(var = "mc") %>%
     mutate(
       bestFactor =
-        # NOTE: ONLY TAKES POSITIVE LOADINGS: NEED TO IMPLEMENT 
-        # TRANSLATION INTO MODEL IN ORDER TO INCLUDE ABSOLUTE VALUES 
-        # (wrap all "MR*" with abs)
-        ifelse(MR1 == MR2 & MR1 == MR3,
+        ifelse(abs(MR1) == abs(MR2) & MR1 == abs(MR3),
                "all tied",
-               ifelse(MR1 == MR2,
+               ifelse(abs(MR1) == abs(MR2),
                       "MR1 and MR2 tied",
-                      ifelse(MR1 == MR3,
+                      ifelse(abs(MR1) == abs(MR3),
                              "MR1 and MR3 tied",
-                             ifelse(MR2 == MR3,
+                             ifelse(abs(MR2) == abs(MR3),
                                     "MR2 and MR3 tied",
-                                    ifelse(MR1 > MR2,
-                                           ifelse(MR1 > MR3,
+                                    ifelse(abs(MR1) > abs(MR2),
+                                           ifelse(abs(MR1) > abs(MR3),
                                                   "MR1",
                                                   "MR3"),
-                                           ifelse(MR2 > MR3,
+                                           ifelse(abs(MR2) > abs(MR3),
                                                   "MR2",
                                                   "MR3"))))))) %>%
     mutate(bestFactor = factor(bestFactor))
@@ -848,6 +845,20 @@ extractFStructure <- function(efa) {
   
   # return table of factor structure
   return(d_structure_allFactors)
+}
+
+# build model from EFA factor structure
+buildModel <- function (chosenStructure, chosenFactor) {
+  factorName <- paste0("mc_", chosenFactor)
+  factorLoading <- paste0("loading_", chosenFactor)
+  mcs <- chosenStructure
+  pos <- mcs[, factorName][is.na(mcs[factorName]) == F & mcs[factorLoading] > 0]
+  neg <- mcs[, factorName][is.na(mcs[factorName]) == F & mcs[factorLoading] < 0]
+  factorModel <- paste0(chosenFactor, " =~ ", paste(pos, collapse = " + "))
+  if(length(neg) > 0) {
+    factorModel <- paste0(factorModel, " + (-x)* ", paste(neg, collapse = " - "))
+  }
+  return(factorModel)
 }
 
 # run customized CFA
@@ -1286,12 +1297,12 @@ kable(d1_fStructure, align = "l",
 
 ```{r s1 cfa modelDD: 3 factors (data-driven), echo = F}
 # set up model based on EFA
-# NOTE: ONLY WORKS FOR POSITIVE LOADINGS!!
-modelDD_MR1 <- paste0("MR1 =~ ", paste(d1_fStructure$mc_MR1[is.na(d1_fStructure$mc_MR1) == F], collapse = " + "))
-modelDD_MR2 <- paste0("MR2 =~ ", paste(d1_fStructure$mc_MR2[is.na(d1_fStructure$mc_MR2) == F], collapse = " + "))
-modelDD_MR3 <- paste0("MR3 =~ ", paste(d1_fStructure$mc_MR3[is.na(d1_fStructure$mc_MR3) == F], collapse = " + "))
-modelDD_allFactors <- paste(modelDD_MR1, "\n", modelDD_MR2, "\n", modelDD_MR3, collapse = "")
-modelDD <- as.character(noquote(modelDD_allFactors))
+modelDD_MR1 <- buildModel(d1_fStructure, "MR1")
+modelDD_MR2 <- buildModel(d1_fStructure, "MR2")
+modelDD_MR3 <- buildModel(d1_fStructure, "MR3")
+modelDD_allFactors <- paste(modelDD_MR1, "\n", 
+                            modelDD_MR2, "\n", modelDD_MR3, collapse = "")
+modelDD <- gsub(" \n ", "\n", as.character(noquote(modelDD_allFactors)))
 
 # test model
 d1_all_fitDD <- customCFA(d1_all, modelDD)
