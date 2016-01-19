@@ -1093,12 +1093,12 @@ nfactors_d1_beetle <- 2
 
 ```{r s1 beetle no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d1_beetle_unrotatedN <- fa(d1_beetle, nfactors_d1_beetle, 
-                               rotate = "none", cor = "cor", fm = "minres")
-print(efa_d1_beetle_unrotatedN)
+efa_d1_beetle_unrotated <- fa(d1_beetle, 15, rotate = "none",
+                              cor = "cor", fm = "minres")
+print(efa_d1_beetle_unrotated)
 
 # get loadings for each factor
-efa_d1_beetle_unrotatedN_loadings <- getFactorLoadings(efa_d1_beetle_unrotatedN)
+efa_d1_beetle_unrotated_loadings <- getFactorLoadings(efa_d1_beetle_unrotated)
 ```
 
 #### Step 3: Run EFA with oblimin rotation
@@ -1158,12 +1158,12 @@ nfactors_d1_robot <- 2
 
 ```{r s1 robot no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d1_robot_unrotatedN <- fa(d1_robot, nfactors_d1_robot, 
-                              rotate = "none", cor = "cor", fm = "minres")
-print(efa_d1_robot_unrotatedN)
+efa_d2_robot_unrotated <- fa(d2_robot, 15, rotate = "none",
+                             cor = "cor", fm = "minres")
+print(efa_d2_robot_unrotated)
 
 # get loadings for each factor
-efa_d1_robot_unrotatedN_loadings <- getFactorLoadings(efa_d1_robot_unrotatedN)
+efa_d2_robot_unrotated_loadings <- getFactorLoadings(efa_d2_robot_unrotated)
 ```
 
 #### Step 3: Run EFA with oblimin rotation
@@ -1223,12 +1223,12 @@ nfactors_d1_all <- 3
 
 ```{r s1 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d1_all_unrotatedN <- fa(d1_all, nfactors_d1_all, 
-                            rotate = "none", cor = "cor", fm = "minres")
-print(efa_d1_all_unrotatedN)
+efa_d1_all_unrotated <- fa(d1_all, 15, rotate = "none", 
+                           cor = "cor", fm = "minres")
+print(efa_d1_all_unrotated)
 
 # get loadings for each factor
-efa_d1_all_unrotatedN_loadings <- getFactorLoadings(efa_d1_all_unrotatedN)
+efa_d1_all_unrotated_loadings <- getFactorLoadings(efa_d1_all_unrotated)
 ```
 
 #### Step 3: Run EFA with oblimin rotation
@@ -1301,13 +1301,19 @@ summary(d1_all_fitDD, fit.measures = TRUE)
 rm(modelDD_MR1, modelDD_MR2, modelDD_MR3, modelDD_allFactors)
 ```
 
-### ModelWDM: Theoretical, three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
+### ModelWDM: Theoretical, three factors (SOCIAL-EMOTIONAL, BIOLOGICAL, PERCEPTUAL; see Weisman et al., 2015)
 
 ```{r s1 cfa modelWDM: 3 factors (theory-based), echo = F}
+# OLD VERSION, NOT INFORMED BY DATA:
+# # set up model based on Weisman et al (2015)
+# modelWDM <- 'affect =~ happy + depressed + fear + angry + calm + joy
+# perception =~ sounds + seeing + temperature + odors + depth
+# autonomy =~ free_will + choices + self_restraint + intentions + goal'
+
 # set up model based on Weisman et al (2015)
-modelWDM <- 'affect =~ happy + depressed + fear + angry + calm + joy
-perception =~ sounds + seeing + temperature + odors + depth
-autonomy =~ free_will + choices + self_restraint + intentions + goal'
+modelWDM <- 'soc_emo =~ happy + depressed + fear + angry + calm + joy + love + guilt + disrespected + embarrassed + pride
+biological =~ hungry + tired + pain + nauseated + safe + pleasure
+perceptual =~ sounds + seeing + temperature + odors + depth'
 
 # test model
 d1_all_fitWDM <- customCFA(d1_all, modelWDM)
@@ -1326,11 +1332,14 @@ d1_all_fitGGW <- customCFA(d1_all, modelGGW)
 summary(d1_all_fitGGW, fit.measures = TRUE)
 ```
 
-#### Compare models (if possible)
+#### Compare models (not yet implemented)
 
 ```{r s1 cfa model comparison}
-# compare models (iff continuous and ML)
-customVuong(d1_all_fitDD, d1_all_fitWDM, d1_all_fitGGW)
+# MODELS HAVE DIFFERENT SETS OF VARIABLES, MIGHT NOT WORK
+# # compare models (iff continuous and ML)
+# customVuong(chosenDD = d1_all_fitDD, 
+#             chosenWDM = d1_all_fitWDM, 
+#             chosenGGW = d1_all_fitGGW)
 ```
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
@@ -1380,12 +1389,12 @@ nfactors_d2_beetle <- 2
 
 ```{r s2 beetle no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d2_beetle_unrotatedN <- fa(d2_beetle, nfactors_d2_beetle, 
-                               rotate = "none", cor = "cor", fm = "minres")
-print(efa_d2_beetle_unrotatedN)
+efa_d2_beetle_unrotated <- fa(d2_beetle, 15, rotate = "none",
+                              cor = "cor", fm = "minres")
+print(efa_d2_beetle_unrotated)
 
 # get loadings for each factor
-efa_d2_beetle_unrotatedN_loadings <- getFactorLoadings(efa_d2_beetle_unrotatedN)
+efa_d2_beetle_unrotated_loadings <- getFactorLoadings(efa_d2_beetle_unrotated)
 ```
 
 #### Step 3: Run EFA with oblimin rotation
@@ -1445,12 +1454,12 @@ nfactors_d2_robot <- 2
 
 ```{r s2 robot no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d2_robot_unrotatedN <- fa(d2_robot, nfactors_d2_robot, 
-                              rotate = "none", cor = "cor", fm = "minres")
-print(efa_d2_robot_unrotatedN)
+efa_d2_robot_unrotated <- fa(d2_robot, 15, rotate = "none",
+                             cor = "cor", fm = "minres")
+print(efa_d2_robot_unrotated)
 
 # get loadings for each factor
-efa_d2_robot_unrotatedN_loadings <- getFactorLoadings(efa_d2_robot_unrotatedN)
+efa_d2_robot_unrotated_loadings <- getFactorLoadings(efa_d2_robot_unrotated)
 ```
 
 #### Step 3: Run EFA with oblimin rotation
@@ -1510,12 +1519,12 @@ nfactors_d2_all <- 3
 
 ```{r s2 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d2_all_unrotatedN <- fa(d2_all, nfactors_d2_all, 
-                            rotate = "none", cor = "cor", fm = "minres")
-print(efa_d2_all_unrotatedN)
+efa_d2_all_unrotated <- fa(d2_all, 15, rotate = "none", 
+                           cor = "cor", fm = "minres")
+print(efa_d2_all_unrotated)
 
 # get loadings for each factor
-efa_d2_all_unrotatedN_loadings <- getFactorLoadings(efa_d2_all_unrotatedN)
+efa_d2_all_unrotated_loadings <- getFactorLoadings(efa_d2_all_unrotated)
 ```
 
 #### Step 3: Run EFA with oblimin rotation
@@ -1570,7 +1579,7 @@ d2_all_fitDD <- customCFA(d2_all, modelDD)
 summary(d2_all_fitDD, fit.measures = TRUE)
 ```
 
-#### ModelWDM: Theoretical, three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
+#### ModelWDM: Theoretical, three factors (SOCIAL-EMOTIONAL, BIOLOGICAL, PERCEPTUAL; see Weisman et al., 2015)
 
 ```{r s2 cfa modelWDM: 3 factors (theory-based), echo = F}
 # test model
@@ -1586,11 +1595,14 @@ d2_all_fitGGW <- customCFA(d2_all, modelGGW)
 summary(d2_all_fitGGW, fit.measures = TRUE)
 ```
 
-#### Compare models (if possible)
+#### Compare models (not yet implemented)
 
 ```{r s2 cfa model comparison}
-# compare models (iff continuous and ML)
-customVuong(d2_all_fitDD, d2_all_fitWDM, d2_all_fitGGW)
+# MODELS HAVE DIFFERENT SETS OF VARIABLES, MIGHT NOT WORK
+# # compare models (iff continuous and ML)
+# customVuong(chosenDD = d2_all_fitDD, 
+#             chosenWDM = d2_all_fitWDM, 
+#             chosenGGW = d2_all_fitGGW)
 ```
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
@@ -1640,12 +1652,12 @@ nfactors_d3_all <- 3
 
 ```{r s3 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d3_all_unrotatedN <- fa(d3_all, nfactors_d3_all, 
-                            rotate = "none", cor = "cor", fm = "minres")
-print(efa_d3_all_unrotatedN)
+efa_d3_all_unrotated <- fa(d3_all, 15, rotate = "none", 
+                           cor = "cor", fm = "minres")
+print(efa_d3_all_unrotated)
 
 # get loadings for each factor
-efa_d3_all_unrotatedN_loadings <- getFactorLoadings(efa_d3_all_unrotatedN)
+efa_d3_all_unrotated_loadings <- getFactorLoadings(efa_d3_all_unrotated)
 ```
 
 #### Step 3: Run EFA with oblimin rotation
@@ -1700,7 +1712,7 @@ d3_all_fitDD <- customCFA(d3_all, modelDD)
 summary(d3_all_fitDD, fit.measures = TRUE)
 ```
 
-#### ModelWDM: Theoretical, three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
+#### ModelWDM: Theoretical, three factors (SOCIAL-EMOTIONAL, BIOLOGICAL, PERCEPTUAL; see Weisman et al., 2015)
 
 ```{r s3 cfa modelWDM: 3 factors (theory-based), echo = F}
 # test model
@@ -1716,11 +1728,14 @@ d3_all_fitGGW <- customCFA(d3_all, modelGGW)
 summary(d3_all_fitGGW, fit.measures = TRUE)
 ```
 
-#### Compare models (if possible)
+#### Compare models (not yet implemented)
 
 ```{r s3 cfa model comparison}
-# compare models (iff continuous and ML)
-customVuong(d3_all_fitDD, d3_all_fitWDM, d3_all_fitGGW)
+# MODELS HAVE DIFFERENT SETS OF VARIABLES, MIGHT NOT WORK
+# # compare models (iff continuous and ML)
+# customVuong(chosenDD = d3_all_fitDD, 
+#             chosenWDM = d3_all_fitWDM, 
+#             chosenGGW = d3_all_fitGGW)
 ```
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
@@ -1770,12 +1785,12 @@ nfactors_d4_all <- 3
 
 ```{r s4 all no rotation, echo = F}
 # run EFA without rotation with N factors
-efa_d4_all_unrotatedN <- fa(d4_all, nfactors_d4_all, 
-                            rotate = "none", cor = "cor", fm = "minres")
-print(efa_d4_all_unrotatedN)
+efa_d4_all_unrotated <- fa(d4_all, 15, rotate = "none", 
+                           cor = "cor", fm = "minres")
+print(efa_d4_all_unrotated)
 
 # get loadings for each factor
-efa_d4_all_unrotatedN_loadings <- getFactorLoadings(efa_d4_all_unrotatedN)
+efa_d4_all_unrotated_loadings <- getFactorLoadings(efa_d4_all_unrotated)
 ```
 
 #### Step 3: Run EFA with oblimin rotation
@@ -1944,7 +1959,7 @@ ggplot(aes(x = MR2_mean, y = MR3_mean, colour = condition),
        y = "Average score: MR3\n")
 ```
 
-#### ModelWDM: Theoretical, three factors (AFFECT, AUTONOMY, PERCEPTION; see Weisman et al., 2015)
+#### ModelWDM: Theoretical, three factors (SOCIAL-EMOTIONAL, BIOLOGICAL, PERCEPTUAL; see Weisman et al., 2015)
 
 ```{r s4 cfa modelWDM: 3 factors (theory-driven), echo = F}
 # test model
@@ -1958,9 +1973,9 @@ d4_all_fitWDM_predict <- predict(d4_all_fitWDM)
 
 # use dummy model to get subid into factor scores
 modelWDM_dummy <- gsub("=~", "~~", modelWDM)
-modelWDM_dummy <- gsub("affect", "subid", modelWDM_dummy)
-modelWDM_dummy <- gsub("autonomy", "subid", modelWDM_dummy)
-modelWDM_dummy <- gsub("perception", "subid", modelWDM_dummy)
+modelWDM_dummy <- gsub("soc_emo", "subid", modelWDM_dummy)
+modelWDM_dummy <- gsub("biological", "subid", modelWDM_dummy)
+modelWDM_dummy <- gsub("perceptual", "subid", modelWDM_dummy)
 dummy_fitWDM <- cfa(modelWDM_dummy, d4 %>%
                    select(subid, happy:pride), ordered = FALSE, estimator = chosenEstimator)
 
@@ -1983,31 +1998,31 @@ rm(d4_all_fitWDM_predict, modelWDM_dummy, dummy_fitWDM, dummy_dataWDM, d4_subids
 ```{r s4 cfa modelWDM average factor scores by condition, echo = F}
 d4_factor_scoresWDM_condition <- d4_factor_scoresWDM %>%
   group_by(condition) %>%
-  summarise(affect_mean = mean(affect),
-            affect_sd = sd(affect),
-            affect_n = length(affect),
-            autonomy_mean = mean(autonomy),
-            autonomy_sd = sd(autonomy),
-            autonomy_n = length(autonomy),
-            perception_mean = mean(perception),
-            perception_sd = sd(perception),
-            perception_n = length(perception))
+  summarise(soc_emo_mean = mean(soc_emo),
+            soc_emo_sd = sd(soc_emo),
+            soc_emo_n = length(soc_emo),
+            biological_mean = mean(biological),
+            biological_sd = sd(biological),
+            biological_n = length(biological),
+            perceptual_mean = mean(perceptual),
+            perceptual_sd = sd(perceptual),
+            perceptual_n = length(perceptual))
 
 # d4_factor_scoresWDM_condition_mb <- d4_factor_scoresWDM %>%
-#   gather(factor, score, c(affect, autonomy, perception)) %>%
+#   gather(factor, score, c(soc_emo, biological, perceptual)) %>%
 #   multi_boot(column = "score",
 #              summary_groups = c("condition", "factor"),
 #              statistics_functions = c("ci_lower", "mean", "ci_upper"))
 ```
 
-```{r s4 cfa modelWDM plot: affect vs. autonomy, echo = F, fig.height = 8, fig.width = 8}
-ggplot(aes(x = affect_mean, y = autonomy_mean, colour = condition), 
+```{r s4 cfa modelWDM plot: soc_emo vs. biological, echo = F, fig.height = 8, fig.width = 8}
+ggplot(aes(x = soc_emo_mean, y = biological_mean, colour = condition), 
        data = d4_factor_scoresWDM_condition) +
-  geom_errorbar(aes(ymin = autonomy_mean - autonomy_sd/sqrt(autonomy_n),
-                    ymax = autonomy_mean + autonomy_sd/sqrt(autonomy_n)),
+  geom_errorbar(aes(ymin = biological_mean - biological_sd/sqrt(biological_n),
+                    ymax = biological_mean + biological_sd/sqrt(biological_n)),
                 width = 0.1, alpha = 0.4) +
-  geom_errorbarh(aes(xmin = affect_mean - affect_sd/sqrt(affect_n),
-                     xmax = affect_mean + affect_sd/sqrt(affect_n)),
+  geom_errorbarh(aes(xmin = soc_emo_mean - soc_emo_sd/sqrt(soc_emo_n),
+                     xmax = soc_emo_mean + soc_emo_sd/sqrt(soc_emo_n)),
                  height = 0.1, alpha = 0.4) +
   geom_point(size = 4) +
   geom_dl(aes(label = condition), method = "smart.grid") +
@@ -2017,19 +2032,19 @@ ggplot(aes(x = affect_mean, y = autonomy_mean, colour = condition),
         legend.position = "none") +
   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: Data-driven model, AFFECT vs. AUTONOMY\n(Error bars are 95% CIs)\n",
-       x = "\nAverage score: AFFECT",
-       y = "Average score: AUTONOMY\n")
+  labs(title = "Study 4: Data-driven model, SOCIAL-EMOTIONAL vs. BIOLOGICAL\n(Error bars are 95% CIs)\n",
+       x = "\nAverage score: SOCIAL-EMOTIONAL",
+       y = "Average score: BIOLOGICAL\n")
 ```
 
-```{r s4 cfa modelWDM plot: affect vs. perception, echo = F, fig.height = 8, fig.width = 8}
-ggplot(aes(x = affect_mean, y = perception_mean, colour = condition), 
+```{r s4 cfa modelWDM plot: soc_emo vs. perceptual, echo = F, fig.height = 8, fig.width = 8}
+ggplot(aes(x = soc_emo_mean, y = perceptual_mean, colour = condition), 
        data = d4_factor_scoresWDM_condition) +
-  geom_errorbar(aes(ymin = perception_mean - perception_sd/sqrt(perception_n),
-                    ymax = perception_mean + perception_sd/sqrt(perception_n)),
+  geom_errorbar(aes(ymin = perceptual_mean - perceptual_sd/sqrt(perceptual_n),
+                    ymax = perceptual_mean + perceptual_sd/sqrt(perceptual_n)),
                 width = 0.1, alpha = 0.4) +
-  geom_errorbarh(aes(xmin = affect_mean - affect_sd/sqrt(affect_n),
-                     xmax = affect_mean + affect_sd/sqrt(affect_n)),
+  geom_errorbarh(aes(xmin = soc_emo_mean - soc_emo_sd/sqrt(soc_emo_n),
+                     xmax = soc_emo_mean + soc_emo_sd/sqrt(soc_emo_n)),
                  height = 0.1, alpha = 0.4) +
   geom_point(size = 4) +
   geom_dl(aes(label = condition), method = "smart.grid") +
@@ -2039,19 +2054,19 @@ ggplot(aes(x = affect_mean, y = perception_mean, colour = condition),
         legend.position = "none") +
   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: Data-driven model, AFFECT vs. PERCEPTION\n(Error bars are 95% CIs)\n",
-       x = "\nAverage score: AFFECT",
-       y = "Average score: PERCEPTION\n")
+  labs(title = "Study 4: Data-driven model, SOCIAL-EMOTIONAL vs. PERCEPTUAL\n(Error bars are 95% CIs)\n",
+       x = "\nAverage score: SOCIAL-EMOTIONAL",
+       y = "Average score: PERCEPTUAL\n")
 ```
 
-```{r s4 cfa modelWDM plot: autonomy vs. perception, echo = F, fig.height = 8, fig.width = 8}
-ggplot(aes(x = autonomy_mean, y = perception_mean, colour = condition), 
+```{r s4 cfa modelWDM plot: biological vs. perceptual, echo = F, fig.height = 8, fig.width = 8}
+ggplot(aes(x = biological_mean, y = perceptual_mean, colour = condition), 
        data = d4_factor_scoresWDM_condition) +
-  geom_errorbar(aes(ymin = perception_mean - perception_sd/sqrt(perception_n),
-                    ymax = perception_mean + perception_sd/sqrt(perception_n)),
+  geom_errorbar(aes(ymin = perceptual_mean - perceptual_sd/sqrt(perceptual_n),
+                    ymax = perceptual_mean + perceptual_sd/sqrt(perceptual_n)),
                 width = 0.1, alpha = 0.4) +
-  geom_errorbarh(aes(xmin = autonomy_mean - autonomy_sd/sqrt(autonomy_n),
-                     xmax = autonomy_mean + autonomy_sd/sqrt(autonomy_n)),
+  geom_errorbarh(aes(xmin = biological_mean - biological_sd/sqrt(biological_n),
+                     xmax = biological_mean + biological_sd/sqrt(biological_n)),
                  height = 0.1, alpha = 0.4) +
   geom_point(size = 4) +
   geom_dl(aes(label = condition), method = "smart.grid") +
@@ -2061,9 +2076,9 @@ ggplot(aes(x = autonomy_mean, y = perception_mean, colour = condition),
         legend.position = "none") +
   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: Data-driven model, AUTONOMY vs. PERCEPTION\n(Error bars are 95% CIs)\n",
-       x = "\nAverage score: AUTONOMY",
-       y = "Average score: PERCEPTION\n")
+  labs(title = "Study 4: Data-driven model, BIOLOGICAL vs. PERCEPTUAL\n(Error bars are 95% CIs)\n",
+       x = "\nAverage score: BIOLOGICAL",
+       y = "Average score: PERCEPTUAL\n")
 ```
 
 #### ModelGGW: Theoretical, two factors (AGENCY, EXPERIENCE; see Gray et al., 2007)
@@ -2140,11 +2155,14 @@ ggplot(aes(x = experience_mean, y = agency_mean, colour = condition),
        y = "Average score: AGENCY\n")
 ```
 
-#### Compare models (if possible)
+#### Compare models (not yet implemented)
 
 ```{r s4 cfa model comparison}
-# compare models (iff continuous and ML)
-customVuong(d4_all_fitDD, d4_all_fitWDM, d4_all_fitGGW)
+# MODELS HAVE DIFFERENT SETS OF VARIABLES, MIGHT NOT WORK
+# # compare models (iff continuous and ML)
+# customVuong(chosenDD = d4_all_fitDD, 
+#             chosenWDM = d4_all_fitWDM, 
+#             chosenGGW = d4_all_fitGGW)
 ```
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
