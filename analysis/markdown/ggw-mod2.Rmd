@@ -847,20 +847,6 @@ extractFStructure <- function(efa) {
   return(d_structure_allFactors)
 }
 
-# build model from EFA factor structure
-buildModel <- function (chosenStructure, chosenFactor) {
-  factorName <- paste0("mc_", chosenFactor)
-  factorLoading <- paste0("loading_", chosenFactor)
-  mcs <- chosenStructure
-  pos <- mcs[, factorName][is.na(mcs[factorName]) == F & mcs[factorLoading] > 0]
-  neg <- mcs[, factorName][is.na(mcs[factorName]) == F & mcs[factorLoading] < 0]
-  factorModel <- paste0(chosenFactor, " =~ ", paste(pos, collapse = " + "))
-  if(length(neg) > 0) {
-    factorModel <- paste0(factorModel, " + (-x)* ", paste(neg, collapse = " - "))
-  }
-  return(factorModel)
-}
-
 # run customized CFA
 customCFA <- function(d, model) {
   if(chosenVarCoding == "continuous") {
@@ -951,11 +937,12 @@ chosenCorType <- "cor" # pearson correlation, less appropriate for ordinal data 
 # chosenCorType <- "poly" # polychoric correlation, appropriate for ordinal data but seems to throw errors
 
 # for CFAs, treat variables as continuous or ordinal?
-chosenVarCoding <- "continuous" # less true (bc of skewed data) but faster and able to compare non-nested models using vuongtest
-# chosenVarCoding <- "ordinal" # truer but slower and impossible to compare non-nested models
+# chosenVarCoding <- "continuous" # less true (bc of skewed data) but faster and able to compare non-nested models using vuongtest
+chosenVarCoding <- "ordinal" # truer but slower and impossible to compare non-nested models
 
 # for CFAs, what estimator to use?
-chosenEstimator <- "ML" # maximum likelihood, probably less true (bc of skewed data) but able to compare non-nested models using vuongtest
+# chosenEstimator <- "ML" # maximum likelihood, probably less true (bc of skewed data) but able to compare non-nested models using vuongtest
+chosenEstimator <- "WLSMV" # weighted least squares means and variance adjusted, for ordinal data (as recommended by lavaan)
 # chosenEstimator <- "default"
 
 kable(data.frame("EFA_correlation" = chosenCorType,
@@ -1296,51 +1283,51 @@ kable(d1_fStructure, align = "l",
 ### ModelDD: Data-driven, three factors (MR1, MR2, MR3; see Study 1)
 
 ```{r s1 cfa modelDD: 3 factors (data-driven), echo = F}
-# set up model based on EFA
-modelDD_MR1 <- buildModel(d1_fStructure, "MR1")
-modelDD_MR2 <- buildModel(d1_fStructure, "MR2")
-modelDD_MR3 <- buildModel(d1_fStructure, "MR3")
-modelDD_allFactors <- paste(modelDD_MR1, "\n", 
-                            modelDD_MR2, "\n", modelDD_MR3, collapse = "")
-modelDD <- gsub(" \n ", "\n", as.character(noquote(modelDD_allFactors)))
-
-# test model
-d1_all_fitDD <- customCFA(d1_all, modelDD)
-summary(d1_all_fitDD, fit.measures = TRUE)
-
-# remove extraneous variables
-rm(modelDD_MR1, modelDD_MR2, modelDD_MR3, modelDD_allFactors)
+# # set up model based on EFA
+# # NOTE: ONLY WORKS FOR POSITIVE LOADINGS!!
+# modelDD_MR1 <- paste0("MR1 =~ ", paste(d1_fStructure$mc_MR1[is.na(d1_fStructure$mc_MR1) == F], collapse = " + "))
+# modelDD_MR2 <- paste0("MR2 =~ ", paste(d1_fStructure$mc_MR2[is.na(d1_fStructure$mc_MR2) == F], collapse = " + "))
+# modelDD_MR3 <- paste0("MR3 =~ ", paste(d1_fStructure$mc_MR3[is.na(d1_fStructure$mc_MR3) == F], collapse = " + "))
+# modelDD_allFactors <- paste(modelDD_MR1, "\n", modelDD_MR2, "\n", modelDD_MR3, collapse = "")
+# modelDD <- as.character(noquote(modelDD_allFactors))
+# 
+# # test model
+# d1_all_fitDD <- customCFA(d1_all, modelDD)
+# summary(d1_all_fitDD, fit.measures = TRUE)
+# 
+# # remove extraneous variables
+# rm(modelDD_MR1, modelDD_MR2, modelDD_MR3, modelDD_allFactors)
 ```
 
 ### ModelWDM: Theoretical, three factors (SOCIAL-EMOTIONAL, BIOLOGICAL, PERCEPTUAL; see Weisman et al., 2015)
 
 ```{r s1 cfa modelWDM: 3 factors (theory-based), echo = F}
-# OLD VERSION, NOT INFORMED BY DATA:
+# # OLD VERSION, NOT INFORMED BY DATA:
+# # # set up model based on Weisman et al (2015)
+# # modelWDM <- 'affect =~ happy + depressed + fear + angry + calm + joy
+# # perception =~ sounds + seeing + temperature + odors + depth
+# # autonomy =~ free_will + choices + self_restraint + intentions + goal'
+# 
 # # set up model based on Weisman et al (2015)
-# modelWDM <- 'affect =~ happy + depressed + fear + angry + calm + joy
-# perception =~ sounds + seeing + temperature + odors + depth
-# autonomy =~ free_will + choices + self_restraint + intentions + goal'
-
-# set up model based on Weisman et al (2015)
-modelWDM <- 'soc_emo =~ happy + depressed + fear + angry + calm + joy + love + guilt + disrespected + embarrassed + pride
-biological =~ hungry + tired + pain + nauseated + safe + pleasure
-perceptual =~ sounds + seeing + temperature + odors + depth'
-
-# test model
-d1_all_fitWDM <- customCFA(d1_all, modelWDM)
-summary(d1_all_fitWDM, fit.measures = TRUE)
+# modelWDM <- 'soc_emo =~ happy + depressed + fear + angry + calm + joy + love + guilt + disrespected + embarrassed + pride
+# biological =~ hungry + tired + pain + nauseated + safe + pleasure
+# perceptual =~ sounds + seeing + temperature + odors + depth'
+# 
+# # test model
+# d1_all_fitWDM <- customCFA(d1_all, modelWDM)
+# summary(d1_all_fitWDM, fit.measures = TRUE)
 ```
 
 #### ModelGGW: Theoretical, two factors (AGENCY, EXPERIENCE; see Gray et al., 2007)
 
 ```{r s1 cfa modelGGW: 2 factors (theory-based), echo = F}
 # set up model based on Weisman et al (2015)
-modelGGW <- ggw_model <- 'experience =~ hungry + fear + pain + pleasure + angry + desires + personality + conscious + pride + embarrassed + joy
-agency =~ self_restraint + morality + remembering + emo_recog + goal + communicating + thoughts'
-
-# test model
-d1_all_fitGGW <- customCFA(d1_all, modelGGW)
-summary(d1_all_fitGGW, fit.measures = TRUE)
+# modelGGW <- ggw_model <- 'experience =~ hungry + fear + pain + pleasure + angry + desires + personality + conscious + pride + embarrassed + joy
+# agency =~ self_restraint + morality + remembering + emo_recog + goal + communicating + thoughts'
+# 
+# # test model
+# d1_all_fitGGW <- customCFA(d1_all, modelGGW)
+# summary(d1_all_fitGGW, fit.measures = TRUE)
 ```
 
 #### Compare models (not yet implemented)
@@ -1585,25 +1572,25 @@ kable(efa_d2_all_rotatedN_loadings[[3]],
 #### ModelDD: Data-driven, three factors (experience, MR2, MR3; see Study 1)
 
 ```{r s2 cfa modelDD: 3 factors (data-driven), echo = F}
-# test model
-d2_all_fitDD <- customCFA(d2_all, modelDD)
-summary(d2_all_fitDD, fit.measures = TRUE)
+# # test model
+# d2_all_fitDD <- customCFA(d2_all, modelDD)
+# summary(d2_all_fitDD, fit.measures = TRUE)
 ```
 
 #### ModelWDM: Theoretical, three factors (SOCIAL-EMOTIONAL, BIOLOGICAL, PERCEPTUAL; see Weisman et al., 2015)
 
 ```{r s2 cfa modelWDM: 3 factors (theory-based), echo = F}
-# test model
-d2_all_fitWDM <- customCFA(d2_all, modelWDM)
-summary(d2_all_fitWDM, fit.measures = TRUE)
+# # test model
+# d2_all_fitWDM <- customCFA(d2_all, modelWDM)
+# summary(d2_all_fitWDM, fit.measures = TRUE)
 ```
 
 #### ModelGGW: Theoretical, two factors (AGENCY, EXPERIENCE; see Gray et al., 2007)
 
 ```{r s2 cfa modelGGW: 2 factors (theory-based), echo = F}
-# test model
-d2_all_fitGGW <- customCFA(d2_all, modelGGW)
-summary(d2_all_fitGGW, fit.measures = TRUE)
+# # test model
+# d2_all_fitGGW <- customCFA(d2_all, modelGGW)
+# summary(d2_all_fitGGW, fit.measures = TRUE)
 ```
 
 #### Compare models (not yet implemented)
@@ -1718,25 +1705,25 @@ kable(efa_d3_all_rotatedN_loadings[[3]],
 #### ModelDD: Data-driven, three factors (MR1, MR2, MR3; see Study 1)
 
 ```{r s3 cfa modelDD: 3 factors (data-driven), echo = F}
-# test model
-d3_all_fitDD <- customCFA(d3_all, modelDD)
-summary(d3_all_fitDD, fit.measures = TRUE)
+# # test model
+# d3_all_fitDD <- customCFA(d3_all, modelDD)
+# summary(d3_all_fitDD, fit.measures = TRUE)
 ```
 
 #### ModelWDM: Theoretical, three factors (SOCIAL-EMOTIONAL, BIOLOGICAL, PERCEPTUAL; see Weisman et al., 2015)
 
 ```{r s3 cfa modelWDM: 3 factors (theory-based), echo = F}
-# test model
-d3_all_fitWDM <- customCFA(d3_all, modelWDM)
-summary(d3_all_fitWDM, fit.measures = TRUE)
+# # test model
+# d3_all_fitWDM <- customCFA(d3_all, modelWDM)
+# summary(d3_all_fitWDM, fit.measures = TRUE)
 ```
 
 #### ModelGGW: Theoretical, two factors (AGENCY, EXPERIENCE; see Gray et al., 2007)
 
 ```{r s3 cfa modelGGW: 2 factors (theory-based), echo = F}
-# test model
-d3_all_fitGGW <- customCFA(d3_all, modelGGW)
-summary(d3_all_fitGGW, fit.measures = TRUE)
+# # test model
+# d3_all_fitGGW <- customCFA(d3_all, modelGGW)
+# summary(d3_all_fitGGW, fit.measures = TRUE)
 ```
 
 #### Compare models (not yet implemented)
@@ -1851,319 +1838,319 @@ kable(efa_d4_all_rotatedN_loadings[[3]],
 #### ModelDD: Data-driven, three factors (MR1, MR2, MR3; see Study 1)
 
 ```{r s4 cfa modelDD: 3 factors (data-driven), echo = F}
-# test model
-d4_all_fitDD <- customCFA(d4_all, modelDD)
-summary(d4_all_fitDD, fit.measures = TRUE)
+# # test model
+# d4_all_fitDD <- customCFA(d4_all, modelDD)
+# summary(d4_all_fitDD, fit.measures = TRUE)
 ```
 
 ```{r s4 cfa modelDD factor scores, echo = F}
-# use best model to get factor scores by participant
-d4_all_fitDD_predict <- predict(d4_all_fitDD)
-
-# use dummy model to get subid into factor scores
-modelDD_dummy <- gsub("=~", "~~", modelDD)
-modelDD_dummy <- gsub("MR1", "subid", modelDD_dummy)
-modelDD_dummy <- gsub("MR2", "subid", modelDD_dummy)
-modelDD_dummy <- gsub("MR3", "subid", modelDD_dummy)
-dummy_fitDD <- cfa(modelDD_dummy, d4 %>%
-                   select(subid, happy:pride), ordered = FALSE, estimator = chosenEstimator)
-
-dummy_dataDD <- dummy_fitDD@Data@X[[1]]
-d4_all_fitDD_predict <- data.frame(d4_all_fitDD_predict,
-                                   subid = dummy_dataDD[,1])
-
-d4_subids <- d4 %>% select(subid, condition) %>%
-  mutate(subid_num = as.numeric(subid)) %>%
-  rename(subid_cat = subid,
-         subid = subid_num)
-
-d4_factor_scoresDD <- d4_all_fitDD_predict %>%
-  full_join(d4_subids, by = "subid")
-
-# remove extraneous variables
-rm(d4_all_fitDD_predict, modelDD_dummy, dummy_fitDD, dummy_dataDD, d4_subids)
+# # use best model to get factor scores by participant
+# d4_all_fitDD_predict <- predict(d4_all_fitDD)
+# 
+# # use dummy model to get subid into factor scores
+# modelDD_dummy <- gsub("=~", "~~", modelDD)
+# modelDD_dummy <- gsub("MR1", "subid", modelDD_dummy)
+# modelDD_dummy <- gsub("MR2", "subid", modelDD_dummy)
+# modelDD_dummy <- gsub("MR3", "subid", modelDD_dummy)
+# dummy_fitDD <- cfa(modelDD_dummy, d4 %>%
+#                    select(subid, happy:pride), ordered = FALSE, estimator = chosenEstimator)
+# 
+# dummy_dataDD <- dummy_fitDD@Data@X[[1]]
+# d4_all_fitDD_predict <- data.frame(d4_all_fitDD_predict,
+#                                    subid = dummy_dataDD[,1])
+# 
+# d4_subids <- d4 %>% select(subid, condition) %>%
+#   mutate(subid_num = as.numeric(subid)) %>%
+#   rename(subid_cat = subid,
+#          subid = subid_num)
+# 
+# d4_factor_scoresDD <- d4_all_fitDD_predict %>%
+#   full_join(d4_subids, by = "subid")
+# 
+# # remove extraneous variables
+# rm(d4_all_fitDD_predict, modelDD_dummy, dummy_fitDD, dummy_dataDD, d4_subids)
 ```
 
 ```{r s4 cfa modelDD average factor scores by condition, echo = F}
-d4_factor_scoresDD_condition <- d4_factor_scoresDD %>%
-  group_by(condition) %>%
-  summarise(MR1_mean = mean(MR1),
-            MR1_sd = sd(MR1),
-            MR1_n = length(MR1),
-            MR2_mean = mean(MR2),
-            MR2_sd = sd(MR2),
-            MR2_n = length(MR2),
-            MR3_mean = mean(MR3),
-            MR3_sd = sd(MR3),
-            MR3_n = length(MR3))
-
-# d4_factor_scoresDD_condition_mb <- d4_factor_scoresDD %>%
-#   gather(factor, score, c(MR1, MR2, MR3)) %>%
-#   multi_boot(column = "score",
-#              summary_groups = c("condition", "factor"),
-#              statistics_functions = c("ci_lower", "mean", "ci_upper"))
+# d4_factor_scoresDD_condition <- d4_factor_scoresDD %>%
+#   group_by(condition) %>%
+#   summarise(MR1_mean = mean(MR1),
+#             MR1_sd = sd(MR1),
+#             MR1_n = length(MR1),
+#             MR2_mean = mean(MR2),
+#             MR2_sd = sd(MR2),
+#             MR2_n = length(MR2),
+#             MR3_mean = mean(MR3),
+#             MR3_sd = sd(MR3),
+#             MR3_n = length(MR3))
+# 
+# # d4_factor_scoresDD_condition_mb <- d4_factor_scoresDD %>%
+# #   gather(factor, score, c(MR1, MR2, MR3)) %>%
+# #   multi_boot(column = "score",
+# #              summary_groups = c("condition", "factor"),
+# #              statistics_functions = c("ci_lower", "mean", "ci_upper"))
 ```
 
 ```{r s4 cfa modelDD plot: MR1 vs. MR2, echo = F, fig.height = 8, fig.width = 8}
-ggplot(aes(x = MR1_mean, y = MR2_mean, colour = condition), 
-       data = d4_factor_scoresDD_condition) +
-  geom_errorbar(aes(ymin = MR2_mean - MR2_sd/sqrt(MR2_n),
-                    ymax = MR2_mean + MR2_sd/sqrt(MR2_n)),
-                width = 0.1, alpha = 0.4) +
-  geom_errorbarh(aes(xmin = MR1_mean - MR1_sd/sqrt(MR1_n),
-                     xmax = MR1_mean + MR1_sd/sqrt(MR1_n)),
-                 height = 0.1, alpha = 0.4) +
-  geom_point(size = 4) +
-  geom_dl(aes(label = condition), method = "smart.grid") +
-  theme_bw() +
-  scale_color_manual(values = tol21rainbow) +
-  theme(text = element_text(size = 20),
-        legend.position = "none") +
-  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: Data-driven model, MR1 vs. MR2\n(Error bars are 95% CIs)\n",
-       x = "\nAverage score: MR1",
-       y = "Average score: MR2\n")
+# ggplot(aes(x = MR1_mean, y = MR2_mean, colour = condition), 
+#        data = d4_factor_scoresDD_condition) +
+#   geom_errorbar(aes(ymin = MR2_mean - MR2_sd/sqrt(MR2_n),
+#                     ymax = MR2_mean + MR2_sd/sqrt(MR2_n)),
+#                 width = 0.1, alpha = 0.4) +
+#   geom_errorbarh(aes(xmin = MR1_mean - MR1_sd/sqrt(MR1_n),
+#                      xmax = MR1_mean + MR1_sd/sqrt(MR1_n)),
+#                  height = 0.1, alpha = 0.4) +
+#   geom_point(size = 4) +
+#   geom_dl(aes(label = condition), method = "smart.grid") +
+#   theme_bw() +
+#   scale_color_manual(values = tol21rainbow) +
+#   theme(text = element_text(size = 20),
+#         legend.position = "none") +
+#   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   labs(title = "Study 4: Data-driven model, MR1 vs. MR2\n(Error bars are 95% CIs)\n",
+#        x = "\nAverage score: MR1",
+#        y = "Average score: MR2\n")
 ```
 
 ```{r s4 cfa modelDD plot: MR1 vs. MR3, echo = F, fig.height = 8, fig.width = 8}
-ggplot(aes(x = MR1_mean, y = MR3_mean, colour = condition), 
-       data = d4_factor_scoresDD_condition) +
-  geom_errorbar(aes(ymin = MR3_mean - MR3_sd/sqrt(MR3_n),
-                    ymax = MR3_mean + MR3_sd/sqrt(MR3_n)),
-                width = 0.1, alpha = 0.4) +
-  geom_errorbarh(aes(xmin = MR1_mean - MR1_sd/sqrt(MR1_n),
-                     xmax = MR1_mean + MR1_sd/sqrt(MR1_n)),
-                 height = 0.1, alpha = 0.4) +
-  geom_point(size = 4) +
-  geom_dl(aes(label = condition), method = "smart.grid") +
-  theme_bw() +
-  scale_color_manual(values = tol21rainbow) +
-  theme(text = element_text(size = 20),
-        legend.position = "none") +
-  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: Data-driven model, MR1 vs. MR3\n(Error bars are 95% CIs)\n",
-       x = "\nAverage score: MR1",
-       y = "Average score: MR3\n")
+# ggplot(aes(x = MR1_mean, y = MR3_mean, colour = condition), 
+#        data = d4_factor_scoresDD_condition) +
+#   geom_errorbar(aes(ymin = MR3_mean - MR3_sd/sqrt(MR3_n),
+#                     ymax = MR3_mean + MR3_sd/sqrt(MR3_n)),
+#                 width = 0.1, alpha = 0.4) +
+#   geom_errorbarh(aes(xmin = MR1_mean - MR1_sd/sqrt(MR1_n),
+#                      xmax = MR1_mean + MR1_sd/sqrt(MR1_n)),
+#                  height = 0.1, alpha = 0.4) +
+#   geom_point(size = 4) +
+#   geom_dl(aes(label = condition), method = "smart.grid") +
+#   theme_bw() +
+#   scale_color_manual(values = tol21rainbow) +
+#   theme(text = element_text(size = 20),
+#         legend.position = "none") +
+#   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   labs(title = "Study 4: Data-driven model, MR1 vs. MR3\n(Error bars are 95% CIs)\n",
+#        x = "\nAverage score: MR1",
+#        y = "Average score: MR3\n")
 ```
 
 ```{r s4 cfa modelDD plot: MR2 vs. MR3, echo = F, fig.height = 8, fig.width = 8}
-ggplot(aes(x = MR2_mean, y = MR3_mean, colour = condition), 
-       data = d4_factor_scoresDD_condition) +
-  geom_errorbar(aes(ymin = MR3_mean - MR3_sd/sqrt(MR3_n),
-                    ymax = MR3_mean + MR3_sd/sqrt(MR3_n)),
-                width = 0.1, alpha = 0.4) +
-  geom_errorbarh(aes(xmin = MR2_mean - MR2_sd/sqrt(MR2_n),
-                     xmax = MR2_mean + MR2_sd/sqrt(MR2_n)),
-                 height = 0.1, alpha = 0.4) +
-  geom_point(size = 4) +
-  geom_dl(aes(label = condition), method = "smart.grid") +
-  theme_bw() +
-  scale_color_manual(values = tol21rainbow) +
-  theme(text = element_text(size = 20),
-        legend.position = "none") +
-  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: Data-driven model, MR2 vs. MR3\n(Error bars are 95% CIs)\n",
-       x = "\nAverage score: MR2",
-       y = "Average score: MR3\n")
+# ggplot(aes(x = MR2_mean, y = MR3_mean, colour = condition), 
+#        data = d4_factor_scoresDD_condition) +
+#   geom_errorbar(aes(ymin = MR3_mean - MR3_sd/sqrt(MR3_n),
+#                     ymax = MR3_mean + MR3_sd/sqrt(MR3_n)),
+#                 width = 0.1, alpha = 0.4) +
+#   geom_errorbarh(aes(xmin = MR2_mean - MR2_sd/sqrt(MR2_n),
+#                      xmax = MR2_mean + MR2_sd/sqrt(MR2_n)),
+#                  height = 0.1, alpha = 0.4) +
+#   geom_point(size = 4) +
+#   geom_dl(aes(label = condition), method = "smart.grid") +
+#   theme_bw() +
+#   scale_color_manual(values = tol21rainbow) +
+#   theme(text = element_text(size = 20),
+#         legend.position = "none") +
+#   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   labs(title = "Study 4: Data-driven model, MR2 vs. MR3\n(Error bars are 95% CIs)\n",
+#        x = "\nAverage score: MR2",
+#        y = "Average score: MR3\n")
 ```
 
 #### ModelWDM: Theoretical, three factors (SOCIAL-EMOTIONAL, BIOLOGICAL, PERCEPTUAL; see Weisman et al., 2015)
 
 ```{r s4 cfa modelWDM: 3 factors (theory-driven), echo = F}
-# test model
-d4_all_fitWDM <- customCFA(d4_all, modelWDM)
-summary(d4_all_fitWDM, fit.measures = TRUE)
+# # test model
+# d4_all_fitWDM <- customCFA(d4_all, modelWDM)
+# summary(d4_all_fitWDM, fit.measures = TRUE)
 ```
 
 ```{r s4 cfa modelWDM factor scores, echo = F}
-# use best model to get factor scores by participant
-d4_all_fitWDM_predict <- predict(d4_all_fitWDM)
-
-# use dummy model to get subid into factor scores
-modelWDM_dummy <- gsub("=~", "~~", modelWDM)
-modelWDM_dummy <- gsub("soc_emo", "subid", modelWDM_dummy)
-modelWDM_dummy <- gsub("biological", "subid", modelWDM_dummy)
-modelWDM_dummy <- gsub("perceptual", "subid", modelWDM_dummy)
-dummy_fitWDM <- cfa(modelWDM_dummy, d4 %>%
-                   select(subid, happy:pride), ordered = FALSE, estimator = chosenEstimator)
-
-dummy_dataWDM <- dummy_fitWDM@Data@X[[1]]
-d4_all_fitWDM_predict <- data.frame(d4_all_fitWDM_predict,
-                                   subid = dummy_dataWDM[,1])
-
-d4_subids <- d4 %>% select(subid, condition) %>%
-  mutate(subid_num = as.numeric(subid)) %>%
-  rename(subid_cat = subid,
-         subid = subid_num)
-
-d4_factor_scoresWDM <- d4_all_fitWDM_predict %>%
-  full_join(d4_subids, by = "subid")
-
-# remove extraneous variables
-rm(d4_all_fitWDM_predict, modelWDM_dummy, dummy_fitWDM, dummy_dataWDM, d4_subids)
+# # use best model to get factor scores by participant
+# d4_all_fitWDM_predict <- predict(d4_all_fitWDM)
+# 
+# # use dummy model to get subid into factor scores
+# modelWDM_dummy <- gsub("=~", "~~", modelWDM)
+# modelWDM_dummy <- gsub("soc_emo", "subid", modelWDM_dummy)
+# modelWDM_dummy <- gsub("biological", "subid", modelWDM_dummy)
+# modelWDM_dummy <- gsub("perceptual", "subid", modelWDM_dummy)
+# dummy_fitWDM <- cfa(modelWDM_dummy, d4 %>%
+#                    select(subid, happy:pride), ordered = FALSE, estimator = chosenEstimator)
+# 
+# dummy_dataWDM <- dummy_fitWDM@Data@X[[1]]
+# d4_all_fitWDM_predict <- data.frame(d4_all_fitWDM_predict,
+#                                    subid = dummy_dataWDM[,1])
+# 
+# d4_subids <- d4 %>% select(subid, condition) %>%
+#   mutate(subid_num = as.numeric(subid)) %>%
+#   rename(subid_cat = subid,
+#          subid = subid_num)
+# 
+# d4_factor_scoresWDM <- d4_all_fitWDM_predict %>%
+#   full_join(d4_subids, by = "subid")
+# 
+# # remove extraneous variables
+# rm(d4_all_fitWDM_predict, modelWDM_dummy, dummy_fitWDM, dummy_dataWDM, d4_subids)
 ```
 
 ```{r s4 cfa modelWDM average factor scores by condition, echo = F}
-d4_factor_scoresWDM_condition <- d4_factor_scoresWDM %>%
-  group_by(condition) %>%
-  summarise(soc_emo_mean = mean(soc_emo),
-            soc_emo_sd = sd(soc_emo),
-            soc_emo_n = length(soc_emo),
-            biological_mean = mean(biological),
-            biological_sd = sd(biological),
-            biological_n = length(biological),
-            perceptual_mean = mean(perceptual),
-            perceptual_sd = sd(perceptual),
-            perceptual_n = length(perceptual))
-
-# d4_factor_scoresWDM_condition_mb <- d4_factor_scoresWDM %>%
-#   gather(factor, score, c(soc_emo, biological, perceptual)) %>%
-#   multi_boot(column = "score",
-#              summary_groups = c("condition", "factor"),
-#              statistics_functions = c("ci_lower", "mean", "ci_upper"))
+# d4_factor_scoresWDM_condition <- d4_factor_scoresWDM %>%
+#   group_by(condition) %>%
+#   summarise(soc_emo_mean = mean(soc_emo),
+#             soc_emo_sd = sd(soc_emo),
+#             soc_emo_n = length(soc_emo),
+#             biological_mean = mean(biological),
+#             biological_sd = sd(biological),
+#             biological_n = length(biological),
+#             perceptual_mean = mean(perceptual),
+#             perceptual_sd = sd(perceptual),
+#             perceptual_n = length(perceptual))
+# 
+# # d4_factor_scoresWDM_condition_mb <- d4_factor_scoresWDM %>%
+# #   gather(factor, score, c(soc_emo, biological, perceptual)) %>%
+# #   multi_boot(column = "score",
+# #              summary_groups = c("condition", "factor"),
+# #              statistics_functions = c("ci_lower", "mean", "ci_upper"))
 ```
 
 ```{r s4 cfa modelWDM plot: soc_emo vs. biological, echo = F, fig.height = 8, fig.width = 8}
-ggplot(aes(x = soc_emo_mean, y = biological_mean, colour = condition), 
-       data = d4_factor_scoresWDM_condition) +
-  geom_errorbar(aes(ymin = biological_mean - biological_sd/sqrt(biological_n),
-                    ymax = biological_mean + biological_sd/sqrt(biological_n)),
-                width = 0.1, alpha = 0.4) +
-  geom_errorbarh(aes(xmin = soc_emo_mean - soc_emo_sd/sqrt(soc_emo_n),
-                     xmax = soc_emo_mean + soc_emo_sd/sqrt(soc_emo_n)),
-                 height = 0.1, alpha = 0.4) +
-  geom_point(size = 4) +
-  geom_dl(aes(label = condition), method = "smart.grid") +
-  theme_bw() +
-  scale_color_manual(values = tol21rainbow) +
-  theme(text = element_text(size = 20),
-        legend.position = "none") +
-  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: Data-driven model, SOCIAL-EMOTIONAL vs. BIOLOGICAL\n(Error bars are 95% CIs)\n",
-       x = "\nAverage score: SOCIAL-EMOTIONAL",
-       y = "Average score: BIOLOGICAL\n")
+# ggplot(aes(x = soc_emo_mean, y = biological_mean, colour = condition), 
+#        data = d4_factor_scoresWDM_condition) +
+#   geom_errorbar(aes(ymin = biological_mean - biological_sd/sqrt(biological_n),
+#                     ymax = biological_mean + biological_sd/sqrt(biological_n)),
+#                 width = 0.1, alpha = 0.4) +
+#   geom_errorbarh(aes(xmin = soc_emo_mean - soc_emo_sd/sqrt(soc_emo_n),
+#                      xmax = soc_emo_mean + soc_emo_sd/sqrt(soc_emo_n)),
+#                  height = 0.1, alpha = 0.4) +
+#   geom_point(size = 4) +
+#   geom_dl(aes(label = condition), method = "smart.grid") +
+#   theme_bw() +
+#   scale_color_manual(values = tol21rainbow) +
+#   theme(text = element_text(size = 20),
+#         legend.position = "none") +
+#   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   labs(title = "Study 4: Data-driven model, SOCIAL-EMOTIONAL vs. BIOLOGICAL\n(Error bars are 95% CIs)\n",
+#        x = "\nAverage score: SOCIAL-EMOTIONAL",
+#        y = "Average score: BIOLOGICAL\n")
 ```
 
 ```{r s4 cfa modelWDM plot: soc_emo vs. perceptual, echo = F, fig.height = 8, fig.width = 8}
-ggplot(aes(x = soc_emo_mean, y = perceptual_mean, colour = condition), 
-       data = d4_factor_scoresWDM_condition) +
-  geom_errorbar(aes(ymin = perceptual_mean - perceptual_sd/sqrt(perceptual_n),
-                    ymax = perceptual_mean + perceptual_sd/sqrt(perceptual_n)),
-                width = 0.1, alpha = 0.4) +
-  geom_errorbarh(aes(xmin = soc_emo_mean - soc_emo_sd/sqrt(soc_emo_n),
-                     xmax = soc_emo_mean + soc_emo_sd/sqrt(soc_emo_n)),
-                 height = 0.1, alpha = 0.4) +
-  geom_point(size = 4) +
-  geom_dl(aes(label = condition), method = "smart.grid") +
-  theme_bw() +
-  scale_color_manual(values = tol21rainbow) +
-  theme(text = element_text(size = 20),
-        legend.position = "none") +
-  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: Data-driven model, SOCIAL-EMOTIONAL vs. PERCEPTUAL\n(Error bars are 95% CIs)\n",
-       x = "\nAverage score: SOCIAL-EMOTIONAL",
-       y = "Average score: PERCEPTUAL\n")
+# ggplot(aes(x = soc_emo_mean, y = perceptual_mean, colour = condition), 
+#        data = d4_factor_scoresWDM_condition) +
+#   geom_errorbar(aes(ymin = perceptual_mean - perceptual_sd/sqrt(perceptual_n),
+#                     ymax = perceptual_mean + perceptual_sd/sqrt(perceptual_n)),
+#                 width = 0.1, alpha = 0.4) +
+#   geom_errorbarh(aes(xmin = soc_emo_mean - soc_emo_sd/sqrt(soc_emo_n),
+#                      xmax = soc_emo_mean + soc_emo_sd/sqrt(soc_emo_n)),
+#                  height = 0.1, alpha = 0.4) +
+#   geom_point(size = 4) +
+#   geom_dl(aes(label = condition), method = "smart.grid") +
+#   theme_bw() +
+#   scale_color_manual(values = tol21rainbow) +
+#   theme(text = element_text(size = 20),
+#         legend.position = "none") +
+#   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   labs(title = "Study 4: Data-driven model, SOCIAL-EMOTIONAL vs. PERCEPTUAL\n(Error bars are 95% CIs)\n",
+#        x = "\nAverage score: SOCIAL-EMOTIONAL",
+#        y = "Average score: PERCEPTUAL\n")
 ```
 
 ```{r s4 cfa modelWDM plot: biological vs. perceptual, echo = F, fig.height = 8, fig.width = 8}
-ggplot(aes(x = biological_mean, y = perceptual_mean, colour = condition), 
-       data = d4_factor_scoresWDM_condition) +
-  geom_errorbar(aes(ymin = perceptual_mean - perceptual_sd/sqrt(perceptual_n),
-                    ymax = perceptual_mean + perceptual_sd/sqrt(perceptual_n)),
-                width = 0.1, alpha = 0.4) +
-  geom_errorbarh(aes(xmin = biological_mean - biological_sd/sqrt(biological_n),
-                     xmax = biological_mean + biological_sd/sqrt(biological_n)),
-                 height = 0.1, alpha = 0.4) +
-  geom_point(size = 4) +
-  geom_dl(aes(label = condition), method = "smart.grid") +
-  theme_bw() +
-  scale_color_manual(values = tol21rainbow) +
-  theme(text = element_text(size = 20),
-        legend.position = "none") +
-  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: Data-driven model, BIOLOGICAL vs. PERCEPTUAL\n(Error bars are 95% CIs)\n",
-       x = "\nAverage score: BIOLOGICAL",
-       y = "Average score: PERCEPTUAL\n")
+# ggplot(aes(x = biological_mean, y = perceptual_mean, colour = condition), 
+#        data = d4_factor_scoresWDM_condition) +
+#   geom_errorbar(aes(ymin = perceptual_mean - perceptual_sd/sqrt(perceptual_n),
+#                     ymax = perceptual_mean + perceptual_sd/sqrt(perceptual_n)),
+#                 width = 0.1, alpha = 0.4) +
+#   geom_errorbarh(aes(xmin = biological_mean - biological_sd/sqrt(biological_n),
+#                      xmax = biological_mean + biological_sd/sqrt(biological_n)),
+#                  height = 0.1, alpha = 0.4) +
+#   geom_point(size = 4) +
+#   geom_dl(aes(label = condition), method = "smart.grid") +
+#   theme_bw() +
+#   scale_color_manual(values = tol21rainbow) +
+#   theme(text = element_text(size = 20),
+#         legend.position = "none") +
+#   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   labs(title = "Study 4: Data-driven model, BIOLOGICAL vs. PERCEPTUAL\n(Error bars are 95% CIs)\n",
+#        x = "\nAverage score: BIOLOGICAL",
+#        y = "Average score: PERCEPTUAL\n")
 ```
 
 #### ModelGGW: Theoretical, two factors (AGENCY, EXPERIENCE; see Gray et al., 2007)
 
 ```{r s4 cfa modelGGW: 2 factors (theory-based), echo = F}
-# test model
-d4_all_fitGGW <- customCFA(d4_all, modelGGW)
-summary(d4_all_fitGGW, fit.measures = TRUE)
+# # test model
+# d4_all_fitGGW <- customCFA(d4_all, modelGGW)
+# summary(d4_all_fitGGW, fit.measures = TRUE)
 ```
 
 ```{r s4 cfa modelGGW factor scores, echo = F}
-# use best model to get factor scores by participant
-d4_all_fitGGW_predict <- predict(d4_all_fitGGW)
-
-# use dummy model to get subid into factor scores
-modelGGW_dummy <- gsub("=~", "~~", modelGGW)
-modelGGW_dummy <- gsub("experience", "subid", modelGGW_dummy)
-modelGGW_dummy <- gsub("agency", "subid", modelGGW_dummy)
-dummy_fitGGW <- cfa(modelGGW_dummy, d4 %>%
-                   select(subid, happy:pride), ordered = FALSE, estimator = chosenEstimator)
-
-dummy_dataGGW <- dummy_fitGGW@Data@X[[1]]
-d4_all_fitGGW_predict <- data.frame(d4_all_fitGGW_predict,
-                                   subid = dummy_dataGGW[,1])
-
-d4_subids <- d4 %>% select(subid, condition) %>%
-  mutate(subid_num = as.numeric(subid)) %>%
-  rename(subid_cat = subid,
-         subid = subid_num)
-
-d4_factor_scoresGGW <- d4_all_fitGGW_predict %>%
-  full_join(d4_subids, by = "subid")
-
-# remove extraneous variables
-rm(d4_all_fitGGW_predict, modelGGW_dummy, dummy_fitGGW, dummy_dataGGW, d4_subids)
+# # use best model to get factor scores by participant
+# d4_all_fitGGW_predict <- predict(d4_all_fitGGW)
+# 
+# # use dummy model to get subid into factor scores
+# modelGGW_dummy <- gsub("=~", "~~", modelGGW)
+# modelGGW_dummy <- gsub("experience", "subid", modelGGW_dummy)
+# modelGGW_dummy <- gsub("agency", "subid", modelGGW_dummy)
+# dummy_fitGGW <- cfa(modelGGW_dummy, d4 %>%
+#                    select(subid, happy:pride), ordered = FALSE, estimator = chosenEstimator)
+# 
+# dummy_dataGGW <- dummy_fitGGW@Data@X[[1]]
+# d4_all_fitGGW_predict <- data.frame(d4_all_fitGGW_predict,
+#                                    subid = dummy_dataGGW[,1])
+# 
+# d4_subids <- d4 %>% select(subid, condition) %>%
+#   mutate(subid_num = as.numeric(subid)) %>%
+#   rename(subid_cat = subid,
+#          subid = subid_num)
+# 
+# d4_factor_scoresGGW <- d4_all_fitGGW_predict %>%
+#   full_join(d4_subids, by = "subid")
+# 
+# # remove extraneous variables
+# rm(d4_all_fitGGW_predict, modelGGW_dummy, dummy_fitGGW, dummy_dataGGW, d4_subids)
 ```
 
 ```{r s4 cfa modelGGW average factor scores by condition, echo = F}
-d4_factor_scoresGGW_condition <- d4_factor_scoresGGW %>%
-  group_by(condition) %>%
-  summarise(experience_mean = mean(experience),
-            experience_sd = sd(experience),
-            experience_n = length(experience),
-            agency_mean = mean(agency),
-            agency_sd = sd(agency),
-            agency_n = length(agency))
-
-# d4_factor_scoresGGW_condition_mb <- d4_factor_scoresGGW %>%
-#   gather(factor, score, c(MR1, MR2)) %>%
-#   multi_boot(column = "score",
-#              summary_groups = c("condition", "factor"),
-#              statistics_functions = c("ci_lower", "mean", "ci_upper"))
+# d4_factor_scoresGGW_condition <- d4_factor_scoresGGW %>%
+#   group_by(condition) %>%
+#   summarise(experience_mean = mean(experience),
+#             experience_sd = sd(experience),
+#             experience_n = length(experience),
+#             agency_mean = mean(agency),
+#             agency_sd = sd(agency),
+#             agency_n = length(agency))
+# 
+# # d4_factor_scoresGGW_condition_mb <- d4_factor_scoresGGW %>%
+# #   gather(factor, score, c(MR1, MR2)) %>%
+# #   multi_boot(column = "score",
+# #              summary_groups = c("condition", "factor"),
+# #              statistics_functions = c("ci_lower", "mean", "ci_upper"))
 ```
 
 ```{r s4 cfa modelGGW plot: experience vs. agency, echo = F, fig.height = 8, fig.width = 8}
-ggplot(aes(x = experience_mean, y = agency_mean, colour = condition), 
-       data = d4_factor_scoresGGW_condition) +
-  geom_errorbar(aes(ymin = agency_mean - agency_sd/sqrt(agency_n),
-                    ymax = agency_mean + agency_sd/sqrt(agency_n)),
-                width = 0.1, alpha = 0.4) +
-  geom_errorbarh(aes(xmin = experience_mean - experience_sd/sqrt(experience_n),
-                     xmax = experience_mean + experience_sd/sqrt(experience_n)),
-                 height = 0.1, alpha = 0.4) +
-  geom_point(size = 4) +
-  geom_dl(aes(label = condition), method = "smart.grid") +
-  theme_bw() +
-  scale_color_manual(values = tol21rainbow) +
-  theme(text = element_text(size = 20),
-        legend.position = "none") +
-  scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 4: Theoretical model (GGW2007), EXPERIENCE vs. AGENCY\n(Error bars are 95% CIs)\n",
-       x = "\nAverage score: EXPERIENCE",
-       y = "Average score: AGENCY\n")
+# ggplot(aes(x = experience_mean, y = agency_mean, colour = condition), 
+#        data = d4_factor_scoresGGW_condition) +
+#   geom_errorbar(aes(ymin = agency_mean - agency_sd/sqrt(agency_n),
+#                     ymax = agency_mean + agency_sd/sqrt(agency_n)),
+#                 width = 0.1, alpha = 0.4) +
+#   geom_errorbarh(aes(xmin = experience_mean - experience_sd/sqrt(experience_n),
+#                      xmax = experience_mean + experience_sd/sqrt(experience_n)),
+#                  height = 0.1, alpha = 0.4) +
+#   geom_point(size = 4) +
+#   geom_dl(aes(label = condition), method = "smart.grid") +
+#   theme_bw() +
+#   scale_color_manual(values = tol21rainbow) +
+#   theme(text = element_text(size = 20),
+#         legend.position = "none") +
+#   scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+#   labs(title = "Study 4: Theoretical model (GGW2007), EXPERIENCE vs. AGENCY\n(Error bars are 95% CIs)\n",
+#        x = "\nAverage score: EXPERIENCE",
+#        y = "Average score: AGENCY\n")
 ```
 
 #### Compare models (not yet implemented)
