@@ -842,9 +842,7 @@ kable(demoReligion("study 1"), align = "l", digits = 2,
 
 ## Exploratory factor analysis
 
-### EFA: ALL conditions
-
-#### Step 1: Run EFA without rotation
+### Step 1: Run EFA without rotation
 
 ```{r s1 all no rotation, echo = F}
 # examine scree plot
@@ -859,7 +857,7 @@ print(efa_d1_all_unrotated)
 nfactors_d1_all <- 3
 ```
 
-#### Step 3: Run EFA with oblimin rotation
+### Step 3: Run EFA with oblimin rotation
 
 ```{r s1 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
@@ -875,7 +873,7 @@ efa_d1_all_rotatedN_loadings <- loadings(efa_d1_all_rotatedN)[] %>%
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
 
-##### Factor 1
+#### Factor 1
 
 ```{r s1 all oblimin rotation F1, echo = F}
 # examine factor 1
@@ -883,7 +881,7 @@ kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 1")
 ```
 
-##### Factor 2
+#### Factor 2
 
 ```{r s1 all oblimin rotation F2, echo = F}
 # examine factor 1
@@ -891,12 +889,18 @@ kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 2")
 ```
 
-##### Factor 3
+#### Factor 3
 
 ```{r s1 all oblimin rotation F3, echo = F}
 # examine factor 1
 kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR3) %>% arrange(desc(MR3)),
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 3")
+```
+
+#### Factor loadings table
+
+```{r s1 loadings table, echo = F}
+kable(data.frame(loadings(fa.sort(efa_d1_all_rotatedN))[]), digits = 2)
 ```
 
 # Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
@@ -927,9 +931,7 @@ kable(demoReligion("study 2"), align = "l", digits = 2,
 
 ## Exploratory factor analysis
 
-### EFA: ALL conditions
-
-#### Step 1: Run EFA without rotation
+### Step 1: Run EFA without rotation
 
 ```{r s2 all no rotation, echo = F}
 # examine scree plot
@@ -944,7 +946,7 @@ print(efa_d2_all_unrotated)
 nfactors_d2_all <- 3
 ```
 
-#### Step 3: Run EFA with oblimin rotation
+### Step 3: Run EFA with oblimin rotation
 
 ```{r s2 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
@@ -960,7 +962,7 @@ efa_d2_all_rotatedN_loadings <- loadings(efa_d2_all_rotatedN)[] %>%
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
 
-##### Factor 1
+#### Factor 1
 
 ```{r s2 all oblimin rotation F1, echo = F}
 # examine factor 1
@@ -968,7 +970,7 @@ kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 1")
 ```
 
-##### Factor 2
+#### Factor 2
 
 ```{r s2 all oblimin rotation F2, echo = F}
 # examine factor 1
@@ -976,12 +978,18 @@ kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 2")
 ```
 
-##### Factor 3
+#### Factor 3
 
 ```{r s2 all oblimin rotation F3, echo = F}
 # examine factor 1
 kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR3) %>% arrange(desc(MR3)),
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 3")
+```
+
+#### Factor loadings table
+
+```{r s2 loadings table, echo = F}
+kable(data.frame(loadings(fa.sort(efa_d2_all_rotatedN))[]), digits = 2)
 ```
 
 # Study 3 (2016-01-10, 2 conditions, within-subjects)
@@ -1012,9 +1020,7 @@ kable(demoReligion("study 3"), align = "l", digits = 2,
 
 ## Exploratory factor analysis
 
-### EFA: ALL conditions
-
-#### Step 1: Run EFA without rotation
+### Step 1: Run EFA without rotation
 
 ```{r s3 all no rotation, echo = F}
 # examine scree plot
@@ -1029,7 +1035,7 @@ print(efa_d3_all_unrotated)
 nfactors_d3_all <- 3
 ```
 
-#### Step 3: Run EFA with oblimin rotation
+### Step 3: Run EFA with oblimin rotation
 
 ```{r s3 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
@@ -1045,7 +1051,7 @@ efa_d3_all_rotatedN_loadings <- loadings(efa_d3_all_rotatedN)[] %>%
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
 
-##### Factor 1
+#### Factor 1
 
 ```{r s3 all oblimin rotation F1, echo = F}
 # examine factor 1
@@ -1053,7 +1059,7 @@ kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 1")
 ```
 
-##### Factor 2
+#### Factor 2
 
 ```{r s3 all oblimin rotation F2, echo = F}
 # examine factor 1
@@ -1061,12 +1067,18 @@ kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 2")
 ```
 
-##### Factor 3
+#### Factor 3
 
 ```{r s3 all oblimin rotation F3, echo = F}
 # examine factor 1
 kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR3) %>% arrange(desc(MR3)),
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 3")
+```
+
+#### Factor loadings table
+
+```{r s3 loadings table, echo = F}
+kable(data.frame(loadings(fa.sort(efa_d3_all_rotatedN))[]), digits = 2)
 ```
 
 # Study 4 (2016-01-14, 21 conditions, between-subjects)
@@ -1097,9 +1109,7 @@ kable(demoEducation("study 4"), align = "l", digits = 2,
 
 ## Exploratory factor analysis
 
-### EFA: ALL conditions
-
-#### Step 1: Run EFA without rotation
+### Step 1: Run EFA without rotation
 
 ```{r s4 all no rotation, echo = F}
 # examine scree plot
@@ -1114,7 +1124,7 @@ print(efa_d4_all_unrotated)
 nfactors_d4_all <- 3
 ```
 
-#### Step 3: Run EFA with oblimin rotation
+### Step 3: Run EFA with oblimin rotation
 
 ```{r s4 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
@@ -1130,7 +1140,7 @@ efa_d4_all_rotatedN_loadings <- loadings(efa_d4_all_rotatedN)[] %>%
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
 
-##### Factor 1
+#### Factor 1
 
 ```{r s4 all oblimin rotation F1, echo = F}
 # examine factor 1
@@ -1138,7 +1148,7 @@ kable(efa_d4_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
       align = "l", caption = "Study 4, ALL conditions: Rotated Factor 1")
 ```
 
-##### Factor 2
+#### Factor 2
 
 ```{r s4 all oblimin rotation F2, echo = F}
 # examine factor 1
@@ -1146,7 +1156,7 @@ kable(efa_d4_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
       align = "l", caption = "Study 4, ALL conditions: Rotated Factor 2")
 ```
 
-##### Factor 3
+#### Factor 3
 
 ```{r s4 all oblimin rotation F3, echo = F}
 # examine factor 1
@@ -1154,7 +1164,13 @@ kable(efa_d4_all_rotatedN_loadings %>% select(mc, MR3) %>% arrange(desc(MR3)),
       align = "l", caption = "Study 4, ALL conditions: Rotated Factor 3")
 ```
 
-##### Plots! 
+#### Factor loadings table
+
+```{r s4 loadings table, echo = F}
+kable(data.frame(loadings(fa.sort(efa_d4_all_rotatedN))[]), digits = 2)
+```
+
+#### Plots! 
 
 ```{r s4 efa plotting df, echo = F}
 # make dataframe for plotting
@@ -1208,7 +1224,7 @@ d4_f1f2 <- ggplot(aes(x = F1_mean, y = F2_mean,
         legend.position = "none") +
   # scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   # scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "\n",
+  labs(title = "Study 3: Average factor scores\n",
        x = "\nSocial-emotional",
        y = "Physiological\n")
 ```
@@ -1230,7 +1246,7 @@ d4_f1f3 <- ggplot(aes(x = F1_mean, y = F3_mean,
         legend.position = "none") +
   # scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   # scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 3: Average factor scores\n",
+  labs(title = "",
        x = "\nSocial-emotional",
        y = "Perceptual\n")
 ```
@@ -1252,11 +1268,45 @@ d4_f2f3 <- ggplot(aes(x = F2_mean, y = F3_mean,
         legend.position = "none") +
   # scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
   # scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "\n",
+  labs(title = "",
        x = "\nPhysiological",
        y = "Perceptual\n")
 ```
 
 ```{r s4 plots, fig.width = 12, fig.height = 4}
-grid.arrange(d4_f1f2, d4_f1f3, d4_f2f3, ncol = 3)
+grid.arrange(d4_f1f2, d4_f1f3, d4_f2f3, ncol = 1)
 ```
+
+# Big factor loadings table
+
+```{r all studies loadings table, echo = F}
+order1 <- loadings(fa.sort(efa_d1_all_rotatedN))[] %>%
+  data.frame() %>%
+  add_rownames(var = "mc") %>%
+  add_rownames(var = "order1") %>%
+  rename(s1_MR2 = MR2, s1_MR1 = MR1, s1_MR3 = MR3)
+
+s2 <- loadings(fa.sort(efa_d2_all_rotatedN))[] %>%
+  data.frame() %>%
+  add_rownames(var = "mc") %>%
+  rename(s2_MR2 = MR2, s2_MR1 = MR1, s2_MR3 = MR3)
+
+s3 <- loadings(fa.sort(efa_d3_all_rotatedN))[] %>%
+  data.frame() %>%
+  add_rownames(var = "mc") %>%
+  rename(s3_MR2 = MR2, s3_MR1 = MR1, s3_MR3 = MR3)
+
+s4 <- loadings(fa.sort(efa_d4_all_rotatedN))[] %>%
+  data.frame() %>%
+  add_rownames(var = "mc") %>%
+  rename(s4_MR2 = MR2, s4_MR1 = MR1, s4_MR3 = MR3)
+
+bigTable <- order1 %>%
+  # full_join(s2) %>%
+  full_join(s3) %>%
+  full_join(s4)
+
+kable(bigTable, digits = 2)
+```
+
+
