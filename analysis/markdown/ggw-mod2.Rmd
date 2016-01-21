@@ -1178,22 +1178,25 @@ efa_d4_all_rotatedN_scores <- efa_d4_all_rotatedN$scores %>%
   data.frame() %>%
   add_rownames(var = "subid") %>%
   full_join(d4 %>% select(subid, condition)) %>%
-  select(condition, subid, MR1, MR2, MR3)
+  select(condition, subid, MR1, MR2, MR3) %>%
+  mutate(MR1_rescale = scales::rescale(MR1, to = c(0, 1)),
+         MR2_rescale = scales::rescale(MR2, to = c(0, 1)),
+         MR3_rescale = scales::rescale(MR3, to = c(0, 1)))
 
 efa_d4_all_rotatedN_scores_F1 <- efa_d4_all_rotatedN_scores %>%
-  multi_boot(column = "MR1",
+  multi_boot(column = "MR1_rescale",
              summary_groups = "condition",
              statistics_functions = c("ci_lower", "mean", "ci_upper")) %>%
   rename(F1_ci_lower = ci_lower, F1_mean = mean, F1_ci_upper = ci_upper)
 
 efa_d4_all_rotatedN_scores_F2 <- efa_d4_all_rotatedN_scores %>%
-  multi_boot(column = "MR2",
+  multi_boot(column = "MR2_rescale",
              summary_groups = "condition",
              statistics_functions = c("ci_lower", "mean", "ci_upper")) %>%
     rename(F2_ci_lower = ci_lower, F2_mean = mean, F2_ci_upper = ci_upper)
 
 efa_d4_all_rotatedN_scores_F3 <- efa_d4_all_rotatedN_scores %>%
-  multi_boot(column = "MR3",
+  multi_boot(column = "MR3_rescale",
              summary_groups = "condition",
              statistics_functions = c("ci_lower", "mean", "ci_upper")) %>%
     rename(F3_ci_lower = ci_lower, F3_mean = mean, F3_ci_upper = ci_upper)
@@ -1220,13 +1223,15 @@ d4_f1f2 <- ggplot(aes(x = F1_mean, y = F2_mean,
   # geom_text(aes(y = F2_mean + 0.05)) +
   theme_bw() +
   scale_color_manual(values = tol21rainbow) +
+  scale_x_continuous(name = "Factor 1: Social-emotional",
+                     limits = c(0, 1),
+                     breaks = c(0, 1)) +
+  scale_y_continuous(name = "Factor 2: Physiological",
+                     limits = c(0, 1),
+                     breaks = c(0, 1)) +
   theme(text = element_text(size = 20),
         legend.position = "none") +
-  # scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  # scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "Study 3: Average factor scores\n",
-       x = "\nSocial-emotional",
-       y = "Physiological\n")
+  labs(title = "Study 3: Average factor scores\n")
 ```
 
 ```{r s4 efa plot F1 vs F3, echo = F, fig.width = 8, fig.height = 8}
@@ -1242,13 +1247,15 @@ d4_f1f3 <- ggplot(aes(x = F1_mean, y = F3_mean,
   # geom_text(aes(y = F3_mean + 0.05)) +
   theme_bw() +
   scale_color_manual(values = tol21rainbow) +
+  scale_x_continuous(name = "Factor 1: Social-emotional",
+                     limits = c(0, 1),
+                     breaks = c(0, 1)) +
+  scale_y_continuous(name = "Factor 3: Perceptual",
+                     limits = c(0, 1),
+                     breaks = c(0, 1)) +
   theme(text = element_text(size = 20),
         legend.position = "none") +
-  # scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  # scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "",
-       x = "\nSocial-emotional",
-       y = "Perceptual\n")
+  labs(title = "")
 ```
 
 ```{r s4 efa plot F2 vs F3, echo = F, fig.width = 8, fig.height = 8}
@@ -1264,13 +1271,15 @@ d4_f2f3 <- ggplot(aes(x = F2_mean, y = F3_mean,
   # geom_text(aes(y = F3_mean + 0.05)) +
   theme_bw() +
   scale_color_manual(values = tol21rainbow) +
+  scale_x_continuous(name = "Factor 2: Physiological",
+                     limits = c(0, 1),
+                     breaks = c(0, 1)) +
+  scale_y_continuous(name = "Factor 3: Perceptual",
+                     limits = c(0, 1),
+                     breaks = c(0, 1)) +
   theme(text = element_text(size = 20),
         legend.position = "none") +
-  # scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  # scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
-  labs(title = "",
-       x = "\nPhysiological",
-       y = "Perceptual\n")
+    labs(title = "")
 ```
 
 ```{r s4 plots, fig.width = 12, fig.height = 4}
