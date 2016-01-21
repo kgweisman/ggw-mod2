@@ -775,7 +775,7 @@ howManyFactors <- function (df) {
   # vss_unrotated_df <- VSS(df, n = 15, 
   #                                rotate = "none", plot = FALSE)
   # vss_rotated_df <- VSS(df, n = 15, 
-  #                              rotate = "oblimin", cor = "cor", plot = FALSE)
+  #                              rotate = "oblimin", cor = chosenCorType, plot = FALSE)
 }
 
 # get factor loadings for some efa
@@ -1092,7 +1092,7 @@ nfactors_d1_beetle <- 2
 ```{r s1 beetle no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d1_beetle_unrotated <- fa(d1_beetle, 39, rotate = "none",
-                              cor = "cor", fm = "minres")
+                              cor = chosenCorType, fm = "minres")
 print(efa_d1_beetle_unrotated)
 
 # get loadings for each factor
@@ -1104,7 +1104,7 @@ efa_d1_beetle_unrotated_loadings <- getFactorLoadings(efa_d1_beetle_unrotated)
 ```{r s1 beetle oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d1_beetle_rotatedN <- fa(d1_beetle, nfactors_d1_beetle, 
-                             rotate = "oblimin", cor = "cor", fm = "minres")
+                             rotate = "oblimin", cor = chosenCorType, fm = "minres")
 print(efa_d1_beetle_rotatedN)
 
 # get loadings for each factor
@@ -1157,7 +1157,7 @@ nfactors_d1_robot <- 2
 ```{r s1 robot no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d2_robot_unrotated <- fa(d2_robot, 39, rotate = "none",
-                             cor = "cor", fm = "minres")
+                             cor = chosenCorType, fm = "minres")
 print(efa_d2_robot_unrotated)
 
 # get loadings for each factor
@@ -1169,7 +1169,7 @@ efa_d2_robot_unrotated_loadings <- getFactorLoadings(efa_d2_robot_unrotated)
 ```{r s1 robot oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d1_robot_rotatedN <- fa(d1_robot, nfactors_d1_robot, 
-                            rotate = "oblimin", cor = "cor", fm = "minres")
+                            rotate = "oblimin", cor = chosenCorType, fm = "minres")
 print(efa_d1_robot_rotatedN)
 
 # get loadings for each factor
@@ -1222,7 +1222,7 @@ nfactors_d1_all <- 3
 ```{r s1 all no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d1_all_unrotated <- fa(d1_all, 39, rotate = "none", 
-                           cor = "cor", fm = "minres")
+                           cor = chosenCorType, fm = "minres")
 print(efa_d1_all_unrotated)
 
 # get loadings for each factor
@@ -1234,7 +1234,7 @@ efa_d1_all_unrotated_loadings <- getFactorLoadings(efa_d1_all_unrotated)
 ```{r s1 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d1_all_rotatedN <- fa(d1_all, nfactors_d1_all, 
-                          rotate = "oblimin", cor = "cor", fm = "minres")
+                          rotate = "oblimin", cor = chosenCorType, fm = "minres")
 print(efa_d1_all_rotatedN)
 
 # get loadings for each factor
@@ -1388,7 +1388,7 @@ nfactors_d2_beetle <- 2
 ```{r s2 beetle no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d2_beetle_unrotated <- fa(d2_beetle, 39, rotate = "none",
-                              cor = "cor", fm = "minres")
+                              cor = chosenCorType, fm = "minres")
 print(efa_d2_beetle_unrotated)
 
 # get loadings for each factor
@@ -1400,7 +1400,7 @@ efa_d2_beetle_unrotated_loadings <- getFactorLoadings(efa_d2_beetle_unrotated)
 ```{r s2 beetle oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d2_beetle_rotatedN <- fa(d2_beetle, nfactors_d2_beetle, 
-                             rotate = "oblimin", cor = "cor", fm = "minres")
+                             rotate = "oblimin", cor = chosenCorType, fm = "minres")
 print(efa_d2_beetle_rotatedN)
 
 # get loadings for each factor
@@ -1453,7 +1453,7 @@ nfactors_d2_robot <- 2
 ```{r s2 robot no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d2_robot_unrotated <- fa(d2_robot, 39, rotate = "none",
-                             cor = "cor", fm = "minres")
+                             cor = chosenCorType, fm = "minres")
 print(efa_d2_robot_unrotated)
 
 # get loadings for each factor
@@ -1465,7 +1465,7 @@ efa_d2_robot_unrotated_loadings <- getFactorLoadings(efa_d2_robot_unrotated)
 ```{r s2 robot oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d2_robot_rotatedN <- fa(d2_robot, nfactors_d2_robot, 
-                            rotate = "oblimin", cor = "cor", fm = "minres")
+                            rotate = "oblimin", cor = chosenCorType, fm = "minres")
 print(efa_d2_robot_rotatedN)
 
 # get loadings for each factor
@@ -1518,7 +1518,7 @@ nfactors_d2_all <- 3
 ```{r s2 all no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d2_all_unrotated <- fa(d2_all, 39, rotate = "none", 
-                           cor = "cor", fm = "minres")
+                           cor = chosenCorType, fm = "minres")
 print(efa_d2_all_unrotated)
 
 # get loadings for each factor
@@ -1530,7 +1530,7 @@ efa_d2_all_unrotated_loadings <- getFactorLoadings(efa_d2_all_unrotated)
 ```{r s2 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d2_all_rotatedN <- fa(d2_all, nfactors_d2_all, 
-                          rotate = "oblimin", cor = "cor", fm = "minres")
+                          rotate = "oblimin", cor = chosenCorType, fm = "minres")
 print(efa_d2_all_rotatedN)
 
 # get loadings for each factor
@@ -1651,7 +1651,7 @@ nfactors_d3_all <- 3
 ```{r s3 all no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d3_all_unrotated <- fa(d3_all, 39, rotate = "none", 
-                           cor = "cor", fm = "minres")
+                           cor = chosenCorType, fm = "minres")
 print(efa_d3_all_unrotated)
 
 # get loadings for each factor
@@ -1663,7 +1663,7 @@ efa_d3_all_unrotated_loadings <- getFactorLoadings(efa_d3_all_unrotated)
 ```{r s3 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d3_all_rotatedN <- fa(d3_all, nfactors_d3_all, 
-                          rotate = "oblimin", cor = "cor", fm = "minres")
+                          rotate = "oblimin", cor = chosenCorType, fm = "minres")
 print(efa_d3_all_rotatedN)
 
 # get loadings for each factor
@@ -1784,7 +1784,7 @@ nfactors_d4_all <- 3
 ```{r s4 all no rotation, echo = F}
 # run EFA without rotation with N factors
 efa_d4_all_unrotated <- fa(d4_all, 39, rotate = "none", 
-                           cor = "cor", fm = "minres")
+                           cor = chosenCorType, fm = "minres")
 print(efa_d4_all_unrotated)
 
 # get loadings for each factor
@@ -1796,7 +1796,7 @@ efa_d4_all_unrotated_loadings <- getFactorLoadings(efa_d4_all_unrotated)
 ```{r s4 all oblimin rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d4_all_rotatedN <- fa(d4_all, nfactors_d4_all, 
-                          rotate = "oblimin", cor = "cor", fm = "minres")
+                          rotate = "oblimin", cor = chosenCorType, fm = "minres")
 print(efa_d4_all_rotatedN)
 
 # get loadings for each factor
@@ -1830,6 +1830,106 @@ kable(efa_d4_all_rotatedN_loadings[[3]],
 ```
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
+
+##### Plot!
+
+```{r s4 efa plotting df, echo = F}
+# make dataframe for plotting
+efa_d4_all_rotatedN_scores <- efa_d4_all_rotatedN$scores %>%
+  data.frame() %>%
+  add_rownames(var = "subid") %>%
+  full_join(d4 %>% select(subid, condition)) %>%
+  select(condition, subid, MR1, MR2, MR3)
+
+efa_d4_all_rotatedN_scores_F1 <- efa_d4_all_rotatedN_scores %>%
+  multi_boot(column = "MR1",
+             summary_groups = "condition",
+             statistics_functions = c("ci_lower", "mean", "ci_upper")) %>%
+  rename(F1_ci_lower = ci_lower, F1_mean = mean, F1_ci_upper = ci_upper)
+
+efa_d4_all_rotatedN_scores_F2 <- efa_d4_all_rotatedN_scores %>%
+  multi_boot(column = "MR2",
+             summary_groups = "condition",
+             statistics_functions = c("ci_lower", "mean", "ci_upper")) %>%
+    rename(F2_ci_lower = ci_lower, F2_mean = mean, F2_ci_upper = ci_upper)
+
+efa_d4_all_rotatedN_scores_F3 <- efa_d4_all_rotatedN_scores %>%
+  multi_boot(column = "MR3",
+             summary_groups = "condition",
+             statistics_functions = c("ci_lower", "mean", "ci_upper")) %>%
+    rename(F3_ci_lower = ci_lower, F3_mean = mean, F3_ci_upper = ci_upper)
+
+efa_d4_all_rotatedN_scores <- efa_d4_all_rotatedN_scores_F1 %>%
+  full_join(efa_d4_all_rotatedN_scores_F2) %>%
+  full_join(efa_d4_all_rotatedN_scores_F3)
+
+# remove extraneous variables
+rm(efa_d4_all_rotatedN_scores_F1, efa_d4_all_rotatedN_scores_F2, 
+   efa_d4_all_rotatedN_scores_F3)
+```
+
+```{r s4 efa plot F1 vs F2, echo = F, fig.width = 8, fig.height = 8}
+ggplot(aes(x = F1_mean, y = F2_mean, label = condition, colour = condition), 
+       data = efa_d4_all_rotatedN_scores) +
+  geom_errorbar(aes(ymin = F2_ci_lower, ymax = F2_ci_upper), 
+                width = 0.01, alpha = 0.3) +
+  geom_errorbarh(aes(xmin = F1_ci_lower, xmax = F1_ci_upper),
+                 height = 0.01, alpha = 0.3) +
+  geom_point(size = 4) +
+  # geom_dl(aes(label = condition), method = "smart.grid") +
+  geom_text(aes(y = F2_mean + 0.05)) +
+  theme_bw() +
+  scale_color_manual(values = tol21rainbow) +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  # scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  # scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  labs(title = "Study 4: Average factor scores (F1 vs. F2)\n",
+       x = "\nAverage score: F1",
+       y = "Average score: F2\n")
+```
+
+```{r s4 efa plot F1 vs F3, echo = F, fig.width = 8, fig.height = 8}
+ggplot(aes(x = F1_mean, y = F3_mean, label = condition, colour = condition), 
+       data = efa_d4_all_rotatedN_scores) +
+  geom_errorbar(aes(ymin = F3_ci_lower, ymax = F3_ci_upper), 
+                width = 0.01, alpha = 0.3) +
+  geom_errorbarh(aes(xmin = F1_ci_lower, xmax = F1_ci_upper),
+                 height = 0.01, alpha = 0.3) +
+  geom_point(size = 4) +
+  # geom_dl(aes(label = condition), method = "smart.grid") +
+  geom_text(aes(y = F3_mean + 0.05)) +
+  theme_bw() +
+  scale_color_manual(values = tol21rainbow) +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  # scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  # scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  labs(title = "Study 4: Average factor scores (F1 vs. F3)\n",
+       x = "\nAverage score: F1",
+       y = "Average score: F3\n")
+```
+
+```{r s4 efa plot F2 vs F3, echo = F, fig.width = 8, fig.height = 8}
+ggplot(aes(x = F2_mean, y = F3_mean, label = condition, colour = condition), 
+       data = efa_d4_all_rotatedN_scores) +
+  geom_errorbar(aes(ymin = F3_ci_lower, ymax = F3_ci_upper), 
+                width = 0.01, alpha = 0.3) +
+  geom_errorbarh(aes(xmin = F2_ci_lower, xmax = F2_ci_upper),
+                 height = 0.01, alpha = 0.3) +
+  geom_point(size = 4) +
+  # geom_dl(aes(label = condition), method = "smart.grid") +
+  geom_text(aes(y = F3_mean + 0.05)) +
+  theme_bw() +
+  scale_color_manual(values = tol21rainbow) +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  # scale_x_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  # scale_y_continuous(limits = c(-3.6, 3.6), breaks = seq(-3, 3, 0.5)) +
+  labs(title = "Study 4: Average factor scores (F2 vs. F3)\n",
+       x = "\nAverage score: F2",
+       y = "Average score: F3\n")
+```
 
 ## Confirmatory factor analysis
 
