@@ -1283,7 +1283,9 @@ d4_f1f2 <- ggplot(aes(x = F1_mean, y = F2_mean,
 #                      breaks = c(0, 1)) +
   theme(text = element_text(size = 20),
         legend.position = "none") +
-  labs(title = "Study 3: Average factor scores\n")
+  labs(title = "Study 3: Average factor scores\n",
+       x = "FACTOR 1: ← Computational to Physiological →",
+       y = "FACTOR 2: Social-emotional →")
 ```
 
 ```{r s4 efa plot F1 vs F3, echo = F, fig.width = 8, fig.height = 8}
@@ -1307,7 +1309,9 @@ d4_f1f3 <- ggplot(aes(x = F1_mean, y = F3_mean,
 #                      breaks = c(0, 1)) +
   theme(text = element_text(size = 20),
         legend.position = "none") +
-  labs(title = "")
+  labs(title = "",
+       x = "FACTOR 1: ← Computational to Physiological →",
+       y = "FACTOR 3: Perceptual-cognitive →")
 ```
 
 ```{r s4 efa plot F2 vs F3, echo = F, fig.width = 8, fig.height = 8}
@@ -1331,7 +1335,9 @@ d4_f2f3 <- ggplot(aes(x = F2_mean, y = F3_mean,
 #                      breaks = c(0, 1)) +
   theme(text = element_text(size = 20),
         legend.position = "none") +
-    labs(title = "")
+  labs(title = "",
+       x = "FACTOR 2: Social-emotional →",
+       y = "FACTOR 3: Perceptual-cognitive →")
 ```
 
 ```{r s4 plots, fig.width = 8, fig.height = 20}
