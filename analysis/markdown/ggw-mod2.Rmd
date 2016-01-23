@@ -341,15 +341,21 @@ cleanup <- function(datasource) {
              education:age_approx, race_cat3) %>%
       rename(race_cat = race_cat3)
     
+    # filter conditions if desired
+    if(is.element("none", chosenExclude)) {} else {
+      d_clean <- d_clean %>%
+        filter(!condition %in% chosenExclude)
+    }
+    
     # remove extraneous dfs and variables
     rm(d, d_clean_1, d_clean_2)
   }
   
-  # transform to 0 to 6 scale
-  d_clean <- d_clean %>%
-    gather(mc, score, happy:pride) %>%
-    mutate(score = score + 3) %>% # transform from -3 to 3 --> 0 to 6
-    spread(mc, score)
+#   # transform to 0 to 6 scale
+#   d_clean <- d_clean %>%
+#     gather(mc, score, happy:pride) %>%
+#     mutate(score = score + 3) %>% # transform from -3 to 3 --> 0 to 6
+#     spread(mc, score)
   
   # remove outliers
   if(chosenOutlierHandling == "remove") {
@@ -790,13 +796,18 @@ tol21rainbow = c("#771155", "#AA4488", "#CC99BB", "#114477", "#4477AA", "#77AADD
 chosenOutlierHandling <- "keep"
 # chosenOutlierHandling <- "remove"
 
+# exclude any conditions in study 4?
+chosenExclude <- "none"
+# chosenExclude <- c("stapler", "car", "computer")
+
 # for current purposes always choose minimal residual (fm = "minres") instead of ML because of non-normality
 
 # for EFAs, what kind of correlation?
 chosenCorType <- "cor" # pearson correlation, less appropriate for ordinal data but 7-point likert scale might be ok
 # chosenCorType <- "poly" # polychoric correlation, appropriate for ordinal data but seems to throw errors
 
-kable(data.frame("outlierHandling" = chosenOutlierHandling, 
+kable(data.frame("conditionsExcluded" = chosenExclude,
+                 "outlierHandling" = chosenOutlierHandling, 
                  "EFA_correlation" = chosenCorType))
 ```
 
