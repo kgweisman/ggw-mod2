@@ -9,6 +9,16 @@
 
 library(RColorBrewer)
 library(gplots)
+hm_all <- heatmap.2(as.matrix(d1_all),
+                       col = brewer.pal(7, "Blues"),
+                       Rowv = T, Colv = T,
+                       dendrogram = "both",
+                       trace = "none",
+                       main = "Study 1: Beetle",
+                       labRow = d1$condition,
+                       cexRow = 1.5,
+                       cexCol = 1.5)
+
 
 temp_beetle <- d1 %>% 
   filter(condition == "beetle") %>%
