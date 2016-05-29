@@ -380,6 +380,12 @@ cleanup <- function(datasource) {
     
   }
   
+  # filter items if desired
+  if(is.element("none", chosenExcludeItem)) {} else {
+    d_clean <- d_clean %>%
+      select(-contains(chosenExcludeItem))
+  }
+
   # return cleaned dataset
   return(d_clean)
 }
@@ -800,6 +806,10 @@ chosenOutlierHandling <- "keep"
 chosenExclude <- "none"
 # chosenExclude <- c("stapler", "car", "computer")
 
+# exclude any items?
+chosenExcludeItem <- "none"
+# chosenExcludeItem <- "computations"
+
 # for current purposes always choose minimal residual (fm = "minres") instead of ML because of non-normality
 
 # for EFAs, what kind of correlation?
@@ -898,7 +908,7 @@ kable(demoReligion("study 1"), align = "l", digits = 2,
 scree(d1_all)
 
 # run EFA without rotation with N factors
-efa_d1_all_unrotated <- fa(d1_all, 39, rotate = "none",
+efa_d1_all_unrotated <- fa(d1_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d1_all_unrotated)
 
@@ -933,7 +943,7 @@ kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
 #### Factor 2
 
 ```{r s1 all varimax rotation F2, echo = F}
-# examine factor 1
+# examine factor 2
 kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 2")
 ```
@@ -941,7 +951,7 @@ kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
 #### Factor 3
 
 ```{r s1 all varimax rotation F3, echo = F}
-# examine factor 1
+# examine factor 3
 kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR3) %>% arrange(desc(MR3)),
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 3")
 ```
@@ -987,7 +997,7 @@ kable(demoReligion("study 2"), align = "l", digits = 2,
 scree(d2_all)
 
 # run EFA without rotation with N factors
-efa_d2_all_unrotated <- fa(d2_all, 39, rotate = "none",
+efa_d2_all_unrotated <- fa(d2_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d2_all_unrotated)
 
@@ -1022,7 +1032,7 @@ kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
 #### Factor 2
 
 ```{r s2 all varimax rotation F2, echo = F}
-# examine factor 1
+# examine factor 2
 kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 2")
 ```
@@ -1030,7 +1040,7 @@ kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
 #### Factor 3
 
 ```{r s2 all varimax rotation F3, echo = F}
-# examine factor 1
+# examine factor 3
 kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR3) %>% arrange(desc(MR3)),
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 3")
 ```
@@ -1076,7 +1086,7 @@ kable(demoReligion("study 3"), align = "l", digits = 2,
 scree(d3_all)
 
 # run EFA without rotation with N factors
-efa_d3_all_unrotated <- fa(d3_all, 39, rotate = "none",
+efa_d3_all_unrotated <- fa(d3_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d3_all_unrotated)
 
@@ -1111,7 +1121,7 @@ kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
 #### Factor 2
 
 ```{r s3 all varimax rotation F2, echo = F}
-# examine factor 1
+# examine factor 2
 kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 2")
 ```
@@ -1119,7 +1129,7 @@ kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
 #### Factor 3
 
 ```{r s3 all varimax rotation F3, echo = F}
-# examine factor 1
+# examine factor 3
 kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR3) %>% arrange(desc(MR3)),
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 3")
 ```
@@ -1165,7 +1175,7 @@ kable(demoEducation("study 4"), align = "l", digits = 2,
 scree(d4_all)
 
 # run EFA without rotation with N factors
-efa_d4_all_unrotated <- fa(d4_all, 39, rotate = "none",
+efa_d4_all_unrotated <- fa(d4_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d4_all_unrotated)
 
@@ -1178,7 +1188,8 @@ nfactors_d4_all <- 3
 ```{r s4 all varimax rotation, echo = F}
 # run EFA with rotation with N factors
 efa_d4_all_rotatedN <- fa(d4_all, nfactors_d4_all, 
-                          rotate = "varimax", cor = chosenCorType, fm = "minres")
+                          rotate = "varimax", cor = chosenCorType, 
+                          fm = "minres", scores = "tenBerge")
 print(efa_d4_all_rotatedN)
 
 # get loadings for each factor
@@ -1223,7 +1234,8 @@ kable(data.frame(loadings(fa.sort(efa_d4_all_rotatedN))[]), digits = 2)
 
 ```{r s4 efa plotting df, echo = F}
 # make dataframe for plotting
-efa_d4_all_rotatedN_scores <- efa_d4_all_rotatedN$scores %>%
+efa_d4_all_rotatedN_scores <- factor.scores(d4_all, efa_d4_all_rotatedN, 
+                                            method = "components")$scores %>%
   data.frame() %>%
   add_rownames(var = "subid") %>%
   full_join(d4 %>% select(subid, condition)) %>%
