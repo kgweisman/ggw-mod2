@@ -901,7 +901,7 @@ kable(demoReligion("study 1"), align = "l", digits = 2,
 
 ## Exploratory factor analysis
 
-### Step 1: Run EFA without rotation
+### Step 1: Run maximal EFA (without and with rotation)
 
 ```{r s1 all no rotation, echo = F}
 # examine scree plot
@@ -911,6 +911,11 @@ scree(d1_all)
 efa_d1_all_unrotated <- fa(d1_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d1_all_unrotated)
+
+# run EFA with rotation with N factors
+efa_d1_all_rotated <- fa(d1_all, 13, rotate = "varimax",
+                         cor = chosenCorType, fm = "minres")
+print(efa_d1_all_rotated)
 
 # set number of factors to extract: eigenvalue > 1, variance explained > 5%
 nfactors_d1_all <- 3
@@ -990,7 +995,7 @@ kable(demoReligion("study 2"), align = "l", digits = 2,
 
 ## Exploratory factor analysis
 
-### Step 1: Run EFA without rotation
+### Step 1: Run maximal EFA (without and with rotation)
 
 ```{r s2 all no rotation, echo = F}
 # examine scree plot
@@ -1000,6 +1005,11 @@ scree(d2_all)
 efa_d2_all_unrotated <- fa(d2_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d2_all_unrotated)
+
+# run EFA with rotation with N factors
+efa_d2_all_rotated <- fa(d2_all, 13, rotate = "varimax",
+                         cor = chosenCorType, fm = "minres")
+print(efa_d2_all_rotated)
 
 # set number of factors to extract: eigenvalue > 1, variance explained > 5%
 nfactors_d2_all <- 3
@@ -1079,7 +1089,7 @@ kable(demoReligion("study 3"), align = "l", digits = 2,
 
 ## Exploratory factor analysis
 
-### Step 1: Run EFA without rotation
+### Step 1: Run maximal EFA (without and with rotation)
 
 ```{r s3 all no rotation, echo = F}
 # examine scree plot
@@ -1089,6 +1099,11 @@ scree(d3_all)
 efa_d3_all_unrotated <- fa(d3_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d3_all_unrotated)
+
+# run EFA with rotation with N factors
+efa_d3_all_rotated <- fa(d3_all, 13, rotate = "varimax",
+                         cor = chosenCorType, fm = "minres")
+print(efa_d3_all_rotated)
 
 # set number of factors to extract: eigenvalue > 1, variance explained > 5%
 nfactors_d3_all <- 3
@@ -1168,7 +1183,7 @@ kable(demoEducation("study 4"), align = "l", digits = 2,
 
 ## Exploratory factor analysis
 
-### Step 1: Run EFA without rotation
+### Step 1: Run maximal EFA (without and with rotation)
 
 ```{r s4 all no rotation, echo = F}
 # examine scree plot
@@ -1178,6 +1193,11 @@ scree(d4_all)
 efa_d4_all_unrotated <- fa(d4_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d4_all_unrotated)
+
+# run EFA with rotation with N factors
+efa_d4_all_rotated <- fa(d4_all, 13, rotate = "varimax",
+                         cor = chosenCorType, fm = "minres")
+print(efa_d4_all_rotated)
 
 # set number of factors to extract: eigenvalue > 1, variance explained > 5%
 nfactors_d4_all <- 3
