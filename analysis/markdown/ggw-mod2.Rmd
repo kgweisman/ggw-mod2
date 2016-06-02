@@ -1299,11 +1299,12 @@ d4_f1f2 <- ggplot(aes(x = F1_mean, y = F2_mean,
                       label = condition, colour = condition),
                   data = efa_d4_all_rotatedN_scores) +
   geom_errorbar(aes(ymin = F2_ci_lower, ymax = F2_ci_upper), 
-                width = 0.01, alpha = 0.3) +
+                width = 0.01, alpha = 0.3, size = 0.5) +
   geom_errorbarh(aes(xmin = F1_ci_lower, xmax = F1_ci_upper),
-                 height = 0.01, alpha = 0.3) +
+                 height = 0.01, alpha = 0.3, size = 0.5) +
   geom_point(size = 4) +
-  geom_dl(aes(label = condition), method = "smart.grid") +
+  geom_text_repel(aes(label = condition), size = 8, segment.size = 0) +
+  # geom_dl(aes(label = condition), method = "smart.grid") +
   # geom_text(aes(y = F2_mean + 0.05)) +
   theme_bw() +
   scale_color_manual(values = tol21rainbow) +
@@ -1315,9 +1316,11 @@ d4_f1f2 <- ggplot(aes(x = F1_mean, y = F2_mean,
 #                      breaks = c(0, 1)) +
   theme(text = element_text(size = 20),
         legend.position = "none") +
-  labs(title = "Study 3: Average factor scores\n",
-       x = "FACTOR 1: ← Computational to Physiological →",
-       y = "FACTOR 2: Social-emotional →")
+  labs(title = "Study 3: Average factor scores by character\n",
+       x = "\nFACTOR 1: Physiological",
+       y = "FACTOR 2: Social-emotional\n") +
+  xlim(-30, 30) +
+  ylim(-30, 30)
 ```
 
 ```{r s4 efa plot F1 vs F3, echo = F, fig.width = 8, fig.height = 8}
@@ -1325,25 +1328,28 @@ d4_f1f3 <- ggplot(aes(x = F1_mean, y = F3_mean,
                       label = condition, colour = condition),
                   data = efa_d4_all_rotatedN_scores) +
   geom_errorbar(aes(ymin = F3_ci_lower, ymax = F3_ci_upper), 
-                width = 0.01, alpha = 0.3) +
+                width = 0.01, alpha = 0.3, size = 0.5) +
   geom_errorbarh(aes(xmin = F1_ci_lower, xmax = F1_ci_upper),
-                 height = 0.01, alpha = 0.3) +
+                 height = 0.01, alpha = 0.3, size = 0.5) +
   geom_point(size = 4) +
-  geom_dl(aes(label = condition), method = "smart.grid") +
+  geom_text_repel(aes(label = condition), size = 8, segment.size = 0) +
+  # geom_dl(aes(label = condition), method = "smart.grid") +
   # geom_text(aes(y = F3_mean + 0.05)) +
   theme_bw() +
   scale_color_manual(values = tol21rainbow) +
 #   scale_x_continuous(name = "Factor 1",
 #                      limits = c(0, 1),
 #                      breaks = c(0, 1)) +
-#   scale_y_continuous(name = "Factor 3",
+#   scale_y_continuous(name = "Factor 2",
 #                      limits = c(0, 1),
 #                      breaks = c(0, 1)) +
   theme(text = element_text(size = 20),
         legend.position = "none") +
-  labs(title = "",
-       x = "FACTOR 1: ← Computational to Physiological →",
-       y = "FACTOR 3: Perceptual-cognitive →")
+  labs(title = "Study 3: Average factor scores by character\n",
+       x = "\nFACTOR 1: Physiological",
+       y = "FACTOR 3: Perceptual-cognitive\n") +
+  xlim(-30, 30) +
+  ylim(-30, 30)
 ```
 
 ```{r s4 efa plot F2 vs F3, echo = F, fig.width = 8, fig.height = 8}
@@ -1351,25 +1357,28 @@ d4_f2f3 <- ggplot(aes(x = F2_mean, y = F3_mean,
                       label = condition, colour = condition),
                   data = efa_d4_all_rotatedN_scores) +
   geom_errorbar(aes(ymin = F3_ci_lower, ymax = F3_ci_upper), 
-                width = 0.01, alpha = 0.3) +
+                width = 0.01, alpha = 0.3, size = 0.5) +
   geom_errorbarh(aes(xmin = F2_ci_lower, xmax = F2_ci_upper),
-                 height = 0.01, alpha = 0.3) +
+                 height = 0.01, alpha = 0.3, size = 0.5) +
   geom_point(size = 4) +
-  geom_dl(aes(label = condition), method = "smart.grid") +
+  geom_text_repel(aes(label = condition), size = 8, segment.size = 0) +
+  # geom_dl(aes(label = condition), method = "smart.grid") +
   # geom_text(aes(y = F3_mean + 0.05)) +
   theme_bw() +
   scale_color_manual(values = tol21rainbow) +
-#   scale_x_continuous(name = "Factor 2",
+#   scale_x_continuous(name = "Factor 1",
 #                      limits = c(0, 1),
 #                      breaks = c(0, 1)) +
-#   scale_y_continuous(name = "Factor 3",
+#   scale_y_continuous(name = "Factor 2",
 #                      limits = c(0, 1),
 #                      breaks = c(0, 1)) +
   theme(text = element_text(size = 20),
         legend.position = "none") +
-  labs(title = "",
-       x = "FACTOR 2: Social-emotional →",
-       y = "FACTOR 3: Perceptual-cognitive →")
+  labs(title = "Study 3: Average factor scores by character\n",
+       x = "\nFACTOR 2: Social-emotional",
+       y = "FACTOR 3: Perceptual-cognitive\n") +
+  xlim(-30, 30) +
+  ylim(-30, 30)
 ```
 
 ```{r s4 plots, fig.width = 8, fig.height = 20}
