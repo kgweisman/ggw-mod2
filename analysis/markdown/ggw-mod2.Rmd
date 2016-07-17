@@ -25,6 +25,7 @@ library(ggplot2)
 library(knitr)
 library(tidyr)
 library(dplyr)
+# library(t)
 library(gridExtra)
 library(robustHD)
 
@@ -99,7 +100,7 @@ cleanup <- function(datasource) {
         race_cat2 = factor(sub(" +$", "", race_cat)),
         race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
                                   as.character(race_cat2)))) %>%
-      select(study, subid:end_time, duration, finished:gender, 
+      dplyr::select(study, subid:end_time, duration, finished:gender, 
              religion_buddhism:age_approx, race_cat3) %>%
       rename(race_cat = race_cat3) %>%
       mutate( # deal with religion
@@ -132,7 +133,7 @@ cleanup <- function(datasource) {
         religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
                                       "multireligious",
                                       as.character(religion_cat2)))) %>%
-      select(study:gender, feedback:race_cat, religion_cat3) %>%
+      dplyr::select(study:gender, feedback:race_cat, religion_cat3) %>%
       rename(religion_cat = religion_cat3)
     
     # remove extraneous dfs and variables
@@ -198,7 +199,7 @@ cleanup <- function(datasource) {
         race_cat2 = factor(sub(" +$", "", race_cat)),
         race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
                                   as.character(race_cat2)))) %>%
-      select(study, subid:end_time, duration, finished:gender, 
+      dplyr::select(study, subid:end_time, duration, finished:gender, 
              religion_buddhism:age_approx, race_cat3) %>%
       rename(race_cat = race_cat3) %>%
       mutate( # deal with religion
@@ -231,7 +232,7 @@ cleanup <- function(datasource) {
         religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
                                       "multireligious",
                                       as.character(religion_cat2)))) %>%
-      select(study:gender, feedback:race_cat, religion_cat3) %>%
+      dplyr::select(study:gender, feedback:race_cat, religion_cat3) %>%
       rename(religion_cat = religion_cat3)
     
     # rename response variables
@@ -250,24 +251,24 @@ cleanup <- function(datasource) {
     
     # recode characterL vs. characterR as beetle vs. robot
     d_clean_5_demo <- d_clean_4 %>%
-      select(study:condition, yob:religion_cat)
+      dplyr::select(study:condition, yob:religion_cat)
     
     d_clean_5_characterL <- d_clean_4 %>%
       mutate(target = characterL) %>%
-      select(study, subid, target, happy_characterL:CATCH_characterL)
+      dplyr::select(study, subid, target, happy_characterL:CATCH_characterL)
     names(d_clean_5_characterL) <- gsub("_characterL", "", 
                                         names(d_clean_5_characterL))
     
     d_clean_5_characterR <- d_clean_4 %>%
       mutate(target = characterR) %>%
-      select(study, subid, target, happy_characterR:CATCH_characterR)
+      dplyr::select(study, subid, target, happy_characterR:CATCH_characterR)
     names(d_clean_5_characterR) <- gsub("_characterR", "", 
                                         names(d_clean_5_characterR))
     
     d_clean <- d_clean_5_characterL %>%
       full_join(d_clean_5_characterR) %>%
       full_join(d_clean_5_demo) %>%
-      select(study, subid, date:religion_cat, target:CATCH)
+      dplyr::select(study, subid, date:religion_cat, target:CATCH)
     
     # remove extraneous dfs and variables
     rm(d, d_clean_1, d_clean_2, d_clean_3, d_clean_4, d_clean_5_characterL, 
@@ -338,7 +339,7 @@ cleanup <- function(datasource) {
         race_cat2 = factor(sub(" +$", "", race_cat)),
         race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
                                   as.character(race_cat2)))) %>%
-      select(study, subid:end_time, duration, finished:gender, 
+      dplyr::select(study, subid:end_time, duration, finished:gender, 
              education:age_approx, race_cat3) %>%
       rename(race_cat = race_cat3)
     
@@ -384,7 +385,7 @@ cleanup <- function(datasource) {
   # filter items if desired
   if(is.element("none", chosenExcludeItem)) {} else {
     d_clean <- d_clean %>%
-      select(-contains(chosenExcludeItem))
+      dplyr::select(-contains(chosenExcludeItem))
   }
 
   # return cleaned dataset
@@ -418,7 +419,7 @@ excludedCounts <- function(datasource) {
   # get subids of excluded participants
   d_excluded <- d_raw %>%
     filter(is.element(subid, d_subids) == FALSE) %>%
-    select(condition, subid, finished, starts_with("CATCH"), yob)
+    dplyr::select(condition, subid, finished, starts_with("CATCH"), yob)
 
   # count excluded participants
   d_excluded_n <- length(d_excluded$subid)
@@ -428,14 +429,14 @@ excludedCounts <- function(datasource) {
     d_excluded_unfinished <- d_excluded %>%
       filter(is.na(CATCH) == T,
              finished != 1) %>%
-      select(subid) %>%
+      dplyr::select(subid) %>%
       c()
     
     # count participants who finished, but failed catch trial
     d_excluded_CATCH <- d_excluded %>%
       filter(is.element(subid, d_excluded_unfinished$subid) == FALSE) %>%
       filter(CATCH != 1) %>%
-      select(subid) %>%
+      dplyr::select(subid) %>%
       c()
   }
   
@@ -445,14 +446,14 @@ excludedCounts <- function(datasource) {
       filter(is.na(CATCH..characterL) == T,
              is.na(CATCH..characterR) == T,
              finished != 1) %>%
-      select(subid) %>%
+      dplyr::select(subid) %>%
       c()
     
     # count participants who finished, but failed catch trial
     d_excluded_CATCH <- d_excluded %>%
       filter(is.element(subid, d_excluded_unfinished$subid) == FALSE) %>%
       filter(CATCH..characterL != 5 | CATCH..characterR != 5) %>%
-      select(subid) %>%
+      dplyr::select(subid) %>%
       c()
   }
   
@@ -463,7 +464,7 @@ excludedCounts <- function(datasource) {
            is.element(subid, d_excluded_CATCH$subid) == FALSE) %>%
     mutate(yob = as.numeric(as.character(yob))) %>%
     filter(is.na(yob) | yob < 1899 | nchar(as.character(yob)) != 4) %>%
-    select(subid) %>%
+    dplyr::select(subid) %>%
     c()
   
   # count participants who finished and passed catch trial, 
@@ -474,7 +475,7 @@ excludedCounts <- function(datasource) {
            is.element(subid, d_excluded_no_yob$subid) == FALSE) %>%
     mutate(yob = as.numeric(as.character(yob))) %>%
     filter(is.na(yob) | 2016 - yob < 18) %>%
-    select(subid) %>%
+    dplyr::select(subid) %>%
     c()
   
   # sum up excluded participants by category
@@ -525,7 +526,7 @@ makeDRDF <- function(datasource, chosenCondition) {
   
   # make stripped dataframe for dimension reducation analyses
   d_strip <- d %>%
-    select(subid, happy:pride)
+    dplyr::select(subid, happy:pride)
   d_strip <- data.frame(d_strip[,-1], row.names = d_strip$subid)
   
   # return stripped dataframe
@@ -550,17 +551,17 @@ demoSampleSize <- function(datasource) {
   sample_size <- vector()
   for(i in levels(d$condition)) {
     sample_size[as.character(i)] <- 
-      as.numeric(d %>% filter(condition == i) %>% select(subid) %>% 
+      as.numeric(d %>% filter(condition == i) %>% dplyr::select(subid) %>% 
                    unique() %>% count())
   }
 
   # add total sample size  
-  sample_size["all"] <- as.numeric(d %>% select(subid) %>% 
+  sample_size["all"] <- as.numeric(d %>% dplyr::select(subid) %>% 
                                      unique() %>% count())
   
   # make into dataframe for using kable
   sample_size <- data.frame(sample_size) %>%
-    add_rownames() %>%
+    tibble::rownames_to_column() %>%
     rename(condition = rowname,
            n = sample_size)
   
@@ -658,7 +659,7 @@ demoGender <- function(datasource) {
     gender <- data.frame(with(d, table(gender))) %>%
       rename(n = Freq) %>%
       mutate(condition = "Sum") %>%
-      select(condition, gender, n)
+      dplyr::select(condition, gender, n)
   }
   
   if(datasource %in% c("study 1", "study 2", "study 3")) {
@@ -701,7 +702,7 @@ demoRace <- function(datasource) {
     race <- data.frame(with(d, table(race_cat))) %>%
       rename(n = Freq) %>%
       mutate(condition = "Sum") %>%
-      select(condition, race_cat, n)
+      dplyr::select(condition, race_cat, n)
   }
   
   if(datasource %in% c("study 1", "study 2", "study 3")) {
@@ -743,7 +744,7 @@ demoReligion <- function(datasource) {
     religion <- data.frame(with(d, table(religion_cat))) %>%
       rename(n = Freq) %>%
       mutate(condition = "Sum") %>%
-      select(condition, religion_cat, n)
+      dplyr::select(condition, religion_cat, n)
   }
   
   if(datasource %in% c("study 1", "study 2", "study 3")) {
@@ -933,7 +934,7 @@ print(efa_d1_all_rotatedN)
 # get loadings for each factor
 efa_d1_all_rotatedN_loadings <- loadings(efa_d1_all_rotatedN)[] %>%
   data.frame() %>% 
-  add_rownames(var = "mc")
+  tibble::rownames_to_column(var = "mc")
 ```
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
@@ -942,7 +943,7 @@ efa_d1_all_rotatedN_loadings <- loadings(efa_d1_all_rotatedN)[] %>%
 
 ```{r s1 all varimax rotation F1, echo = F}
 # examine factor 1
-kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
+kable(efa_d1_all_rotatedN_loadings %>% dplyr::select(mc, MR1) %>% arrange(desc(MR1)),
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 1")
 ```
 
@@ -950,7 +951,7 @@ kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
 
 ```{r s1 all varimax rotation F2, echo = F}
 # examine factor 2
-kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
+kable(efa_d1_all_rotatedN_loadings %>% dplyr::select(mc, MR2) %>% arrange(desc(MR2)),
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 2")
 ```
 
@@ -958,7 +959,7 @@ kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
 
 ```{r s1 all varimax rotation F3, echo = F}
 # examine factor 3
-kable(efa_d1_all_rotatedN_loadings %>% select(mc, MR3) %>% arrange(desc(MR3)),
+kable(efa_d1_all_rotatedN_loadings %>% dplyr::select(mc, MR3) %>% arrange(desc(MR3)),
       align = "l", caption = "Study 1, ALL conditions: Rotated Factor 3")
 ```
 
@@ -1027,7 +1028,7 @@ print(efa_d2_all_rotatedN)
 # get loadings for each factor
 efa_d2_all_rotatedN_loadings <- loadings(efa_d2_all_rotatedN)[] %>%
   data.frame() %>% 
-  add_rownames(var = "mc")
+  tibble::rownames_to_column(var = "mc")
 ```
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
@@ -1036,7 +1037,7 @@ efa_d2_all_rotatedN_loadings <- loadings(efa_d2_all_rotatedN)[] %>%
 
 ```{r s2 all varimax rotation F1, echo = F}
 # examine factor 1
-kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
+kable(efa_d2_all_rotatedN_loadings %>% dplyr::select(mc, MR1) %>% arrange(desc(MR1)),
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 1")
 ```
 
@@ -1044,7 +1045,7 @@ kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
 
 ```{r s2 all varimax rotation F2, echo = F}
 # examine factor 2
-kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
+kable(efa_d2_all_rotatedN_loadings %>% dplyr::select(mc, MR2) %>% arrange(desc(MR2)),
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 2")
 ```
 
@@ -1052,7 +1053,7 @@ kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
 
 ```{r s2 all varimax rotation F3, echo = F}
 # examine factor 3
-kable(efa_d2_all_rotatedN_loadings %>% select(mc, MR3) %>% arrange(desc(MR3)),
+kable(efa_d2_all_rotatedN_loadings %>% dplyr::select(mc, MR3) %>% arrange(desc(MR3)),
       align = "l", caption = "Study 2, ALL conditions: Rotated Factor 3")
 ```
 
@@ -1121,7 +1122,7 @@ print(efa_d3_all_rotatedN)
 # get loadings for each factor
 efa_d3_all_rotatedN_loadings <- loadings(efa_d3_all_rotatedN)[] %>%
   data.frame() %>% 
-  add_rownames(var = "mc")
+  tibble::rownames_to_column(var = "mc")
 ```
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
@@ -1130,7 +1131,7 @@ efa_d3_all_rotatedN_loadings <- loadings(efa_d3_all_rotatedN)[] %>%
 
 ```{r s3 all varimax rotation F1, echo = F}
 # examine factor 1
-kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
+kable(efa_d3_all_rotatedN_loadings %>% dplyr::select(mc, MR1) %>% arrange(desc(MR1)),
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 1")
 ```
 
@@ -1138,7 +1139,7 @@ kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
 
 ```{r s3 all varimax rotation F2, echo = F}
 # examine factor 2
-kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
+kable(efa_d3_all_rotatedN_loadings %>% dplyr::select(mc, MR2) %>% arrange(desc(MR2)),
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 2")
 ```
 
@@ -1146,7 +1147,7 @@ kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
 
 ```{r s3 all varimax rotation F3, echo = F}
 # examine factor 3
-kable(efa_d3_all_rotatedN_loadings %>% select(mc, MR3) %>% arrange(desc(MR3)),
+kable(efa_d3_all_rotatedN_loadings %>% dplyr::select(mc, MR3) %>% arrange(desc(MR3)),
       align = "l", caption = "Study 3, ALL conditions: Rotated Factor 3")
 ```
 
@@ -1216,7 +1217,7 @@ print(efa_d4_all_rotatedN)
 # get loadings for each factor
 efa_d4_all_rotatedN_loadings <- loadings(efa_d4_all_rotatedN)[] %>%
   data.frame() %>% 
-  add_rownames(var = "mc")
+  tibble::rownames_to_column(var = "mc")
 ```
 
 <p style="text-align:right"><a href="#header">back to TOC</a></p>
@@ -1225,7 +1226,7 @@ efa_d4_all_rotatedN_loadings <- loadings(efa_d4_all_rotatedN)[] %>%
 
 ```{r s4 all varimax rotation F1, echo = F}
 # examine factor 1
-kable(efa_d4_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
+kable(efa_d4_all_rotatedN_loadings %>% dplyr::select(mc, MR1) %>% arrange(desc(MR1)),
       align = "l", caption = "Study 4, ALL conditions: Rotated Factor 1")
 ```
 
@@ -1233,7 +1234,7 @@ kable(efa_d4_all_rotatedN_loadings %>% select(mc, MR1) %>% arrange(desc(MR1)),
 
 ```{r s4 all varimax rotation F2, echo = F}
 # examine factor 1
-kable(efa_d4_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
+kable(efa_d4_all_rotatedN_loadings %>% dplyr::select(mc, MR2) %>% arrange(desc(MR2)),
       align = "l", caption = "Study 4, ALL conditions: Rotated Factor 2")
 ```
 
@@ -1241,7 +1242,7 @@ kable(efa_d4_all_rotatedN_loadings %>% select(mc, MR2) %>% arrange(desc(MR2)),
 
 ```{r s4 all varimax rotation F3, echo = F}
 # examine factor 1
-kable(efa_d4_all_rotatedN_loadings %>% select(mc, MR3) %>% arrange(desc(MR3)),
+kable(efa_d4_all_rotatedN_loadings %>% dplyr::select(mc, MR3) %>% arrange(desc(MR3)),
       align = "l", caption = "Study 4, ALL conditions: Rotated Factor 3")
 ```
 
@@ -1255,12 +1256,11 @@ kable(data.frame(loadings(fa.sort(efa_d4_all_rotatedN))[]), digits = 2)
 
 ```{r s4 efa plotting df, echo = F}
 # make dataframe for plotting
-efa_d4_all_rotatedN_scores <- factor.scores(d4_all, efa_d4_all_rotatedN, 
-                                            method = "components")$scores %>%
+efa_d4_all_rotatedN_scores <- efa_d4_all_rotatedN$scores %>%
   data.frame() %>%
-  add_rownames(var = "subid") %>%
-  full_join(d4 %>% select(subid, condition)) %>%
-  select(condition, subid, MR1, MR2, MR3) # %>%
+  tibble::rownames_to_column(var = "subid") %>%
+  full_join(d4 %>% dplyr::select(subid, condition)) %>%
+  dplyr::select(condition, subid, MR1, MR2, MR3) # %>%
 #   mutate(MR1_rescale = scales::rescale(MR1, to = c(0, 1)),
 #          MR2_rescale = scales::rescale(MR2, to = c(0, 1)),
 #          MR3_rescale = scales::rescale(MR3, to = c(0, 1)))
@@ -1319,9 +1319,9 @@ d4_f1f2 <- ggplot(aes(x = F1_mean, y = F2_mean,
         legend.position = "none") +
   labs(title = "Study 3: Average factor scores by character\n",
        x = "\nFACTOR 1: Physiological",
-       y = "FACTOR 2: Social-emotional\n") +
-  xlim(-30, 30) +
-  ylim(-30, 30)
+       y = "FACTOR 2: Social-emotional\n") #+
+  # xlim(-30, 30) +
+  # ylim(-30, 30)
 ```
 
 ```{r s4 efa plot F1 vs F3, echo = F, fig.width = 8, fig.height = 8}
@@ -1348,9 +1348,9 @@ d4_f1f3 <- ggplot(aes(x = F1_mean, y = F3_mean,
         legend.position = "none") +
   labs(title = "Study 3: Average factor scores by character\n",
        x = "\nFACTOR 1: Physiological",
-       y = "FACTOR 3: Perceptual-cognitive\n") +
-  xlim(-30, 30) +
-  ylim(-30, 30)
+       y = "FACTOR 3: Perceptual-cognitive\n") #+
+  # xlim(-30, 30) +
+  # ylim(-30, 30)
 ```
 
 ```{r s4 efa plot F2 vs F3, echo = F, fig.width = 8, fig.height = 8}
@@ -1377,9 +1377,9 @@ d4_f2f3 <- ggplot(aes(x = F2_mean, y = F3_mean,
         legend.position = "none") +
   labs(title = "Study 3: Average factor scores by character\n",
        x = "\nFACTOR 2: Social-emotional",
-       y = "FACTOR 3: Perceptual-cognitive\n") +
-  xlim(-30, 30) +
-  ylim(-30, 30)
+       y = "FACTOR 3: Perceptual-cognitive\n") #+
+  # xlim(-30, 30) +
+  # ylim(-30, 30)
 ```
 
 ```{r s4 plots, fig.width = 8, fig.height = 20}
@@ -1391,23 +1391,23 @@ grid.arrange(d4_f1f2, d4_f1f3, d4_f2f3, ncol = 1)
 ```{r all studies loadings table, echo = F}
 order1 <- loadings(fa.sort(efa_d1_all_rotatedN))[] %>%
   data.frame() %>%
-  add_rownames(var = "mc") %>%
-  add_rownames(var = "order1") %>%
+  tibble::rownames_to_column(var = "mc") %>%
+  tibble::rownames_to_column(var = "order1") %>%
   rename(s1_MR2 = MR2, s1_MR1 = MR1, s1_MR3 = MR3)
 
 s2 <- loadings(fa.sort(efa_d2_all_rotatedN))[] %>%
   data.frame() %>%
-  add_rownames(var = "mc") %>%
+  tibble::rownames_to_column(var = "mc") %>%
   rename(s2_MR2 = MR2, s2_MR1 = MR1, s2_MR3 = MR3)
 
 s3 <- loadings(fa.sort(efa_d3_all_rotatedN))[] %>%
   data.frame() %>%
-  add_rownames(var = "mc") %>%
+  tibble::rownames_to_column(var = "mc") %>%
   rename(s3_MR2 = MR2, s3_MR1 = MR1, s3_MR3 = MR3)
 
 s4 <- loadings(fa.sort(efa_d4_all_rotatedN))[] %>%
   data.frame() %>%
-  add_rownames(var = "mc") %>%
+  tibble::rownames_to_column(var = "mc") %>%
   rename(s4_MR2 = MR2, s4_MR1 = MR1, s4_MR3 = MR3)
 
 bigTable <- order1 %>%
@@ -1416,7 +1416,7 @@ bigTable <- order1 %>%
   full_join(s4)
 
 # remove extraneous variables
-rm(s1, s2, s3, s4)
+rm(order1, s2, s3, s4)
 
 kable(bigTable, digits = 2)
 ```
