@@ -95,6 +95,13 @@ d4_F2F3_regression <-
   labs(title = "Factor scores: regression")
 d4_F2F3_regression
 
+# examine validity of scores
+head(efa_d4_all_rotatedN_regression$scores)
+efa_d4_all_rotatedN_regression$R2
+efa_d4_all_rotatedN_regression$r.scores
+efa_d4_all_rotatedN_regression$valid
+efa_d4_all_rotatedN_regression$score.cor
+
 # scores: Thurstone ----------------------------------------------------------
 efa_d4_all_rotatedN_Thurstone <- 
   fa(d4_all, nfactors = 3, rotate = "varimax", cor = chosenCorType,
@@ -189,6 +196,14 @@ d4_F2F3_Thurstone <-
         legend.position = "none") +
   labs(title = "Factor scores: Thurstone")
 d4_F2F3_Thurstone
+
+# examine validity of scores
+head(efa_d4_all_rotatedN_Thurstone$scores)
+efa_d4_all_rotatedN_Thurstone$R2
+efa_d4_all_rotatedN_Thurstone$r.scores
+efa_d4_all_rotatedN_Thurstone$valid
+efa_d4_all_rotatedN_Thurstone$score.cor
+
 
 # scores: tenBerge ----------------------------------------------------------
 efa_d4_all_rotatedN_tenBerge <- 
@@ -285,6 +300,14 @@ d4_F2F3_tenBerge <-
   labs(title = "Factor scores: tenBerge")
 d4_F2F3_tenBerge
 
+# examine validity of scores
+head(efa_d4_all_rotatedN_tenBerge$scores)
+efa_d4_all_rotatedN_tenBerge$R2
+efa_d4_all_rotatedN_tenBerge$r.scores
+efa_d4_all_rotatedN_tenBerge$valid
+efa_d4_all_rotatedN_tenBerge$score.cor
+
+
 # scores: Anderson ----------------------------------------------------------
 efa_d4_all_rotatedN_Anderson <- 
   fa(d4_all, nfactors = 3, rotate = "varimax", cor = chosenCorType,
@@ -379,6 +402,13 @@ d4_F2F3_Anderson <-
         legend.position = "none") +
   labs(title = "Factor scores: Anderson")
 d4_F2F3_Anderson
+
+# examine validity of scores
+head(efa_d4_all_rotatedN_Anderson$scores)
+efa_d4_all_rotatedN_Anderson$R2
+efa_d4_all_rotatedN_Anderson$r.scores
+efa_d4_all_rotatedN_Anderson$valid
+efa_d4_all_rotatedN_Anderson$score.cor
 
 # scores: Bartlett ----------------------------------------------------------
 efa_d4_all_rotatedN_Bartlett <- 
@@ -475,6 +505,14 @@ d4_F2F3_Bartlett <-
   labs(title = "Factor scores: Bartlett")
 d4_F2F3_Bartlett
 
+# examine validity of scores
+head(efa_d4_all_rotatedN_Bartlett$scores)
+efa_d4_all_rotatedN_Bartlett$R2
+efa_d4_all_rotatedN_Bartlett$r.scores
+efa_d4_all_rotatedN_Bartlett$valid
+efa_d4_all_rotatedN_Bartlett$score.cor
+
+
 # scores: PCA regression ------------------------------------------------------
 pca_d4_all_rotatedN_regression <- 
   principal(d4_all, nfactors = 3, rotate = "varimax", method = "regression")
@@ -568,3 +606,8 @@ d4_pca_C2C3_regression <-
         legend.position = "none") +
   labs(title = "Component scores: regression")
 d4_pca_C2C3_regression
+
+# examine validity of scores
+head(pca_d4_all_rotatedN_regression$scores)
+pca_d4_all_rotatedN_regression$R2
+pca_d4_all_rotatedN_regression$r.scores
