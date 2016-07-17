@@ -1304,7 +1304,7 @@ d4_f1f2 <- ggplot(aes(x = F1_mean, y = F2_mean,
   geom_errorbarh(aes(xmin = F1_ci_lower, xmax = F1_ci_upper),
                  height = 0.01, alpha = 0.3, size = 0.5) +
   geom_point(size = 4) +
-  geom_text_repel(aes(label = condition), size = 8, segment.size = 0) +
+  geom_text_repel(aes(label = condition), size = 6, segment.size = 0) +
   # geom_dl(aes(label = condition), method = "smart.grid") +
   # geom_text(aes(y = F2_mean + 0.05)) +
   theme_bw() +
@@ -1333,7 +1333,7 @@ d4_f1f3 <- ggplot(aes(x = F1_mean, y = F3_mean,
   geom_errorbarh(aes(xmin = F1_ci_lower, xmax = F1_ci_upper),
                  height = 0.01, alpha = 0.3, size = 0.5) +
   geom_point(size = 4) +
-  geom_text_repel(aes(label = condition), size = 8, segment.size = 0) +
+  geom_text_repel(aes(label = condition), size = 6, segment.size = 0) +
   # geom_dl(aes(label = condition), method = "smart.grid") +
   # geom_text(aes(y = F3_mean + 0.05)) +
   theme_bw() +
@@ -1362,7 +1362,7 @@ d4_f2f3 <- ggplot(aes(x = F2_mean, y = F3_mean,
   geom_errorbarh(aes(xmin = F2_ci_lower, xmax = F2_ci_upper),
                  height = 0.01, alpha = 0.3, size = 0.5) +
   geom_point(size = 4) +
-  geom_text_repel(aes(label = condition), size = 8, segment.size = 0) +
+  geom_text_repel(aes(label = condition), size = 6, segment.size = 0) +
   # geom_dl(aes(label = condition), method = "smart.grid") +
   # geom_text(aes(y = F3_mean + 0.05)) +
   theme_bw() +
