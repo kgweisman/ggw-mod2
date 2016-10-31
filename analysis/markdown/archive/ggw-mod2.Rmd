@@ -1,0 +1,1424 @@
+---
+title: 'GGW-mod2: Factor Analysis'
+output:
+  html_document:
+    theme: flatly
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+
+# Setup
+
+```{r workspace setup, message = F, echo = F}
+# load libraries
+library(devtools)
+library(psych)
+library(stats)
+library(lavaan)
+library(nonnest2)
+library(nFactors)
+library(langcog)
+# library(directlabels)
+library(ggrepel)
+library(ggplot2)
+library(knitr)
+library(tidyr)
+library(dplyr)
+# library(t)
+library(gridExtra)
+library(robustHD)
+
+# clear workspace
+rm(list = ls(all = T))
+graphics.off()
+```
+
+```{r functions, message = F, echo = F}
+# make na.rm = T versions of summary functions
+mean_na <- function(x) {mean(x, na.rm = T)}
+ci_lower_na <- function(x) {quantile(x, 0.025, na.rm = T)}
+ci_upper_na <- function(x) {quantile(x, 0.975, na.rm = T)}
+
+# make cleanup function
+cleanup <- function(datasource) {
+  if(datasource %in% c("study 1", "study 2")) {
+    
+    # set target dataset
+    if(datasource == "study 1"){d <- d_raw_study1}
+    if(datasource == "study 2"){d <- d_raw_study2}
+    
+    # enact exclusionary criteria
+    d_clean_1 <- d %>%
+      mutate(finished_mod = ifelse(is.na(CATCH), 0,
+                                   ifelse(finished == 1, 1,
+                                          0.5))) %>%
+      filter(CATCH == 1, # exclude Ps who fail catch trials 
+             finished_mod != 0) %>% # exclude Ps who did not complete task
+      mutate(yob_correct = as.numeric(
+        ifelse(as.numeric(as.character(yob)) > 1900 & 
+                 as.numeric(as.character(yob)) < 2000, 
+               as.numeric(as.character(yob)), NA)), # correct formatting in yob
+        age_approx = 2016 - yob_correct) %>% # calculate approximate age
+      mutate(gender = factor(gender, levels = c(1, 2, 0), 
+                             labels = c("m", "f", "other"))) %>%
+      filter(age_approx >= 18) # exclude Ps who are younger than 18 years
+    
+    # recode background and demographic variables
+    d_clean <- d_clean_1 %>%
+      mutate( # deal with study number
+        study = factor(study)) %>%
+      mutate( # deal with study duration
+        duration = as.numeric(difftime(strptime(end_time, "%I:%M:%S"),
+                                       strptime(start_time, "%I:%M:%S"),
+                                       units = "mins"))) %>%
+      mutate( # deal with race
+        race_asian_east = 
+          factor(ifelse(is.na(race_asian_east), "", "asian_east ")),
+        race_asian_south = 
+          factor(ifelse(is.na(race_asian_south), "", "asian_south ")),
+        race_asian_other = 
+          factor(ifelse(is.na(race_asian_other), "", "asian_other ")),
+        race_black = 
+          factor(ifelse(is.na(race_black), "", "black ")),
+        race_hispanic = 
+          factor(ifelse(is.na(race_hispanic), "", "hispanic ")),
+        race_middle_eastern = 
+          factor(ifelse(is.na(race_middle_eastern), "", "middle_eastern ")),
+        race_native_american = 
+          factor(ifelse(is.na(race_native_american), "", "native_american ")),
+        race_pac_islander = 
+          factor(ifelse(is.na(race_pac_islander), "", "pac_islander ")),
+        race_white = 
+          factor(ifelse(is.na(race_white), "", "white ")),
+        race_other_prefno = 
+          factor(ifelse(is.na(race_other_prefno), "", "other_prefno ")),
+        race_cat = paste0(race_asian_east, race_asian_south, race_asian_other,
+                          race_black, race_hispanic, race_middle_eastern,
+                          race_native_american, race_pac_islander, race_white,
+                          race_other_prefno),
+        race_cat2 = factor(sub(" +$", "", race_cat)),
+        race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
+                                  as.character(race_cat2)))) %>%
+      dplyr::select(study, subid:end_time, duration, finished:gender, 
+             religion_buddhism:age_approx, race_cat3) %>%
+      rename(race_cat = race_cat3) %>%
+      mutate( # deal with religion
+        religion_buddhism = 
+          factor(ifelse(is.na(religion_buddhism), "", "buddhism ")),
+        religion_christianity = 
+          factor(ifelse(is.na(religion_christianity), "", "christianity ")),
+        religion_hinduism = 
+          factor(ifelse(is.na(religion_hinduism), "", "hinduism ")),
+        religion_islam = 
+          factor(ifelse(is.na(religion_islam), "", "islam ")),
+        religion_jainism = 
+          factor(ifelse(is.na(religion_jainism), "", "jainism ")),
+        religion_judaism = 
+          factor(ifelse(is.na(religion_judaism), "", "judaism ")),
+        religion_sikhism = 
+          factor(ifelse(is.na(religion_sikhism), "", "sikhism ")),
+        religion_other = 
+          factor(ifelse(is.na(religion_other), "", "other ")),
+        religion_none = 
+          factor(ifelse(is.na(religion_none), "", "none ")),
+        religion_prefno = 
+          factor(ifelse(is.na(religion_prefno), "", "other_prefno ")),
+        religion_cat = paste0(religion_buddhism, religion_christianity, 
+                              religion_hinduism, religion_islam, 
+                              religion_jainism, religion_judaism, 
+                              religion_sikhism, religion_other, 
+                              religion_none, religion_prefno),
+        religion_cat2 = factor(sub(" +$", "", religion_cat)),
+        religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
+                                      "multireligious",
+                                      as.character(religion_cat2)))) %>%
+      dplyr::select(study:gender, feedback:race_cat, religion_cat3) %>%
+      rename(religion_cat = religion_cat3)
+    
+    # remove extraneous dfs and variables
+    rm(d, d_clean_1)
+  }
+  
+  if(datasource == "study 3") {
+    
+    # set target dataset
+    d <- d_raw_study3
+    
+    # enact exclusionary criteria
+    d_clean_1 <- d %>%
+      mutate(finished_mod = ifelse(is.na(CATCH..characterL) | 
+                                     is.na(CATCH..characterR), 0,
+                                   ifelse(finished == 1, 1,
+                                          0.5))) %>%
+      filter(CATCH..characterL == 5, # exclude Ps who fail catch trials 
+             CATCH..characterR == 5,
+             finished_mod != 0) %>% # exclude Ps who did not complete task
+      mutate(yob_correct = as.numeric(
+        ifelse(as.numeric(as.character(yob)) > 1900 & 
+                 as.numeric(as.character(yob)) < 2000, 
+               as.numeric(as.character(yob)), NA)), # correct formatting in yob
+        age_approx = 2016 - yob_correct) %>% # calculate approximate age
+      mutate(gender = factor(gender, levels = c(1, 2, 0), 
+                             labels = c("m", "f", "other"))) %>%
+      filter(age_approx >= 18) # exclude Ps who are younger than 18 years
+    
+    # recode background and demographic variables
+    d_clean_2 <- d_clean_1 %>%
+      mutate( # deal with study number
+        study = factor(study)) %>%
+      mutate( # deal with study duration
+        duration = as.numeric(difftime(strptime(end_time, "%I:%M:%S"),
+                                       strptime(start_time, "%I:%M:%S"),
+                                       units = "mins"))) %>%
+      mutate( # deal with race
+        race_asian_east = 
+          factor(ifelse(is.na(race_asian_east), "", "asian_east ")),
+        race_asian_south = 
+          factor(ifelse(is.na(race_asian_south), "", "asian_south ")),
+        race_asian_other = 
+          factor(ifelse(is.na(race_asian_other), "", "asian_other ")),
+        race_black = 
+          factor(ifelse(is.na(race_black), "", "black ")),
+        race_hispanic = 
+          factor(ifelse(is.na(race_hispanic), "", "hispanic ")),
+        race_middle_eastern = 
+          factor(ifelse(is.na(race_middle_eastern), "", "middle_eastern ")),
+        race_native_american = 
+          factor(ifelse(is.na(race_native_american), "", "native_american ")),
+        race_pac_islander = 
+          factor(ifelse(is.na(race_pac_islander), "", "pac_islander ")),
+        race_white = 
+          factor(ifelse(is.na(race_white), "", "white ")),
+        race_other_prefno = 
+          factor(ifelse(is.na(race_other_prefno), "", "other_prefno ")),
+        race_cat = paste0(race_asian_east, race_asian_south, race_asian_other,
+                          race_black, race_hispanic, race_middle_eastern,
+                          race_native_american, race_pac_islander, race_white,
+                          race_other_prefno),
+        race_cat2 = factor(sub(" +$", "", race_cat)),
+        race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
+                                  as.character(race_cat2)))) %>%
+      dplyr::select(study, subid:end_time, duration, finished:gender, 
+             religion_buddhism:age_approx, race_cat3) %>%
+      rename(race_cat = race_cat3) %>%
+      mutate( # deal with religion
+        religion_buddhism = 
+          factor(ifelse(is.na(religion_buddhism), "", "buddhism ")),
+        religion_christianity = 
+          factor(ifelse(is.na(religion_christianity), "", "christianity ")),
+        religion_hinduism = 
+          factor(ifelse(is.na(religion_hinduism), "", "hinduism ")),
+        religion_islam = 
+          factor(ifelse(is.na(religion_islam), "", "islam ")),
+        religion_jainism = 
+          factor(ifelse(is.na(religion_jainism), "", "jainism ")),
+        religion_judaism = 
+          factor(ifelse(is.na(religion_judaism), "", "judaism ")),
+        religion_sikhism = 
+          factor(ifelse(is.na(religion_sikhism), "", "sikhism ")),
+        religion_other = 
+          factor(ifelse(is.na(religion_other), "", "other ")),
+        religion_none = 
+          factor(ifelse(is.na(religion_none), "", "none ")),
+        religion_prefno = 
+          factor(ifelse(is.na(religion_prefno), "", "other_prefno ")),
+        religion_cat = paste0(religion_buddhism, religion_christianity, 
+                              religion_hinduism, religion_islam, 
+                              religion_jainism, religion_judaism, 
+                              religion_sikhism, religion_other, 
+                              religion_none, religion_prefno),
+        religion_cat2 = factor(sub(" +$", "", religion_cat)),
+        religion_cat3 = factor(ifelse(grepl(" ", religion_cat2) == T, 
+                                      "multireligious",
+                                      as.character(religion_cat2)))) %>%
+      dplyr::select(study:gender, feedback:race_cat, religion_cat3) %>%
+      rename(religion_cat = religion_cat3)
+    
+    # rename response variables
+    d_clean_3 <- d_clean_2
+    names(d_clean_3) <- gsub("get", "", names(d_clean_3))
+    names(d_clean_3) <- gsub("\\.", "", names(d_clean_3))
+    names(d_clean_3) <- gsub("char", "_char", names(d_clean_3))
+    names(d_clean_3)[names(d_clean_3) %in% c("_characterL", "_characterR")] <- 
+      c("characterL", "characterR")
+    
+    # recode response variables (center)
+    d_clean_4 <- d_clean_3
+    for(i in 11:92) {
+      d_clean_4[,i] <- d_clean_4[,i] - 4 # transform from 1 to 7 --> -3 to 3
+    }
+    
+    # recode characterL vs. characterR as beetle vs. robot
+    d_clean_5_demo <- d_clean_4 %>%
+      dplyr::select(study:condition, yob:religion_cat)
+    
+    d_clean_5_characterL <- d_clean_4 %>%
+      mutate(target = characterL) %>%
+      dplyr::select(study, subid, target, happy_characterL:CATCH_characterL)
+    names(d_clean_5_characterL) <- gsub("_characterL", "", 
+                                        names(d_clean_5_characterL))
+    
+    d_clean_5_characterR <- d_clean_4 %>%
+      mutate(target = characterR) %>%
+      dplyr::select(study, subid, target, happy_characterR:CATCH_characterR)
+    names(d_clean_5_characterR) <- gsub("_characterR", "", 
+                                        names(d_clean_5_characterR))
+    
+    d_clean <- d_clean_5_characterL %>%
+      full_join(d_clean_5_characterR) %>%
+      full_join(d_clean_5_demo) %>%
+      dplyr::select(study, subid, date:religion_cat, target:CATCH)
+    
+    # remove extraneous dfs and variables
+    rm(d, d_clean_1, d_clean_2, d_clean_3, d_clean_4, d_clean_5_characterL, 
+       d_clean_5_characterR, d_clean_5_demo, i)
+  }
+  
+  if(datasource == "study 4") {
+    
+    # set target dataset
+    d <- d_raw_study4
+
+        # enact exclusionary criteria
+    d_clean_1 <- d %>%
+      mutate(finished_mod = ifelse(is.na(CATCH), 0,
+                                   ifelse(finished == 1, 1,
+                                          0.5))) %>%
+      filter(CATCH == 1, # exclude Ps who fail catch trials 
+             finished_mod != 0) %>% # exclude Ps who did not complete task
+      mutate(yob_correct = as.numeric(
+        ifelse(as.numeric(as.character(yob)) > 1900 & 
+                 as.numeric(as.character(yob)) < 2000, 
+               as.numeric(as.character(yob)), NA)), # correct formatting in yob
+        age_approx = 2016 - yob_correct) %>% # calculate approximate age
+      mutate(gender = factor(gender, levels = c(1, 2, 0), 
+                             labels = c("m", "f", "other"))) %>%
+      filter(age_approx >= 18) # exclude Ps who are younger than 18 years
+    
+    # recode one character
+    d_clean_2 <- d_clean_1 %>%
+      mutate(condition = factor(ifelse(
+        grepl("vegetative", as.character(condition)), "pvs",
+        ifelse(grepl("blue", as.character(condition)), "bluejay",
+               as.character(condition)))))
+    
+    # recode background and demographic variables
+    d_clean <- d_clean_2 %>%
+      mutate( # deal with study number
+        study = factor(study)) %>%
+      mutate( # deal with study duration
+        duration = as.numeric(difftime(strptime(end_time, "%I:%M:%S"),
+                                       strptime(start_time, "%I:%M:%S"),
+                                       units = "mins"))) %>%
+      mutate( # deal with race
+        race_asian_east = 
+          factor(ifelse(is.na(race_asian_east), "", "asian_east ")),
+        race_asian_south = 
+          factor(ifelse(is.na(race_asian_south), "", "asian_south ")),
+        race_asian_other = 
+          factor(ifelse(is.na(race_asian_other), "", "asian_other ")),
+        race_black = 
+          factor(ifelse(is.na(race_black), "", "black ")),
+        race_hispanic = 
+          factor(ifelse(is.na(race_hispanic), "", "hispanic ")),
+        race_middle_eastern = 
+          factor(ifelse(is.na(race_middle_eastern), "", "middle_eastern ")),
+        race_native_american = 
+          factor(ifelse(is.na(race_native_american), "", "native_american ")),
+        race_pac_islander = 
+          factor(ifelse(is.na(race_pac_islander), "", "pac_islander ")),
+        race_white = 
+          factor(ifelse(is.na(race_white), "", "white ")),
+        race_other_prefno = 
+          factor(ifelse(is.na(race_other_prefno), "", "other_prefno ")),
+        race_cat = paste0(race_asian_east, race_asian_south, race_asian_other,
+                          race_black, race_hispanic, race_middle_eastern,
+                          race_native_american, race_pac_islander, race_white,
+                          race_other_prefno),
+        race_cat2 = factor(sub(" +$", "", race_cat)),
+        race_cat3 = factor(ifelse(grepl(" ", race_cat2) == T, "multiracial",
+                                  as.character(race_cat2)))) %>%
+      dplyr::select(study, subid:end_time, duration, finished:gender, 
+             education:age_approx, race_cat3) %>%
+      rename(race_cat = race_cat3)
+    
+    # filter conditions if desired
+    if(is.element("none", chosenExclude)) {} else {
+      d_clean <- d_clean %>%
+        filter(!condition %in% chosenExclude)
+    }
+    
+    # remove extraneous dfs and variables
+    rm(d, d_clean_1, d_clean_2)
+  }
+  
+#   # transform to 0 to 6 scale
+#   d_clean <- d_clean %>%
+#     gather(mc, score, happy:pride) %>%
+#     mutate(score = score + 3) %>% # transform from -3 to 3 --> 0 to 6
+#     spread(mc, score)
+  
+  # remove outliers
+  if(chosenOutlierHandling == "remove") {
+    
+    if(datasource %in% c("study 1", "study 2", "study 4")) {
+        d_clean <- d_clean %>%
+        gather(mc, score, happy:pride) %>%
+        group_by(condition, mc) %>%
+        filter(!score %in% boxplot.stats(score, 2.5)$out) %>%
+        spread(mc, score) %>%
+        arrange(condition, subid)
+    }
+    
+    if(datasource == "study 3") {
+      d_clean <- d_clean %>%
+        gather(mc, score, happy:pride) %>%
+        group_by(target, mc) %>%
+        filter(!score %in% boxplot.stats(score, 2.5)$out) %>%
+        spread(mc, score) %>%
+        arrange(target, subid)
+    }
+    
+  }
+  
+  # filter items if desired
+  if(is.element("none", chosenExcludeItem)) {} else {
+    d_clean <- d_clean %>%
+      dplyr::select(-contains(chosenExcludeItem))
+  }
+
+  # return cleaned dataset
+  return(d_clean)
+}
+
+# make function for examining exclusion of participants
+excludedCounts <- function(datasource) {
+  
+  # set datasource
+  if(datasource == "study 1"){
+    d <- d1
+    d_raw <- d_raw_study1
+  }
+  if(datasource == "study 2"){
+    d <- d2
+    d_raw <- d_raw_study2
+  }
+  if(datasource == "study 3"){
+    d <- d3
+    d_raw <- d_raw_study3
+  }
+  if(datasource == "study 4"){
+    d <- d4
+    d_raw <- d_raw_study4
+  }
+  
+  # get subids of successful participants
+  d_subids <- levels(factor(as.character(d$subid)))
+  
+  # get subids of excluded participants
+  d_excluded <- d_raw %>%
+    filter(is.element(subid, d_subids) == FALSE) %>%
+    dplyr::select(condition, subid, finished, starts_with("CATCH"), yob)
+
+  # count excluded participants
+  d_excluded_n <- length(d_excluded$subid)
+  
+  if(datasource %in% c("study 1", "study 2", "study 4")) {
+    # count participants who did not finish
+    d_excluded_unfinished <- d_excluded %>%
+      filter(is.na(CATCH) == T,
+             finished != 1) %>%
+      dplyr::select(subid) %>%
+      c()
+    
+    # count participants who finished, but failed catch trial
+    d_excluded_CATCH <- d_excluded %>%
+      filter(is.element(subid, d_excluded_unfinished$subid) == FALSE) %>%
+      filter(CATCH != 1) %>%
+      dplyr::select(subid) %>%
+      c()
+  }
+  
+  if(datasource == "study 3") {
+    # count participants who did not finish
+    d_excluded_unfinished <- d_excluded %>%
+      filter(is.na(CATCH..characterL) == T,
+             is.na(CATCH..characterR) == T,
+             finished != 1) %>%
+      dplyr::select(subid) %>%
+      c()
+    
+    # count participants who finished, but failed catch trial
+    d_excluded_CATCH <- d_excluded %>%
+      filter(is.element(subid, d_excluded_unfinished$subid) == FALSE) %>%
+      filter(CATCH..characterL != 5 | CATCH..characterR != 5) %>%
+      dplyr::select(subid) %>%
+      c()
+  }
+  
+  # count participants who finished and passed catch trial, 
+  # but did not provide year of birth
+  d_excluded_no_yob <- d_excluded %>%
+    filter(is.element(subid, d_excluded_unfinished$subid) == FALSE,
+           is.element(subid, d_excluded_CATCH$subid) == FALSE) %>%
+    mutate(yob = as.numeric(as.character(yob))) %>%
+    filter(is.na(yob) | yob < 1899 | nchar(as.character(yob)) != 4) %>%
+    dplyr::select(subid) %>%
+    c()
+  
+  # count participants who finished and passed catch trial, 
+  # but did not provide year of birth
+  d_excluded_young <- d_excluded %>%
+    filter(is.element(subid, d_excluded_unfinished$subid) == FALSE,
+           is.element(subid, d_excluded_CATCH$subid) == FALSE,
+           is.element(subid, d_excluded_no_yob$subid) == FALSE) %>%
+    mutate(yob = as.numeric(as.character(yob))) %>%
+    filter(is.na(yob) | 2016 - yob < 18) %>%
+    dplyr::select(subid) %>%
+    c()
+  
+  # sum up excluded participants by category
+  total <- sum(length(d_excluded_unfinished$subid),
+               length(d_excluded_CATCH$subid),
+               length(d_excluded_no_yob$subid),
+               length(d_excluded_young$subid))
+  
+  # calculate counts
+  excluded_counts <- 
+    data.frame("did_not_finish" = length(d_excluded_unfinished$subid),
+               "failed_catch_trial" = length(d_excluded_CATCH$subid),
+               "did_not_provide_yob" = length(d_excluded_no_yob$subid),
+               "too_young" = length(d_excluded_young$subid),
+               "TOTAL_excluded" = total,
+               "TOTAL_participated" = length(d$subid),
+               "OVERALL_TOTAL" = sum(total, length(d$subid)))
+  
+  if(total != d_excluded_n) {
+    stop("Error: 4 sources of exclusion do not add up to total.")
+    } else {
+      return(excluded_counts)
+    }
+}
+
+# make function for stripping dataframes for dimension reducation
+makeDRDF <- function(datasource, chosenCondition) {
+  
+  # set target dataset
+  if(datasource == "study 1"){d <- d1}
+  if(datasource == "study 2"){d <- d2}
+  if(datasource == "study 3"){
+    # rename variables for ease of function applpication
+    d <- d3 %>%
+      rename(order = condition,
+             condition = target)
+    
+    # rename subids by condition if collapses across conditions
+    d <- d %>%
+      mutate(subid = paste(condition, subid, sep = "_"))
+  }
+  if(datasource == "study 4"){d <- d4}
+  
+  # filter by condition if specified
+  if(chosenCondition %in% c("beetle", "robot")) {
+    d <- d %>% filter(condition == chosenCondition)
+  }
+  
+  # make stripped dataframe for dimension reducation analyses
+  d_strip <- d %>%
+    dplyr::select(subid, happy:pride)
+  d_strip <- data.frame(d_strip[,-1], row.names = d_strip$subid)
+  
+  # return stripped dataframe
+  return(d_strip)
+}
+
+# make demographics functions
+demoSampleSize <- function(datasource) {
+
+  # set target dataset
+  if(datasource == "study 1"){d <- d1}
+  if(datasource == "study 2"){d <- d2}
+  if(datasource == "study 3"){
+    # rename variables for ease of function applpication
+    d <- d3 %>%
+      rename(order = condition,
+             condition = target)
+  }
+  if(datasource == "study 4"){d <- d4}
+
+  # get sample size per condition
+  sample_size <- vector()
+  for(i in levels(d$condition)) {
+    sample_size[as.character(i)] <- 
+      as.numeric(d %>% filter(condition == i) %>% dplyr::select(subid) %>% 
+                   unique() %>% count())
+  }
+
+  # add total sample size  
+  sample_size["all"] <- as.numeric(d %>% dplyr::select(subid) %>% 
+                                     unique() %>% count())
+  
+  # make into dataframe for using kable
+  sample_size <- data.frame(sample_size) %>%
+    tibble::rownames_to_column() %>%
+    rename(condition = rowname,
+           n = sample_size)
+  
+  # return dataframe for using kable
+  return(sample_size)
+}
+demoDuration <- function(datasource) {
+
+  # set target dataset
+  if(datasource == "study 1"){d <- d1}
+  if(datasource == "study 2"){d <- d2}
+  if(datasource == "study 3"){
+    # recode variables for ease of function applpication
+    d <- d3 %>%
+      mutate(condition = "within-subjects")
+  }
+  if(datasource == "study 4"){d <- d4}
+
+  # get sample size per condition
+  duration <- d %>%
+    group_by(condition) %>%
+    summarise(min_duration = min(duration),
+              max_duration = max(duration),
+              median_duration = median(duration),
+              mean_duration = mean(duration),
+              sd_duration = sd(duration))
+
+  # add total duration
+  if(datasource %in% c("study 1", "study 2", "study 4")) {
+    all <- d %>%
+      summarise(min_duration = min(duration),
+                max_duration = max(duration),
+                median_duration = median(duration),
+                mean_duration = mean(duration),
+                sd_duration = sd(duration)) %>%
+      mutate(condition = "all")
+    duration <- rbind(duration, all) # not sure why full_join doesn't work    
+  }
+
+  # return dataframe for using kable
+  return(duration)
+}
+demoAge <- function(datasource) {
+
+  # set target dataset
+  if(datasource == "study 1"){d <- d1}
+  if(datasource == "study 2"){d <- d2}
+  if(datasource == "study 3"){
+    # recode variables for ease of function applpication
+    d <- d3 %>%
+      mutate(condition = "within-subjects")
+  }
+  if(datasource == "study 4"){d <- d4}
+
+  # get sample size per condition
+  age <- d %>%
+    group_by(condition) %>%
+    summarise(min_age = min(age_approx),
+              max_age = max(age_approx),
+              median_age = median(age_approx),
+              mean_age = mean(age_approx),
+              sd_age = sd(age_approx))
+
+  # add total age
+  if(datasource %in% c("study 1", "study 2", "study 4")) {
+    all <- d %>%
+      summarise(min_age = min(age_approx),
+                max_age = max(age_approx),
+                median_age = median(age_approx),
+                mean_age = mean(age_approx),
+                sd_age = sd(age_approx)) %>%
+      mutate(condition = "all")
+    age <- full_join(age, all)
+  }
+
+  # return dataframe for using kable
+  return(age)
+}
+demoGender <- function(datasource) {
+
+  # set target dataset
+  if(datasource == "study 1"){d <- d1}
+  if(datasource == "study 2"){d <- d2}
+  if(datasource == "study 3"){d <- d3}
+  if(datasource == "study 4"){d <- d4}
+
+  # get gender per condition and overall
+  if(datasource %in% c("study 1", "study 2", "study 4")) {
+    gender <- data.frame(addmargins(with(d, table(condition, gender)))) %>%
+      filter(gender != "Sum") %>%
+      rename(n = Freq)
+  }
+  
+  if(datasource == "study 3") {
+    gender <- data.frame(with(d, table(gender))) %>%
+      rename(n = Freq) %>%
+      mutate(condition = "Sum") %>%
+      dplyr::select(condition, gender, n)
+  }
+  
+  if(datasource %in% c("study 1", "study 2", "study 3")) {
+    gender <- gender %>%
+    mutate(condition = factor(ifelse(condition == "Sum", 
+                                     "all", as.character(condition)),
+                              levels = c("beetle", "robot", "all"))) %>%
+    arrange(condition, gender) %>%
+    spread(gender, n)
+  }
+  
+  if(datasource == "study 4") {
+    gender <- gender %>%
+    mutate(condition = factor(ifelse(condition == "Sum", 
+                                     "all", as.character(condition)),
+                              levels = c(levels(d$condition), "all"))) %>%
+    arrange(condition, gender) %>%
+    spread(gender, n)
+  }
+  
+  # return dataframe for using kable
+  return(gender)
+}
+demoRace <- function(datasource) {
+
+  # set target dataset
+  if(datasource == "study 1"){d <- d1}
+  if(datasource == "study 2"){d <- d2}
+  if(datasource == "study 3"){d <- d3}
+  if(datasource == "study 4"){d <- d4}
+
+  # get race per condition and overall
+  if(datasource %in% c("study 1", "study 2", "study 4")) {
+    race <- data.frame(addmargins(with(d, table(condition, race_cat)))) %>%
+      filter(race_cat != "Sum") %>%
+      rename(n = Freq)
+  }
+  
+  if(datasource == "study 3") {
+    race <- data.frame(with(d, table(race_cat))) %>%
+      rename(n = Freq) %>%
+      mutate(condition = "Sum") %>%
+      dplyr::select(condition, race_cat, n)
+  }
+  
+  if(datasource %in% c("study 1", "study 2", "study 3")) {
+    race <- race %>%
+    mutate(condition = factor(ifelse(condition == "Sum", 
+                                     "all", as.character(condition)),
+                              levels = c("beetle", "robot", "all"))) %>%
+    arrange(condition, race_cat) %>%
+    spread(race_cat, n)
+  }
+  
+  if(datasource == "study 4") {
+    race <- race %>%
+    mutate(condition = factor(ifelse(condition == "Sum", 
+                                     "all", as.character(condition)),
+                              levels = c(levels(d$condition), "all"))) %>%
+    arrange(condition, race_cat) %>%
+    spread(race_cat, n)
+  }
+  
+  # return dataframe for using kable
+  return(race)
+}
+demoReligion <- function(datasource) {
+
+  # set target dataset
+  if(datasource == "study 1"){d <- d1}
+  if(datasource == "study 2"){d <- d2}
+  if(datasource == "study 3"){d <- d3}
+
+  # get religion per condition and overall
+  if(datasource %in% c("study 1", "study 2")) {
+    religion <- data.frame(addmargins(with(d, table(condition, religion_cat)))) %>%
+      filter(religion_cat != "Sum") %>%
+      rename(n = Freq)
+  }
+  
+  if(datasource == "study 3") {
+    religion <- data.frame(with(d, table(religion_cat))) %>%
+      rename(n = Freq) %>%
+      mutate(condition = "Sum") %>%
+      dplyr::select(condition, religion_cat, n)
+  }
+  
+  if(datasource %in% c("study 1", "study 2", "study 3")) {
+    religion <- religion %>%
+    mutate(condition = factor(ifelse(condition == "Sum", 
+                                     "all", as.character(condition)),
+                              levels = c("beetle", "robot", "all"))) %>%
+    arrange(condition, religion_cat) %>%
+    spread(religion_cat, n)
+  }
+  
+  # return dataframe for using kable
+  if(datasource == "study 4"){
+    stop("Religion information not available for Study 4")
+  } else {return(religion)}
+}
+demoEducation <- function(datasource) {
+
+  # set target dataset
+  if(datasource == "study 4"){d <- d4}
+  
+  # get education per condition and overall
+  if(datasource == "study 4") {
+    education <- 
+      data.frame(addmargins(with(d, table(condition, education)))) %>%
+      filter(education != "Sum") %>%
+      rename(n = Freq) %>%
+      mutate(condition = factor(ifelse(condition == "Sum",
+                                       "all", as.character(condition)),
+                                levels = c(levels(d$condition), "all")),
+             education = factor(education,
+                                levels = c(1:7, 0),
+                                labels = c("some_HS",
+                                           "HS_diploma",
+                                           "some_college",
+                                           "associates",
+                                           "bachelors",
+                                           "some_grad",
+                                           "grad",
+                                           "pref_no"))) %>%
+      arrange(condition, education) %>%
+      spread(education, n)
+  }
+  
+  # return dataframe for using kable
+  if(datasource %in% c("study 1", "study 2", "study 3")){
+    stop("Education information not available for Studies 1-3")
+  } else {return(education)}
+}
+
+# set 21-color palette (thank to Paul Tol: https://personal.sron.nl/~pault/colourschemes.pdf)
+tol21rainbow = c("#771155", "#AA4488", "#CC99BB", "#114477", "#4477AA", "#77AADD", "#117777", "#44AAAA", "#77CCCC", "#117744", "#44AA77", "#88CCAA", "#777711", "#AAAA44", "#DDDD77", "#774411", "#AA7744", "#DDAA77", "#771122", "#AA4455", "#DD7788")
+```
+
+```{r modeling decisions, echo = F}
+# remove outliers?
+chosenOutlierHandling <- "keep"
+# chosenOutlierHandling <- "remove"
+
+# exclude any conditions in study 4?
+chosenExclude <- "none"
+# chosenExclude <- c("stapler", "car", "computer")
+
+# exclude any items?
+chosenExcludeItem <- "none"
+# chosenExcludeItem <- "computations"
+
+# for current purposes always choose minimal residual (fm = "minres") instead of ML because of non-normality
+
+# for EFAs, what kind of correlation?
+chosenCorType <- "cor" # pearson correlation, less appropriate for ordinal data but 7-point likert scale might be ok
+# chosenCorType <- "poly" # polychoric correlation, appropriate for ordinal data but seems to throw errors
+
+kable(data.frame("conditionsExcluded" = chosenExclude,
+                 "outlierHandling" = chosenOutlierHandling, 
+                 "EFA_correlation" = chosenCorType))
+```
+
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
+
+# Data preparation
+
+```{r data upload, message = F, echo = F}
+# study 1 (2015-12-15, 2 conditions, between-subjects)
+d_raw_study1 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (2 conditions between)/GGWmod2_v1_clean.csv") %>%
+  mutate(study = "study 1")
+
+# study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
+d_raw_study2 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v1 (replication)/GGWmod2_v1_replication_clean.csv") %>%
+  mutate(study = "study 2")
+
+# study 3 (2016-01-10, 2 conditions, within-subjects)
+d_raw_study3 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v2 (2 conditions within)/GGWmod2_v2_withinsubjects_clean.csv") %>%
+  mutate(study = "study 3")
+
+# study 4 (2016-01-14, 21 conditions, between-subjects)
+d_raw_study4 <- read.csv("/Users/kweisman/Documents/Research (Stanford)/Projects/GGW-mod/ggw-mod2/mturk/v3 (21 conditions between)/GGWmod2_v3_many_characters_clean.csv") %>%
+  mutate(study = "study 4")
+```
+
+```{r data cleanup, message = F, echo = F}
+# clean up datasets
+d1 <- cleanup("study 1")
+d2 <- cleanup("study 2")
+d3 <- cleanup("study 3")
+d4 <- cleanup("study 4")
+```
+
+```{r dataframes for dimension reducation, message = F, echo = F}
+# make dataframes for s1
+d1_beetle <- makeDRDF("study 1", "beetle")
+d1_robot <- makeDRDF("study 1", "robot")
+d1_all <- makeDRDF("study 1", "all")
+
+# make dataframes for study 2
+d2_beetle <- makeDRDF("study 2", "beetle")
+d2_robot <- makeDRDF("study 2", "robot")
+d2_all <- makeDRDF("study 2", "all")
+
+# make dataframes for study 3
+d3_beetle <- makeDRDF("study 3", "beetle")
+d3_robot <- makeDRDF("study 3", "robot")
+d3_all <- makeDRDF("study 3", "all")
+
+# make dataframes for study 4
+d4_all <- makeDRDF("study 4", "all")
+```
+
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
+
+# Study 1 (2015-12-15, 2 conditions, between-subjects)
+
+## Demographics
+
+```{r s1 demographics, echo = F}
+# examine exclusion
+kable(excludedCounts("study 1"), align = "l",
+      caption = "Study 1: Exclusion")
+
+# make demographics tables
+kable(demoSampleSize("study 1"), align = "l", digits = 2,
+      caption = "Study 1: Sample size")
+kable(demoDuration("study 1"), align = "l", digits = 2,
+      caption = "Study 1: Study duration (minutes)")
+kable(demoAge("study 1"), align = "l", digits = 2,
+      caption = "Study 1: Participant age (years; approximate)")
+kable(demoGender("study 1"), align = "l", digits = 2,
+      caption = "Study 1: Participant gender")
+kable(demoRace("study 1"), align = "l", digits = 2,
+      caption = "Study 1: Participant race/ethnicity")
+kable(demoReligion("study 1"), align = "l", digits = 2,
+      caption = "Study 1: Participant religion")
+```
+
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
+
+## Exploratory factor analysis
+
+### Step 1: Run maximal EFA (without and with rotation)
+
+```{r s1 all no rotation, echo = F}
+# examine scree plot
+scree(d1_all)
+
+# run EFA without rotation with N factors
+efa_d1_all_unrotated <- fa(d1_all, 13, rotate = "none",
+                           cor = chosenCorType, fm = "minres")
+print(efa_d1_all_unrotated)
+
+# run EFA with rotation with N factors
+efa_d1_all_rotated <- fa(d1_all, 13, rotate = "varimax",
+                         cor = chosenCorType, fm = "minres")
+print(efa_d1_all_rotated)
+
+# set number of factors to extract: eigenvalue > 1, variance explained > 5%
+nfactors_d1_all <- 3
+```
+
+### Step 3: Run EFA with varimax rotation
+
+```{r s1 all varimax rotation, echo = F}
+# run EFA with rotation with N factors
+efa_d1_all_rotatedN <- fa(d1_all, nfactors_d1_all, 
+                          rotate = "varimax", cor = chosenCorType, fm = "minres")
+print(efa_d1_all_rotatedN)
+
+# get loadings for each factor
+efa_d1_all_rotatedN_loadings <- loadings(efa_d1_all_rotatedN)[] %>%
+  data.frame() %>% 
+  tibble::rownames_to_column(var = "mc")
+```
+
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
+
+#### Factor 1
+
+```{r s1 all varimax rotation F1, echo = F}
+# examine factor 1
+kable(efa_d1_all_rotatedN_loadings %>% dplyr::select(mc, MR1) %>% arrange(desc(MR1)),
+      align = "l", caption = "Study 1, ALL conditions: Rotated Factor 1")
+```
+
+#### Factor 2
+
+```{r s1 all varimax rotation F2, echo = F}
+# examine factor 2
+kable(efa_d1_all_rotatedN_loadings %>% dplyr::select(mc, MR2) %>% arrange(desc(MR2)),
+      align = "l", caption = "Study 1, ALL conditions: Rotated Factor 2")
+```
+
+#### Factor 3
+
+```{r s1 all varimax rotation F3, echo = F}
+# examine factor 3
+kable(efa_d1_all_rotatedN_loadings %>% dplyr::select(mc, MR3) %>% arrange(desc(MR3)),
+      align = "l", caption = "Study 1, ALL conditions: Rotated Factor 3")
+```
+
+#### Factor loadings table
+
+```{r s1 loadings table, echo = F}
+kable(data.frame(loadings(fa.sort(efa_d1_all_rotatedN))[]), digits = 2)
+```
+
+# Study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
+
+## Demographics
+
+```{r s2 demographics, echo = F}
+# examine exclusion
+kable(excludedCounts("study 2"), align = "l",
+      caption = "Study 2: Exclusion")
+
+# make demographics tables
+kable(demoSampleSize("study 2"), align = "l", digits = 2,
+      caption = "Study 2: Sample size")
+kable(demoDuration("study 2"), align = "l", digits = 2,
+      caption = "Study 2: Study duration (minutes)")
+kable(demoAge("study 2"), align = "l", digits = 2,
+      caption = "Study 2: Participant age (years; approximate)")
+kable(demoGender("study 2"), align = "l", digits = 2,
+      caption = "Study 2: Participant gender")
+kable(demoRace("study 2"), align = "l", digits = 2,
+      caption = "Study 2: Participant race/ethnicity")
+kable(demoReligion("study 2"), align = "l", digits = 2,
+      caption = "Study 2: Participant religion")
+```
+
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
+
+## Exploratory factor analysis
+
+### Step 1: Run maximal EFA (without and with rotation)
+
+```{r s2 all no rotation, echo = F}
+# examine scree plot
+scree(d2_all)
+
+# run EFA without rotation with N factors
+efa_d2_all_unrotated <- fa(d2_all, 13, rotate = "none",
+                           cor = chosenCorType, fm = "minres")
+print(efa_d2_all_unrotated)
+
+# run EFA with rotation with N factors
+efa_d2_all_rotated <- fa(d2_all, 13, rotate = "varimax",
+                         cor = chosenCorType, fm = "minres")
+print(efa_d2_all_rotated)
+
+# set number of factors to extract: eigenvalue > 1, variance explained > 5%
+nfactors_d2_all <- 3
+```
+
+### Step 3: Run EFA with varimax rotation
+
+```{r s2 all varimax rotation, echo = F}
+# run EFA with rotation with N factors
+efa_d2_all_rotatedN <- fa(d2_all, nfactors_d2_all, 
+                          rotate = "varimax", cor = chosenCorType, fm = "minres")
+print(efa_d2_all_rotatedN)
+
+# get loadings for each factor
+efa_d2_all_rotatedN_loadings <- loadings(efa_d2_all_rotatedN)[] %>%
+  data.frame() %>% 
+  tibble::rownames_to_column(var = "mc")
+```
+
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
+
+#### Factor 1
+
+```{r s2 all varimax rotation F1, echo = F}
+# examine factor 1
+kable(efa_d2_all_rotatedN_loadings %>% dplyr::select(mc, MR1) %>% arrange(desc(MR1)),
+      align = "l", caption = "Study 2, ALL conditions: Rotated Factor 1")
+```
+
+#### Factor 2
+
+```{r s2 all varimax rotation F2, echo = F}
+# examine factor 2
+kable(efa_d2_all_rotatedN_loadings %>% dplyr::select(mc, MR2) %>% arrange(desc(MR2)),
+      align = "l", caption = "Study 2, ALL conditions: Rotated Factor 2")
+```
+
+#### Factor 3
+
+```{r s2 all varimax rotation F3, echo = F}
+# examine factor 3
+kable(efa_d2_all_rotatedN_loadings %>% dplyr::select(mc, MR3) %>% arrange(desc(MR3)),
+      align = "l", caption = "Study 2, ALL conditions: Rotated Factor 3")
+```
+
+#### Factor loadings table
+
+```{r s2 loadings table, echo = F}
+kable(data.frame(loadings(fa.sort(efa_d2_all_rotatedN))[]), digits = 2)
+```
+
+# Study 3 (2016-01-10, 2 conditions, within-subjects)
+
+## Demographics
+
+```{r s3 demographics, echo = F}
+# examine exclusion
+kable(excludedCounts("study 3"), align = "l",
+      caption = "Study 3: Exclusion")
+
+# make demographics tables
+kable(demoSampleSize("study 3"), align = "l", digits = 2,
+      caption = "Study 3: Sample size")
+kable(demoDuration("study 3"), align = "l", digits = 2,
+      caption = "Study 3: Study duration (minutes)")
+kable(demoAge("study 3"), align = "l", digits = 2,
+      caption = "Study 3: Participant age (years; approximate)")
+kable(demoGender("study 3"), align = "l", digits = 2,
+      caption = "Study 3: Participant gender")
+kable(demoRace("study 3"), align = "l", digits = 2,
+      caption = "Study 3: Participant race/ethnicity")
+kable(demoReligion("study 3"), align = "l", digits = 2,
+      caption = "Study 3: Participant religion")
+```
+
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
+
+## Exploratory factor analysis
+
+### Step 1: Run maximal EFA (without and with rotation)
+
+```{r s3 all no rotation, echo = F}
+# examine scree plot
+scree(d3_all)
+
+# run EFA without rotation with N factors
+efa_d3_all_unrotated <- fa(d3_all, 13, rotate = "none",
+                           cor = chosenCorType, fm = "minres")
+print(efa_d3_all_unrotated)
+
+# run EFA with rotation with N factors
+efa_d3_all_rotated <- fa(d3_all, 13, rotate = "varimax",
+                         cor = chosenCorType, fm = "minres")
+print(efa_d3_all_rotated)
+
+# set number of factors to extract: eigenvalue > 1, variance explained > 5%
+nfactors_d3_all <- 3
+```
+
+### Step 3: Run EFA with varimax rotation
+
+```{r s3 all varimax rotation, echo = F}
+# run EFA with rotation with N factors
+efa_d3_all_rotatedN <- fa(d3_all, nfactors_d3_all, 
+                          rotate = "varimax", cor = chosenCorType, fm = "minres")
+print(efa_d3_all_rotatedN)
+
+# get loadings for each factor
+efa_d3_all_rotatedN_loadings <- loadings(efa_d3_all_rotatedN)[] %>%
+  data.frame() %>% 
+  tibble::rownames_to_column(var = "mc")
+```
+
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
+
+#### Factor 1
+
+```{r s3 all varimax rotation F1, echo = F}
+# examine factor 1
+kable(efa_d3_all_rotatedN_loadings %>% dplyr::select(mc, MR1) %>% arrange(desc(MR1)),
+      align = "l", caption = "Study 3, ALL conditions: Rotated Factor 1")
+```
+
+#### Factor 2
+
+```{r s3 all varimax rotation F2, echo = F}
+# examine factor 2
+kable(efa_d3_all_rotatedN_loadings %>% dplyr::select(mc, MR2) %>% arrange(desc(MR2)),
+      align = "l", caption = "Study 3, ALL conditions: Rotated Factor 2")
+```
+
+#### Factor 3
+
+```{r s3 all varimax rotation F3, echo = F}
+# examine factor 3
+kable(efa_d3_all_rotatedN_loadings %>% dplyr::select(mc, MR3) %>% arrange(desc(MR3)),
+      align = "l", caption = "Study 3, ALL conditions: Rotated Factor 3")
+```
+
+#### Factor loadings table
+
+```{r s3 loadings table, echo = F}
+kable(data.frame(loadings(fa.sort(efa_d3_all_rotatedN))[]), digits = 2)
+```
+
+# Study 4 (2016-01-14, 21 conditions, between-subjects)
+
+## Demographics
+
+```{r s4 demographics, echo = F}
+# examine exclusion
+kable(excludedCounts("study 4"), align = "l",
+      caption = "Study 4: Exclusion")
+
+# make demographics tables
+kable(demoSampleSize("study 4"), align = "l", digits = 2,
+      caption = "Study 4: Sample size")
+kable(demoDuration("study 4"), align = "l", digits = 2,
+      caption = "Study 4: Study duration (minutes)")
+kable(demoAge("study 4"), align = "l", digits = 2,
+      caption = "Study 4: Participant age (years; approximate)")
+kable(demoGender("study 4"), align = "l", digits = 2,
+      caption = "Study 4: Participant gender")
+kable(demoRace("study 4"), align = "l", digits = 2,
+      caption = "Study 4: Participant race/ethnicity")
+kable(demoEducation("study 4"), align = "l", digits = 2,
+      caption = "Study 4: Participant education")
+```
+
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
+
+## Exploratory factor analysis
+
+### Step 1: Run maximal EFA (without and with rotation)
+
+```{r s4 all no rotation, echo = F}
+# examine scree plot
+scree(d4_all)
+
+# run EFA without rotation with N factors
+efa_d4_all_unrotated <- fa(d4_all, 13, rotate = "none",
+                           cor = chosenCorType, fm = "minres")
+print(efa_d4_all_unrotated)
+
+# run EFA with rotation with N factors
+efa_d4_all_rotated <- fa(d4_all, 13, rotate = "varimax",
+                         cor = chosenCorType, fm = "minres")
+print(efa_d4_all_rotated)
+
+# set number of factors to extract: eigenvalue > 1, variance explained > 5%
+nfactors_d4_all <- 3
+```
+
+### Step 3: Run EFA with varimax rotation
+
+```{r s4 all varimax rotation, echo = F}
+# run EFA with rotation with N factors
+efa_d4_all_rotatedN <- fa(d4_all, nfactors_d4_all, 
+                          rotate = "varimax", cor = chosenCorType, 
+                          fm = "minres", scores = "tenBerge")
+print(efa_d4_all_rotatedN)
+
+# get loadings for each factor
+efa_d4_all_rotatedN_loadings <- loadings(efa_d4_all_rotatedN)[] %>%
+  data.frame() %>% 
+  tibble::rownames_to_column(var = "mc")
+```
+
+<p style="text-align:right"><a href="#header">back to TOC</a></p>
+
+#### Factor 1
+
+```{r s4 all varimax rotation F1, echo = F}
+# examine factor 1
+kable(efa_d4_all_rotatedN_loadings %>% dplyr::select(mc, MR1) %>% arrange(desc(MR1)),
+      align = "l", caption = "Study 4, ALL conditions: Rotated Factor 1")
+```
+
+#### Factor 2
+
+```{r s4 all varimax rotation F2, echo = F}
+# examine factor 1
+kable(efa_d4_all_rotatedN_loadings %>% dplyr::select(mc, MR2) %>% arrange(desc(MR2)),
+      align = "l", caption = "Study 4, ALL conditions: Rotated Factor 2")
+```
+
+#### Factor 3
+
+```{r s4 all varimax rotation F3, echo = F}
+# examine factor 1
+kable(efa_d4_all_rotatedN_loadings %>% dplyr::select(mc, MR3) %>% arrange(desc(MR3)),
+      align = "l", caption = "Study 4, ALL conditions: Rotated Factor 3")
+```
+
+#### Factor loadings table
+
+```{r s4 loadings table, echo = F}
+kable(data.frame(loadings(fa.sort(efa_d4_all_rotatedN))[]), digits = 2)
+```
+
+#### Plots! 
+
+```{r s4 efa plotting df, echo = F}
+# make dataframe for plotting
+efa_d4_all_rotatedN_scores <- efa_d4_all_rotatedN$scores %>%
+  data.frame() %>%
+  tibble::rownames_to_column(var = "subid") %>%
+  full_join(d4 %>% dplyr::select(subid, condition)) %>%
+  dplyr::select(condition, subid, MR1, MR2, MR3) # %>%
+#   mutate(MR1_rescale = scales::rescale(MR1, to = c(0, 1)),
+#          MR2_rescale = scales::rescale(MR2, to = c(0, 1)),
+#          MR3_rescale = scales::rescale(MR3, to = c(0, 1)))
+
+efa_d4_all_rotatedN_scores_F1 <- efa_d4_all_rotatedN_scores %>%
+  multi_boot(column = "MR1",
+             summary_groups = "condition",
+             summary_function = "mean_na",
+             statistics_functions = c("ci_lower_na", "mean_na", "ci_upper_na")) %>%
+  rename(F1_ci_lower = ci_lower_na, F1_mean = mean_na, F1_ci_upper = ci_upper_na)
+
+efa_d4_all_rotatedN_scores_F2 <- efa_d4_all_rotatedN_scores %>%
+  multi_boot(column = "MR2",
+             summary_groups = "condition",
+             summary_function = "mean_na",
+             statistics_functions = c("ci_lower_na", "mean_na", "ci_upper_na")) %>%
+  rename(F2_ci_lower = ci_lower_na, F2_mean = mean_na, F2_ci_upper = ci_upper_na)
+
+efa_d4_all_rotatedN_scores_F3 <- efa_d4_all_rotatedN_scores %>%
+  multi_boot(column = "MR3",
+             summary_groups = "condition",
+             summary_function = "mean_na",
+             statistics_functions = c("ci_lower_na", "mean_na", "ci_upper_na")) %>%
+  rename(F3_ci_lower = ci_lower_na, F3_mean = mean_na, F3_ci_upper = ci_upper_na)
+
+efa_d4_all_rotatedN_scores <- efa_d4_all_rotatedN_scores_F1 %>%
+  full_join(efa_d4_all_rotatedN_scores_F2) %>%
+  full_join(efa_d4_all_rotatedN_scores_F3)
+
+# remove extraneous variables
+rm(efa_d4_all_rotatedN_scores_F1, efa_d4_all_rotatedN_scores_F2, 
+   efa_d4_all_rotatedN_scores_F3)
+```
+
+```{r s4 efa plot F1 vs F2, echo = F, fig.width = 8, fig.height = 8}
+d4_f1f2 <- ggplot(aes(x = F1_mean, y = F2_mean, 
+                      label = condition, colour = condition),
+                  data = efa_d4_all_rotatedN_scores) +
+  geom_errorbar(aes(ymin = F2_ci_lower, ymax = F2_ci_upper), 
+                width = 0.01, alpha = 0.3, size = 0.5) +
+  geom_errorbarh(aes(xmin = F1_ci_lower, xmax = F1_ci_upper),
+                 height = 0.01, alpha = 0.3, size = 0.5) +
+  geom_point(size = 4) +
+  geom_text_repel(aes(label = condition), size = 6, segment.size = 0) +
+  # geom_dl(aes(label = condition), method = "smart.grid") +
+  # geom_text(aes(y = F2_mean + 0.05)) +
+  theme_bw() +
+  scale_color_manual(values = tol21rainbow) +
+#   scale_x_continuous(name = "Factor 1",
+#                      limits = c(0, 1),
+#                      breaks = c(0, 1)) +
+#   scale_y_continuous(name = "Factor 2",
+#                      limits = c(0, 1),
+#                      breaks = c(0, 1)) +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  labs(title = "Study 3: Average factor scores by character\n",
+       x = "\nFACTOR 1: Physiological",
+       y = "FACTOR 2: Social-emotional\n") #+
+  # xlim(-30, 30) +
+  # ylim(-30, 30)
+```
+
+```{r s4 efa plot F1 vs F3, echo = F, fig.width = 8, fig.height = 8}
+d4_f1f3 <- ggplot(aes(x = F1_mean, y = F3_mean, 
+                      label = condition, colour = condition),
+                  data = efa_d4_all_rotatedN_scores) +
+  geom_errorbar(aes(ymin = F3_ci_lower, ymax = F3_ci_upper), 
+                width = 0.01, alpha = 0.3, size = 0.5) +
+  geom_errorbarh(aes(xmin = F1_ci_lower, xmax = F1_ci_upper),
+                 height = 0.01, alpha = 0.3, size = 0.5) +
+  geom_point(size = 4) +
+  geom_text_repel(aes(label = condition), size = 6, segment.size = 0) +
+  # geom_dl(aes(label = condition), method = "smart.grid") +
+  # geom_text(aes(y = F3_mean + 0.05)) +
+  theme_bw() +
+  scale_color_manual(values = tol21rainbow) +
+#   scale_x_continuous(name = "Factor 1",
+#                      limits = c(0, 1),
+#                      breaks = c(0, 1)) +
+#   scale_y_continuous(name = "Factor 2",
+#                      limits = c(0, 1),
+#                      breaks = c(0, 1)) +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  labs(title = "Study 3: Average factor scores by character\n",
+       x = "\nFACTOR 1: Physiological",
+       y = "FACTOR 3: Perceptual-cognitive\n") #+
+  # xlim(-30, 30) +
+  # ylim(-30, 30)
+```
+
+```{r s4 efa plot F2 vs F3, echo = F, fig.width = 8, fig.height = 8}
+d4_f2f3 <- ggplot(aes(x = F2_mean, y = F3_mean, 
+                      label = condition, colour = condition),
+                  data = efa_d4_all_rotatedN_scores) +
+  geom_errorbar(aes(ymin = F3_ci_lower, ymax = F3_ci_upper), 
+                width = 0.01, alpha = 0.3, size = 0.5) +
+  geom_errorbarh(aes(xmin = F2_ci_lower, xmax = F2_ci_upper),
+                 height = 0.01, alpha = 0.3, size = 0.5) +
+  geom_point(size = 4) +
+  geom_text_repel(aes(label = condition), size = 6, segment.size = 0) +
+  # geom_dl(aes(label = condition), method = "smart.grid") +
+  # geom_text(aes(y = F3_mean + 0.05)) +
+  theme_bw() +
+  scale_color_manual(values = tol21rainbow) +
+#   scale_x_continuous(name = "Factor 1",
+#                      limits = c(0, 1),
+#                      breaks = c(0, 1)) +
+#   scale_y_continuous(name = "Factor 2",
+#                      limits = c(0, 1),
+#                      breaks = c(0, 1)) +
+  theme(text = element_text(size = 20),
+        legend.position = "none") +
+  labs(title = "Study 3: Average factor scores by character\n",
+       x = "\nFACTOR 2: Social-emotional",
+       y = "FACTOR 3: Perceptual-cognitive\n") #+
+  # xlim(-30, 30) +
+  # ylim(-30, 30)
+```
+
+```{r s4 plots, fig.width = 8, fig.height = 20}
+grid.arrange(d4_f1f2, d4_f1f3, d4_f2f3, ncol = 1)
+```
+
+# Big factor loadings table
+
+```{r all studies loadings table, echo = F}
+order1 <- loadings(fa.sort(efa_d1_all_rotatedN))[] %>%
+  data.frame() %>%
+  tibble::rownames_to_column(var = "mc") %>%
+  tibble::rownames_to_column(var = "order1") %>%
+  rename(s1_MR2 = MR2, s1_MR1 = MR1, s1_MR3 = MR3)
+
+s2 <- loadings(fa.sort(efa_d2_all_rotatedN))[] %>%
+  data.frame() %>%
+  tibble::rownames_to_column(var = "mc") %>%
+  rename(s2_MR2 = MR2, s2_MR1 = MR1, s2_MR3 = MR3)
+
+s3 <- loadings(fa.sort(efa_d3_all_rotatedN))[] %>%
+  data.frame() %>%
+  tibble::rownames_to_column(var = "mc") %>%
+  rename(s3_MR2 = MR2, s3_MR1 = MR1, s3_MR3 = MR3)
+
+s4 <- loadings(fa.sort(efa_d4_all_rotatedN))[] %>%
+  data.frame() %>%
+  tibble::rownames_to_column(var = "mc") %>%
+  rename(s4_MR2 = MR2, s4_MR1 = MR1, s4_MR3 = MR3)
+
+bigTable <- order1 %>%
+  # full_join(s2) %>%
+  full_join(s3) %>%
+  full_join(s4)
+
+# remove extraneous variables
+rm(order1, s2, s3, s4)
+
+kable(bigTable, digits = 2)
+```
+
+
