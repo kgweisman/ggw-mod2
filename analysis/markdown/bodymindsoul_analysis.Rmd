@@ -296,8 +296,9 @@ cleanup <- function(datasource) {
       mutate(condition = factor(ifelse(
         grepl("vegetative", as.character(condition)), "pvs",
         ifelse(grepl("blue", as.character(condition)), "bluejay",
-               as.character(condition)))))
-    
+               ifelse(grepl("chimp", as.character(condition)), "chimp",
+                      as.character(condition))))))
+
     # recode background and demographic variables
     d_clean <- d_clean_2 %>%
       mutate( # deal with study number
@@ -1334,7 +1335,7 @@ char_plotting <- char_ratings %>%
            happy = "feeling happy", morality = "telling right from wrong",
            thoughts = "having thoughts", self_restraint = "exercising self-restraint",
            remembering = "remembering things", recognizing = "recognizing others",
-           temperatures = "sensing temperatures", communicating = "communicating ...",
+           temperature = "sensing temperatures", communicating = "communicating ...",
            goal = "working toward a goal", depth = "perceiving depth",
            sounds = "detecting sounds", seeing = "seeing things",
            choices = "making choices", reasoning = "reasoning about things"))) %>%
@@ -1343,7 +1344,7 @@ char_plotting <- char_ratings %>%
                             levels = c("stapler", "car", "computer", "robot", 
                                        "microbe", "beetle", "fish", "bluejay", 
                                        "frog", "mouse", "goat", "dog", 
-                                       "bear", "dolphin", "elephant", "chimpanzee", 
+                                       "bear", "dolphin", "elephant", "chimp", 
                                        "fetus", "pvs", "infant", "child", "adult")))
 
 # merge with loadings, orderings, and dominant factors from each study 
@@ -1448,20 +1449,21 @@ fig2_pal <- c(rep(myPalette["MIND"],
                                                     fig2_plotting$s1_factor == "BODY"])))
 
 # plot! (ordered by study 1 factor loadings)
+facetLabs_2 <- gsub(" \\(", "\n(", facetLabs)
 fig2 <- ggplot(fig2_plotting, 
                aes(x = mean, y = reorder(wording, desc(s1_order)), colour = s1_color)) +
   geom_point(stat = "identity", position = "identity", size = 4) +
   geom_errorbarh(aes(xmin = ci_lower, xmax = ci_upper), height = 0.4) +
   facet_wrap(~ condition, ncol = 6,
-             labeller = labeller(condition = facetLabs)) +
+             labeller = labeller(condition = facetLabs_2)) +
   theme_bw() +
-  theme(text = element_text(size = 14),
+  theme(text = element_text(size = 16),
         axis.title.y = element_blank(),
         axis.text.y = element_text(face = "italic",
                                    colour = fig2_pal),
         panel.grid.minor = element_blank(),
         legend.position = "none") +
-  scale_x_continuous(name = "Mean rating",
+  scale_x_continuous(name = "\nMean rating",
                      limits = c(-3, 3),
                      breaks = seq(-3, 3, 1),
                      labels = seq(0, 6, 1)) +
@@ -1475,7 +1477,7 @@ fig2
 
 Mean ratings of 40 mental capacities for all 21 entities included in Study 4. Participants responded on a scale from 0 (Not at all capable) to 6 (Highly capable). Error bars are nonparametric bootstrapped 95% confidence intervals. Mental capacities are grouped according to their dominant factor loading in Study 4.
 
-```{r figure S1, message = F, warning = F, echo = F, fig.width = 27, fig.height = 15}
+```{r figure S1, message = F, warning = F, echo = F, fig.width = 27, fig.height = 20}
 # include all 21 conditions
 figS1_plotting <- char_plotting 
 
@@ -1499,13 +1501,13 @@ figS1 <- ggplot(figS1_plotting,
   facet_wrap(~ condition, ncol = 21,
              labeller = labeller(condition = facetLabs_S1)) +
   theme_bw() +
-  theme(text = element_text(size = 21),
+  theme(text = element_text(size = 24),
         axis.title.y = element_blank(),
         axis.text.y = element_text(face = "italic",
                                    colour = figS1_pal),
         panel.grid.minor = element_blank(),
         legend.position = "none") +
-  scale_x_continuous(name = "Mean rating",
+  scale_x_continuous(name = "\nMean rating",
                      limits = c(-3, 3),
                      breaks = seq(-3, 3, 1),
                      labels = seq(0, 6, 1)) +
