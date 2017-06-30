@@ -1,15 +1,18 @@
 ---
-title: 'Body, Heart, & Mind (Weisman, Dweck, & Markman, submitted)'
+title: "Body, Heart, & Mind (Weisman, Dweck, & Markman, submitted)"
 output:
   html_notebook:
     theme: flatly
+    toc: yes
+  html_document:
     toc: yes
   pdf_document:
     toc: yes
 ---
 
 ```{r global_options, include = FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
+                      fig.width = 10, fig.height = 30)
 ```
 
 # Setup
@@ -897,15 +900,15 @@ For all studies we conduct exploratory factor analyses using Pearson correlation
 
 For each study, we first examine maximal unrotated and rotated solutions. To determine the maximum number of factors to extract, we use the following rule of thumb: With $p$ observations per participant, we can extract a maximum of $k$ factors, where $(p-k)*2 > p+k$, i.e., $k < p/3$. Thus, with 40 mental capacity items, we can extract a maximum of 13 factors.
 
-To determine how many factors to retain, we use the following preset retention criteria, considering the unrotated maximal solution:
+To determine how many factors to retain, we use the following preset retention criteria, considering the unrotated maximal solution (unless otherwise noted):
 
   - Each factor must have an eigenvalue >1.0.
   - Each factor must individually account for >5% of the total variance in the maximal model.
-  - Each factor must be the dominant factor (i.e., the factor with the highest factor loading) for ≥1 mental capacity item.
+  - After rotation, each factor must be the dominant factor (i.e., the factor with the highest factor loading) for ≥1 mental capacity item.
 
 We then examine and interpret varimax-rotated solutions, extracting only the number of factors that meet these criteria.
 
-*Note*: For Studies 1-2, we initially planned to conduct dimension reduction analyses for each condition (beetle vs. robot) separately. However, we now consider this analysis plan to have been fundamentally flawed: Each of these separate analyses is only capable of surfacing factors that highlight substantial disagreement among participants within that condition thus failing to capture key differences in attributions of mental capacities to beetles vs. robots, with no formal means of synthesizing results across conditions. Nonetheless, the results of these analyses are generally consistent with the findings reported here: The most prominent and reliable finding within each condition is that participants distinguish between emotional and perceptual varieties of experience. See <a href="https://osf.io/zd3mu", target="blank">https://osf.io/zd3mu</a> for the preregistered analyses, included analysis scripts.
+*Note*: For Studies 1-2, we initially planned to conduct dimension reduction analyses for each condition (beetle vs. robot) separately. However, we now consider this analysis plan to have been fundamentally flawed: Each of these separate analyses is only capable of surfacing factors that highlight substantial disagreement among participants within that condition thus failing to capture key differences in attributions of mental capacities to beetles vs. robots, with no formal means of synthesizing results across conditions. Nonetheless, the results of these analyses are generally consistent with the findings reported here: The most prominent and reliable finding within each condition is that participants distinguish between emotional and perceptual varieties of experience. See <a href="https://osf.io/zd3mu", target="blank">https://osf.io/zd3mu</a> for the preregistered analyses, including analysis scripts.
 
 # Study 1
 
@@ -956,6 +959,9 @@ efa_d1_all_unrotated_nfactors
 ```
 
 ```{r s1 all rotation}
+efa_d1_all_rotated_max <- fa(d1_all, 13, rotate = chosenRotType,
+                           cor = chosenCorType, fm = "minres")
+
 efa_d1_all_rotated <- fa(d1_all, efa_d1_all_unrotated_nfactors, rotate = chosenRotType,
                            cor = chosenCorType, fm = "minres")
 
@@ -1056,6 +1062,9 @@ efa_d2_all_unrotated_nfactors
 ```
 
 ```{r s2 all rotation}
+efa_d2_all_rotated_max <- fa(d2_all, 13, rotate = chosenRotType,
+                           cor = chosenCorType, fm = "minres")
+
 efa_d2_all_rotated <- fa(d2_all, efa_d2_all_unrotated_nfactors, rotate = chosenRotType,
                            cor = chosenCorType, fm = "minres")
 
@@ -1156,6 +1165,9 @@ efa_d3_all_unrotated_nfactors
 ```
 
 ```{r s3 all rotation}
+efa_d3_all_rotated_max <- fa(d3_all, 13, rotate = chosenRotType,
+                           cor = chosenCorType, fm = "minres")
+
 efa_d3_all_rotated <- fa(d3_all, efa_d3_all_unrotated_nfactors, rotate = chosenRotType,
                            cor = chosenCorType, fm = "minres")
 
@@ -1256,6 +1268,9 @@ efa_d4_all_unrotated_nfactors
 ```
 
 ```{r s4 all rotation}
+efa_d4_all_rotated_max <- fa(d4_all, 13, rotate = chosenRotType,
+                           cor = chosenCorType, fm = "minres")
+
 efa_d4_all_rotated <- fa(d4_all, efa_d4_all_unrotated_nfactors, rotate = chosenRotType,
                            cor = chosenCorType, fm = "minres")
 
@@ -1287,7 +1302,7 @@ nfactors_d4_all
 
 ```{r s4 all varimax rotation}
 # run EFA with rotation with N factors
-efa_d4_all_rotatedN <- fa(d4_all, 4, 
+efa_d4_all_rotatedN <- fa(d4_all, nfactors_d4_all, 
                           rotate = chosenRotType, cor = chosenCorType, fm = "minres")
 print(efa_d4_all_rotatedN)
 
@@ -1557,7 +1572,7 @@ palette_s4 <- c(rep(myPalette["MIND"], palette_base %>% filter(s4_factor == "MIN
 
 Mean ratings of 40 mental capacities for a subset of the 21 entities included in Study 4. (See Fig. S5 for mean ratings for the full set of entities.) Participants responded on a scale from 0 (Not at all capable) to 6 (Highly capable). Error bars are nonparametric bootstrapped 95% confidence intervals. Mental capacities are grouped according to their dominant factor loading in Study 1. *Doing computations* was the only item to load negatively on its dominant factor in any study (and did so in Studies 1-3); in Study 4, it loaded positively on its dominant factor (Factor 2, “heart”).
 
-```{r figure 1, fig.width = 18, fig.height = 10}
+```{r figure 1}
 # make dataframe
 s4_subset_plotting <- char_plotting %>% 
   filter(study == "study 4",
@@ -1567,12 +1582,12 @@ s4_subset_plotting <- char_plotting %>%
 # plot! (ordered by study 1 factor loadings)
 s4_subset <- ggplot(s4_subset_plotting, 
                aes(x = mean, y = reorder(wording, desc(s1_order)), colour = s1_color)) +
-  geom_point(stat = "identity", position = "identity", size = 4) +
+  geom_point(stat = "identity", position = "identity", size = 2) +
   geom_errorbarh(aes(xmin = ci_lower, xmax = ci_upper), height = 0.4) +
   facet_wrap(~ condition, ncol = 6,
              labeller = labeller(condition = facetLabs_s4)) +
   theme_bw() +
-  theme(text = element_text(size = 16),
+  theme(text = element_text(size = 9),
         axis.title.y = element_blank(),
         axis.text.y = element_text(face = "italic",
                                    colour = palette_s1),
@@ -1666,7 +1681,7 @@ figS1
 
 Mean ratings of 40 mental capacities for the 2 entities included in Studies 1-3. Participants responded on a scale from 0 (Not at all capable) to 6 (Highly capable). Error bars are nonparametric bootstrapped 95% confidence intervals. Mental capacities are grouped according to their dominant factor loading in Study 1.
 
-```{r figure S2, fig.width = 27, fig.height = 20}
+```{r figure S2}
 # make dataframe
 s123_plotting <- char_plotting %>% 
   filter(study != "study 4") %>%
@@ -1690,7 +1705,7 @@ s123 <- ggplot(s123_plotting,
                       type = "qual", palette = 6,
                       guide = FALSE) +
   coord_flip() +
-  theme(text = element_text(size = 16),
+  theme(text = element_text(size = 9),
       axis.title.y = element_blank(),
       axis.text.y = element_text(face = "italic",
                                  colour = palette_s1),
@@ -1704,7 +1719,7 @@ s123
 
 Mean ratings of 40 mental capacities for all 21 entities included in Study 4. Participants responded on a scale from 0 (Not at all capable) to 6 (Highly capable). Error bars are nonparametric bootstrapped 95% confidence intervals. Mental capacities are grouped according to their dominant factor loading in Study 4.
 
-```{r figure S3, fig.width = 27, fig.height = 20}
+```{r figure S3}
 # make dataframe
 s4_plotting <- char_plotting %>% 
   filter(study == "study 4") %>%
@@ -1713,12 +1728,12 @@ s4_plotting <- char_plotting %>%
 # plot! (ordered by study 4 factor loadings)
 s4 <- ggplot(s4_plotting, 
                aes(x = mean, y = reorder(wording, desc(s4_order)), colour = s4_color)) +
-  geom_point(stat = "identity", position = "identity", size = 4) +
-  geom_errorbarh(aes(xmin = ci_lower, xmax = ci_upper), height = 0.4) +
+  geom_point(stat = "identity", position = "identity", size = 1) +
+  geom_errorbarh(aes(xmin = ci_lower, xmax = ci_upper), height = 0.01) +
   facet_wrap(~ condition, ncol = 21,
              labeller = labeller(condition = facetLabs_s4)) +
   theme_bw() +
-  theme(text = element_text(size = 16),
+  theme(text = element_text(size = 6),
         axis.title.y = element_blank(),
         axis.text.y = element_text(face = "italic",
                                    colour = palette_s4),
@@ -1732,42 +1747,5 @@ s4 <- ggplot(s4_plotting,
                       type = "qual", palette = 6)
 
 s4
-```
-
-## Figure S7 (supporting materials)
-
-Mean ratings of 40 mental capacities for all of the entities included in Studies 1-4. Participants responded on a scale from 0 (Not at all capable) to 6 (Highly capable). Error bars are nonparametric bootstrapped 95% confidence intervals. Mental capacities are grouped according to their dominant factor loading in Study 1.
-
-```{r figure S7, fig.width = 27, fig.height = 40}
-# make dataframe
-s1234_plotting <- char_plotting %>% 
-  distinct()
-
-# plot! (ordered by study 3 factor loadings)
-s1234 <- ggplot(s1234_plotting, 
-               aes(y = mean, x = reorder(wording, desc(s1_order)), colour = s1_color,
-                   shape = study)) +
-  geom_point(stat = "identity", position = position_dodge(width = 0.6), size = 2) +
-  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.4,
-                position = position_dodge(width = 0.6)) +
-  facet_wrap(~ condition, ncol = 11) +
-  theme_bw() +
-  scale_y_continuous(name = "\nMean rating",
-                     limits = c(-3, 3),
-                     breaks = seq(-3, 3, 1),
-                     labels = seq(0, 6, 1)) +
-  scale_shape_discrete(name = "Study:") +
-  scale_colour_brewer(name = "Factor:",
-                      type = "qual", palette = 6,
-                      guide = FALSE) +
-  coord_flip() +
-  theme(text = element_text(size = 16),
-      axis.title.y = element_blank(),
-      axis.text.y = element_text(face = "italic",
-                                 colour = palette_s1),
-      panel.grid.minor = element_blank(),
-      legend.position = "bottom")
-
-s1234
 ```
 
