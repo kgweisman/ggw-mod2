@@ -841,7 +841,7 @@ data.frame("conditionsExcluded" = chosenExclude,
 
 # Data preparation
 
-```{r data upload}
+```{r data upload, include = F}
 # study 1 (2015-12-15, 2 conditions, between-subjects)
 d_raw_study1 <- read.csv("https://osf.io/29vng/download") %>%
   mutate(study = "study 1")

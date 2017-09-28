@@ -1,8 +1,10 @@
 name: Document
 title:
+username:
 account: rpubs
 server: rpubs.com
-appId: https://api.rpubs.com/api/v1/document/288306/0af6aefc9aac4b64b76b185369781e3b
-bundleId: https://api.rpubs.com/api/v1/document/288306/0af6aefc9aac4b64b76b185369781e3b
-url: http://rpubs.com/publish/claim/288306/8631af1d4f624029b20c234d4f1bb17b
-when: 1498795850.00649
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/313202/9057cef9efe14c20b5bb03b5a27283c4
+bundleId: https://api.rpubs.com/api/v1/document/313202/9057cef9efe14c20b5bb03b5a27283c4
+url: http://rpubs.com/publish/claim/313202/57a67d7f22774bc3ba8b4b4b71b8bb68
+when: 1506636490.41001
