@@ -22,6 +22,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
 library(tidyverse)
 library(psych)
 library(langcog) # source: https://github.com/langcog/langcog
+library(rms)
 library(scatterplot3d)
 library(lattice)
 library(directlabels)
@@ -29,16 +30,11 @@ library(plotly)
 library(RColorBrewer)
 
 # clear workspace
-rm(list = ls(all = T))
-graphics.off()
+# rm(list = ls(all = T))
+# graphics.off()
 ```
 
 ```{r functions}
-# make na.rm = T versions of summary functions
-mean_na <- function(x) {mean(x, na.rm = T)}
-ci_lower_na <- function(x) {quantile(x, 0.025, na.rm = T)}
-ci_upper_na <- function(x) {quantile(x, 0.975, na.rm = T)}
-
 # make rounding function
 round2 <- function(x) {format(round(x, 2), nsmall = 2)}
 
@@ -848,19 +844,19 @@ data.frame("conditionsExcluded" = chosenExclude,
 
 ```{r data upload}
 # study 1 (2015-12-15, 2 conditions, between-subjects)
-d_raw_study1 <- read.csv("http://stanford.edu/~kweisman/experiments/bodyheartmind/bodyheartmind_study1.csv") %>%
+d_raw_study1 <- read.csv("https://osf.io/29vng/download") %>%
   mutate(study = "study 1")
 
 # study 2 (2016-01-12, 2 conditions, between-subjects - REPLICATION)
-d_raw_study2 <- read.csv("http://stanford.edu/~kweisman/experiments/bodyheartmind/bodyheartmind_study2.csv") %>%
+d_raw_study2 <- read.csv("https://osf.io/g76hj/download") %>%
   mutate(study = "study 2")
 
 # study 3 (2016-01-10, 2 conditions, within-subjects)
-d_raw_study3 <- read.csv("http://stanford.edu/~kweisman/experiments/bodyheartmind/bodyheartmind_study3.csv") %>%
+d_raw_study3 <- read.csv("https://osf.io/epykf/download") %>%
   mutate(study = "study 3")
 
 # study 4 (2016-01-14, 21 conditions, between-subjects)
-d_raw_study4 <- read.csv("http://stanford.edu/~kweisman/experiments/bodyheartmind/bodyheartmind_study4.csv") %>%
+d_raw_study4 <- read.csv("https://osf.io/kdzge/download") %>%
   mutate(study = "study 4")
 ```
 
@@ -938,7 +934,7 @@ demoReligion("study 1")
 
 ```{r s1 all no rotation}
 # examine scree plot
-fa.parallel(d1_all)
+# fa.parallel(d1_all)
 
 # run EFA without rotation with N factors
 efa_d1_all_unrotated <- fa(d1_all, 13, rotate = "none",
@@ -1041,7 +1037,7 @@ demoReligion("study 2")
 
 ```{r s2 all no rotation}
 # examine scree plot
-fa.parallel(d2_all)
+# fa.parallel(d2_all)
 
 # run EFA without rotation with N factors
 efa_d2_all_unrotated <- fa(d2_all, 13, rotate = "none",
@@ -1144,7 +1140,7 @@ demoReligion("study 3")
 
 ```{r s3 all no rotation}
 # examine scree plot
-fa.parallel(d3_all)
+# fa.parallel(d3_all)
 
 # run EFA without rotation with N factors
 efa_d3_all_unrotated <- fa(d3_all, 13, rotate = "none",
@@ -1247,7 +1243,7 @@ demoEducation("study 4")
 
 ```{r s4 all no rotation}
 # examine scree plot
-fa.parallel(d4_all)
+# fa.parallel(d4_all)
 
 # run EFA without rotation with N factors
 efa_d4_all_unrotated <- fa(d4_all, 13, rotate = "none",
@@ -1365,10 +1361,8 @@ char_plotting_ratings_s1 <- d1 %>%
   select(condition, subid, happy:pride) %>%
   gather(mc, response, -subid, -condition) %>%
   mutate(response = as.numeric(response)) %>%
-  multi_boot(column = "response",
-             summary_function = "mean",
-             summary_groups = c("condition", "mc"),
-             statistics_functions = c("ci_lower", "mean", "ci_upper")) %>%
+  group_by(condition, mc) %>%
+  do(data.frame(rbind(smean.cl.boot(.$response)))) %>%
   full_join(demoSampleSize("study 1") %>% filter(condition != "all")) %>%
   mutate(study = "study 1")
 
@@ -1377,10 +1371,8 @@ char_plotting_ratings_s2 <- d2 %>%
   select(condition, subid, happy:pride) %>%
   gather(mc, response, -subid, -condition) %>%
   mutate(response = as.numeric(response)) %>%
-  multi_boot(column = "response",
-             summary_function = "mean",
-             summary_groups = c("condition", "mc"),
-             statistics_functions = c("ci_lower", "mean", "ci_upper")) %>%
+  group_by(condition, mc) %>%
+  do(data.frame(rbind(smean.cl.boot(.$response)))) %>%
   full_join(demoSampleSize("study 2") %>% filter(condition != "all")) %>%
   mutate(study = "study 2")
 
@@ -1391,10 +1383,8 @@ char_plotting_ratings_s3 <- d3 %>%
   rename(condition = target) %>%
   gather(mc, response, -subid, -condition) %>%
   mutate(response = as.numeric(response)) %>%
-  multi_boot(column = "response",
-             summary_function = "mean",
-             summary_groups = c("condition", "mc"),
-             statistics_functions = c("ci_lower", "mean", "ci_upper")) %>%
+  group_by(condition, mc) %>%
+  do(data.frame(rbind(smean.cl.boot(.$response)))) %>%
   full_join(demoSampleSize("study 3") %>% filter(condition != "all")) %>%
   mutate(study = "study 3")
 
@@ -1403,10 +1393,8 @@ char_plotting_ratings_s4 <- d4 %>%
   select(condition, subid, happy:pride) %>%
   gather(mc, response, -subid, -condition) %>%
   mutate(response = as.numeric(response)) %>%
-  multi_boot(column = "response",
-             summary_function = "mean",
-             summary_groups = c("condition", "mc"),
-             statistics_functions = c("ci_lower", "mean", "ci_upper")) %>%
+  group_by(condition, mc) %>%
+  do(data.frame(rbind(smean.cl.boot(.$response)))) %>%
   full_join(demoSampleSize("study 4") %>% filter(condition != "all")) %>%
   mutate(study = "study 4")
 ```
@@ -1581,9 +1569,9 @@ s4_subset_plotting <- char_plotting %>%
 
 # plot! (ordered by study 1 factor loadings)
 s4_subset <- ggplot(s4_subset_plotting, 
-               aes(x = mean, y = reorder(wording, desc(s1_order)), colour = s1_color)) +
+               aes(x = Mean, y = reorder(wording, desc(s1_order)), colour = s1_color)) +
   geom_point(stat = "identity", position = "identity", size = 2) +
-  geom_errorbarh(aes(xmin = ci_lower, xmax = ci_upper), height = 0.4) +
+  geom_errorbarh(aes(xmin = Lower, xmax = Upper), height = 0.4) +
   facet_wrap(~ condition, ncol = 6,
              labeller = labeller(condition = facetLabs_s4)) +
   theme_bw() +
@@ -1665,14 +1653,15 @@ scatter_plotting <- loadings(efa_d1_all_rotatedN)[] %>%
                                  NA))))
 
 # plot!
-figS1 <- plot_ly(scatter_plotting, x = HEART, y = BODY, z = MIND,
-             type = "scatter3d",
-             color = dominant, colors = c("#4daf4a", "#e41a1c", "#377eb8"),
-             marker = list(size = 4),
-             text = short,
-             textfont = list(size = 15),
-             mode = "text+markers",
-             showlegend = TRUE)
+figS1 <- plot_ly(data = scatter_plotting, 
+                 x = ~HEART, y = ~BODY, z = ~MIND,
+                 type = "scatter3d",
+                 color = ~dominant, colors = c("#4daf4a", "#e41a1c", "#377eb8"),
+                 marker = list(size = 4),
+                 text = ~short,
+                 textfont = list(size = 15),
+                 mode = "text+markers",
+                 showlegend = TRUE)
 
 figS1
 ```
@@ -1689,10 +1678,10 @@ s123_plotting <- char_plotting %>%
 
 # plot! (ordered by study 3 factor loadings)
 s123 <- ggplot(s123_plotting, 
-               aes(y = mean, x = reorder(wording, desc(s1_order)), colour = s1_color,
+               aes(y = Mean, x = reorder(wording, desc(s1_order)), colour = s1_color,
                    shape = study)) +
   geom_point(stat = "identity", position = position_dodge(width = 0.6), size = 2) +
-  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.4,
+  geom_errorbar(aes(ymin = Lower, ymax = Upper), width = 0.4,
                 position = position_dodge(width = 0.6)) +
   facet_wrap(~ condition) +
   theme_bw() +
@@ -1727,9 +1716,9 @@ s4_plotting <- char_plotting %>%
 
 # plot! (ordered by study 4 factor loadings)
 s4 <- ggplot(s4_plotting, 
-               aes(x = mean, y = reorder(wording, desc(s4_order)), colour = s4_color)) +
+               aes(x = Mean, y = reorder(wording, desc(s4_order)), colour = s4_color)) +
   geom_point(stat = "identity", position = "identity", size = 1) +
-  geom_errorbarh(aes(xmin = ci_lower, xmax = ci_upper), height = 0.01) +
+  geom_errorbarh(aes(xmin = Lower, xmax = Upper), height = 0.01) +
   facet_wrap(~ condition, ncol = 21,
              labeller = labeller(condition = facetLabs_s4)) +
   theme_bw() +
