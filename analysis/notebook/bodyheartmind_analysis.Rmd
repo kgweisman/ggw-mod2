@@ -940,7 +940,9 @@ demoReligion("study 1")
 efa_d1_all_unrotated <- fa(d1_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d1_all_unrotated)
+```
 
+```{r s1 how many factors, include = F}
 # examine eigenvalues and variance explained
 efa_d1_all_unrotated_eigenvalues <- print(efa_d1_all_unrotated)$Vaccounted %>%
   t() %>%
@@ -1043,7 +1045,9 @@ demoReligion("study 2")
 efa_d2_all_unrotated <- fa(d2_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d2_all_unrotated)
+```
 
+```{r s2 how many factors, include = F}
 # examine eigenvalues and variance explained
 efa_d2_all_unrotated_eigenvalues <- print(efa_d2_all_unrotated)$Vaccounted %>%
   t() %>%
@@ -1146,7 +1150,9 @@ demoReligion("study 3")
 efa_d3_all_unrotated <- fa(d3_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d3_all_unrotated)
+```
 
+```{r s3 how many factors, include = F}
 # examine eigenvalues and variance explained
 efa_d3_all_unrotated_eigenvalues <- print(efa_d3_all_unrotated)$Vaccounted %>%
   t() %>%
@@ -1249,7 +1255,9 @@ demoEducation("study 4")
 efa_d4_all_unrotated <- fa(d4_all, 13, rotate = "none",
                            cor = chosenCorType, fm = "minres")
 print(efa_d4_all_unrotated)
+```
 
+```{r s4 how many factors, include = F}
 # examine eigenvalues and variance explained
 efa_d4_all_unrotated_eigenvalues <- print(efa_d4_all_unrotated)$Vaccounted %>%
   t() %>%
