@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/313202/9057cef9efe14c20b5bb03b5a27283c4
+bundleId: https://api.rpubs.com/api/v1/document/313202/9057cef9efe14c20b5bb03b5a27283c4
+url: http://rpubs.com/kgweisman/313202
+when: 1506707600.31265
