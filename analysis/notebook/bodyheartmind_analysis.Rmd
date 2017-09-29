@@ -1332,22 +1332,22 @@ order_s1 <- loadings(fa.sort(efa_d1_all_rotatedN))[] %>%
   data.frame() %>%
   rownames_to_column(var = "mc") %>%
   rownames_to_column(var = "order1") %>%
-  rename(s1_MR2 = MR2, s1_MR1 = MR1, s1_MR3 = MR3)
+  rename(s1_MR1 = MR1, s1_MR2 = MR2, s1_MR3 = MR3)
 
 order_s2 <- loadings(fa.sort(efa_d2_all_rotatedN))[] %>%
   data.frame() %>%
   rownames_to_column(var = "mc") %>%
-  rename(s2_MR2 = MR2, s2_MR1 = MR1, s2_MR3 = MR3)
+  rename(s2_MR1 = MR1, s2_MR2 = MR2, s2_MR3 = MR3)
 
 order_s3 <- loadings(fa.sort(efa_d3_all_rotatedN))[] %>%
   data.frame() %>%
   rownames_to_column(var = "mc") %>%
-  rename(s3_MR2 = MR2, s3_MR1 = MR1, s3_MR3 = MR3)
+  rename(s3_MR1 = MR3, s3_MR2 = MR1, s3_MR3 = MR2) # note discrepancy
 
 order_s4 <- loadings(fa.sort(efa_d4_all_rotatedN))[] %>%
   data.frame() %>%
   rownames_to_column(var = "mc") %>%
-  rename(s4_MR2 = MR2, s4_MR1 = MR1, s4_MR3 = MR3)
+  rename(s4_MR1 = MR1, s4_MR2 = MR2, s4_MR3 = MR3)
 
 bigTable <- order_s1 %>%
   full_join(order_s2) %>%
