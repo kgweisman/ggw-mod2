@@ -10,13 +10,13 @@ output:
     toc: yes
 ---
 
-```{r global_options, include = FALSE}
+```{r global_options, include = F}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 # Setup
 
-```{r workspace setup}
+```{r workspace setup, include = F}
 # load libraries
 library(tidyverse)
 library(psych)
@@ -33,7 +33,7 @@ library(RColorBrewer)
 # graphics.off()
 ```
 
-```{r functions}
+```{r functions, include = F}
 # make rounding function
 round2 <- function(x) {format(round(x, 2), nsmall = 2)}
 
@@ -859,7 +859,7 @@ d_raw_study4 <- read.csv("https://osf.io/kdzge/download") %>%
   mutate(study = "study 4")
 ```
 
-```{r data cleanup}
+```{r data cleanup, include = F, warnings = F, echo = F}
 # clean up datasets
 d1 <- cleanup("study 1")
 d2 <- cleanup("study 2")
@@ -867,7 +867,7 @@ d3 <- cleanup("study 3")
 d4 <- cleanup("study 4")
 ```
 
-```{r dataframes for dimension reducation}
+```{r dataframes for dimension reducation, include = F}
 # make dataframes for s1
 # d1_beetle <- makeDRDF("study 1", "beetle")
 # d1_robot <- makeDRDF("study 1", "robot")
@@ -1449,7 +1449,6 @@ char_plotting_wordings <- char_plotting_ratings_all %>%
            sounds = "detecting sounds", seeing = "seeing things",
            choices = "making choices", reasoning = "reasoning about things")))
 ```
-
 
 ```{r plotting setup loadings, include = F}
 # merge with loadings, orderings, and dominant factors from each study 
