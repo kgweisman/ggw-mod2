@@ -1659,16 +1659,14 @@ scatter_plotting <- loadings(efa_d1_all_rotatedN)[] %>%
                                  NA))))
 
 # plot!
-figS1 <- plot_ly(data = scatter_plotting, 
+figS1 <- plot_ly(data = scatter_plotting,
                  x = ~HEART, y = ~BODY, z = ~MIND,
-                 type = "scatter3d",
+                 type = 'scatter3d',
+                 mode = 'markers',
+                 marker = list(opacity = 0.8, size = 6),
+                 hoverinfo = 'text',
                  color = ~dominant, colors = c("#e41a1c", "#377eb8", "#4daf4a"),
-                 marker = list(size = 4),
-                 text = ~short,
-                 textfont = list(size = 15),
-                 mode = "text+markers",
-                 showlegend = TRUE)
-
+                 text = ~wording)
 figS1
 ```
 
